@@ -1,0 +1,127 @@
+options {
+	STATIC = false ;
+}
+
+
+
+
+PARSER_BEGIN(GepardParser)
+package parser;
+public class GepardParser {
+		public static void main(String args[]) throws Exception {
+			GepardParser parser = new GepardParser(System.in);
+			System.out.println(parser.CreateTable());
+		}
+}
+PARSER_END(GepardParser)
+
+
+
+
+/* ================ Tokens Start ============== */
+
+// Skip Tokens
+SKIP : { " " | "\r" | "\n" | "\t"}
+
+
+
+
+// DDL Tokens
+TOKEN : { < CREATE : "CREATE" | "create" > }
+TOKEN : { < TABLE : "TABLE" | "table" > }
+TOKEN : { < INTEGER : "INTEGER" > }
+TOKEN : { < VARCHAR : "VARCHAR"> }
+TOKEN : { < CONSTRAINT : "CONSTRAINT" | "constraint"> }
+TOKEN : { < PRIMARYKEY : "PRIMARY KEY" | "primary key"> }
+TOKEN : { < UNIQUE : "UNIQUE" | "unique"> }
+TOKEN : { < HORIZONTAL : "HORIZONTAL" | "horizontal"> }
+
+
+
+
+// DML Tokens
+
+
+
+
+// Special Character Tokens
+TOKEN : { < LPAREN : "(" > }
+TOKEN : { < RPAREN : ")" > }
+TOKEN : { < SEMICOLON : ";" > }
+TOKEN : { < COMMA : "," > }
+
+
+
+// Select Tokens
+
+
+
+// Literal Tokens
+TOKEN : { < DIGIT : ["0"-"9"] > }
+TOKEN : { < LETTER : ["a"-"z","A"-"Z"] > }
+TOKEN : { < SYMBOL : "_" | "-" > }
+
+/* ================ Tokens End ============== */
+
+/* ================ Rules Start ============== */
+
+// DDL Statement
+int CreateTable() : {int queryType;}
+{
+	<CREATE><TABLE>Name()<LPAREN>TableColumn()(<COMMA>(TableColumn()|TableConstraint()))*<RPAREN>queryType=PartitionedOrNonPartitioned(){return queryType;}
+}
+int PartitionedOrNonPartitioned() : {}
+{
+	CreateTableNonPartitioned(){return 1;}|CreateTablePartitioned(){return 2;}
+}
+void CreateTableNonPartitioned() : {}
+{
+	<SEMICOLON>
+}
+void CreateTablePartitioned() : {}
+{
+	HorizontalSyntax()
+}
+void HorizontalSyntax() : {}
+{
+	<HORIZONTAL><LPAREN>Name()<LPAREN>ListOfBoundaries()<RPAREN><RPAREN><SEMICOLON>
+}
+void ListOfBoundaries() : {}
+{
+	(<DIGIT>)+(<COMMA>(<DIGIT>)+)*
+}
+void TableColumn() : {}
+{
+	Name()(<INTEGER>|(<VARCHAR><LPAREN>(<DIGIT>)+<RPAREN>))
+}
+void TableConstraint() : {}
+{
+	<CONSTRAINT>Name()(<PRIMARYKEY>|<UNIQUE>)<LPAREN>Name()<RPAREN>
+}
+
+
+
+
+
+// Drop Statement
+
+
+
+
+// Select Statement
+
+
+
+
+// DML Statement
+
+
+
+
+// General Semantics
+void Name() : {}
+{
+	<LETTER>(<LETTER>|<DIGIT>|<SYMBOL>)*
+}
+
+/* ================ Rules End ============== */
