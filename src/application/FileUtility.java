@@ -27,7 +27,7 @@ public class FileUtility {
 		String message = "Only SQL Dump (.sql) file is accepted.\nDo you want to try again!";
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			scriptFile = jfc.getSelectedFile();
-			if (!(scriptFile != null && scriptFile.getAbsolutePath().endsWith(".sql"))) {
+			if (!(scriptFile != null && scriptFile.getAbsolutePath().toLowerCase().endsWith(".sql"))) {
 				int selectedOption = JOptionPane.showConfirmDialog(null, message, "Choose", JOptionPane.YES_NO_OPTION);
 				if (selectedOption == JOptionPane.YES_OPTION) {
 					getFile();

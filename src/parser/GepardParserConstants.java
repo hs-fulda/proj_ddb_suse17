@@ -13,33 +13,39 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int CREATE = 5;
   /** RegularExpression Id. */
-  int TABLE = 6;
+  int DROP = 6;
   /** RegularExpression Id. */
-  int INTEGER = 7;
+  int TABLE = 7;
   /** RegularExpression Id. */
-  int VARCHAR = 8;
+  int INTEGER = 8;
   /** RegularExpression Id. */
-  int CONSTRAINT = 9;
+  int VARCHAR = 9;
   /** RegularExpression Id. */
-  int PRIMARYKEY = 10;
+  int CASCADE = 10;
   /** RegularExpression Id. */
-  int UNIQUE = 11;
+  int CONSTRAINT = 11;
   /** RegularExpression Id. */
-  int HORIZONTAL = 12;
+  int CONSTRAINTS = 12;
   /** RegularExpression Id. */
-  int LPAREN = 13;
+  int PRIMARYKEY = 13;
   /** RegularExpression Id. */
-  int RPAREN = 14;
+  int UNIQUE = 14;
   /** RegularExpression Id. */
-  int SEMICOLON = 15;
+  int HORIZONTAL = 15;
   /** RegularExpression Id. */
-  int COMMA = 16;
+  int LPAREN = 16;
   /** RegularExpression Id. */
-  int DIGIT = 17;
+  int RPAREN = 17;
   /** RegularExpression Id. */
-  int LETTER = 18;
+  int SEMICOLON = 18;
   /** RegularExpression Id. */
-  int SYMBOL = 19;
+  int COMMA = 19;
+  /** RegularExpression Id. */
+  int DIGIT = 20;
+  /** RegularExpression Id. */
+  int LETTER = 21;
+  /** RegularExpression Id. */
+  int SYMBOL = 22;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -52,10 +58,13 @@ public interface GepardParserConstants {
     "\"\\n\"",
     "\"\\t\"",
     "<CREATE>",
+    "<DROP>",
     "<TABLE>",
     "\"INTEGER\"",
     "\"VARCHAR\"",
+    "<CASCADE>",
     "<CONSTRAINT>",
+    "<CONSTRAINTS>",
     "<PRIMARYKEY>",
     "<UNIQUE>",
     "<HORIZONTAL>",

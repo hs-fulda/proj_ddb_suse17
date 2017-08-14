@@ -10,7 +10,28 @@ public class GepardParser implements GepardParserConstants {
 
 /* ================ Rules Start ============== */
 
+
+
 // DDL Statement
+  final public int parseDMLQuery() throws ParseException {
+                       int queryType;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case DROP:
+      queryType = DropTable();
+                              {if (true) return queryType;}
+      break;
+    case CREATE:
+      queryType = CreateTable();
+                                {if (true) return queryType;}
+      break;
+    default:
+      jj_la1[0] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   final public int CreateTable() throws ParseException {
                      int queryType;
     jj_consume_token(CREATE);
@@ -25,7 +46,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[0] = jj_gen;
+        jj_la1[1] = jj_gen;
         break label_1;
       }
       jj_consume_token(COMMA);
@@ -37,7 +58,7 @@ public class GepardParser implements GepardParserConstants {
         TableConstraint();
         break;
       default:
-        jj_la1[1] = jj_gen;
+        jj_la1[2] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -59,7 +80,7 @@ public class GepardParser implements GepardParserConstants {
                                                                         {if (true) return 2;}
       break;
     default:
-      jj_la1[2] = jj_gen;
+      jj_la1[3] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -94,7 +115,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[4] = jj_gen;
         break label_2;
       }
     }
@@ -105,7 +126,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         break label_3;
       }
       jj_consume_token(COMMA);
@@ -117,7 +138,7 @@ public class GepardParser implements GepardParserConstants {
           ;
           break;
         default:
-          jj_la1[5] = jj_gen;
+          jj_la1[6] = jj_gen;
           break label_4;
         }
       }
@@ -141,14 +162,14 @@ public class GepardParser implements GepardParserConstants {
           ;
           break;
         default:
-          jj_la1[6] = jj_gen;
+          jj_la1[7] = jj_gen;
           break label_5;
         }
       }
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -165,7 +186,7 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(UNIQUE);
       break;
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -175,9 +196,23 @@ public class GepardParser implements GepardParserConstants {
   }
 
 // Drop Statement
-
-
-
+  final public int DropTable() throws ParseException {
+    jj_consume_token(DROP);
+    jj_consume_token(TABLE);
+    Name();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case CASCADE:
+      jj_consume_token(CASCADE);
+      jj_consume_token(CONSTRAINTS);
+      break;
+    default:
+      jj_la1[10] = jj_gen;
+      ;
+    }
+    jj_consume_token(SEMICOLON);
+         {if (true) return 3;}
+    throw new Error("Missing return statement in function");
+  }
 
 // Select Statement
 
@@ -201,7 +236,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[11] = jj_gen;
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -215,7 +250,7 @@ public class GepardParser implements GepardParserConstants {
         jj_consume_token(SYMBOL);
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -231,13 +266,13 @@ public class GepardParser implements GepardParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[11];
+  final private int[] jj_la1 = new int[13];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10000,0x40200,0x9000,0x20000,0x10000,0x20000,0x20000,0x180,0xc00,0xe0000,0xe0000,};
+      jj_la1_0 = new int[] {0x60,0x80000,0x200800,0x48000,0x100000,0x80000,0x100000,0x100000,0x300,0x6000,0x400,0x700000,0x700000,};
    }
 
   /** Constructor with InputStream. */
@@ -251,7 +286,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -265,7 +300,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -275,7 +310,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -285,7 +320,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -294,7 +329,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -303,7 +338,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -354,12 +389,12 @@ public class GepardParser implements GepardParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[20];
+    boolean[] la1tokens = new boolean[23];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 13; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -368,7 +403,7 @@ public class GepardParser implements GepardParserConstants {
         }
       }
     }
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 23; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

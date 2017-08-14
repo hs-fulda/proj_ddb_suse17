@@ -36,15 +36,8 @@ public class QueryExecutor {
 		// here.
 		GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
 
-		// TEMPORARY: Will be replaced by parseDML after DML portion for parsing
-		// is done.
-		// It validates or throws Exception. Also returns queryType
-		// Every parser Method should return specific number after successful
-		// validation which will help us to process the query
-		queryType = parser.CreateTable();
-
 		// This method should be called to parse all DML queries. It is not
-		// implemented yet queryType = parser.parseDML();
+		queryType = parser.parseDMLQuery();
 
 		switch (queryType) {
 		case QueryTypeConstant.CREATE_NON_PARTITIONED:
@@ -54,7 +47,7 @@ public class QueryExecutor {
 			result = createPartitioned(query);
 			break;
 		case QueryTypeConstant.DROP:
-			result = createPartitioned(query);
+			result = dropTable(query);
 			break;
 		}
 
@@ -76,7 +69,8 @@ public class QueryExecutor {
 		return result;
 	}
 
-	// To Do: Query for 1 list of attribute boundary (in horizontal partitioning) is not handled yet!
+	// To Do: Query for 1 list of attribute boundary (in horizontal
+	// partitioning) is not handled yet!
 	private static int createPartitioned(String query) throws FedException {
 		Statement statementOfDB1 = statementsMap.get(1);
 		Statement statementOfDB2 = statementsMap.get(2);
@@ -185,8 +179,23 @@ public class QueryExecutor {
 		return executableQuery.toString();
 	}
 
+	private static int dropTable(String query) throws FedException {
+		int result = -1;
+
+		try {
+			for (Statement statement : statementsMap.values()) {
+				result = statement.executeUpdate(query);
+			}
+		} catch (SQLException e) {
+			throw new FedException(new Throwable(e.getMessage()));
+		}
+
+		return result;
+	}
+
 	// Not used yet but might be used in further implementation
-	// Parser requires query as InputStream, so this method converts String queries and returns List of parsable InputStream queries
+	// Parser requires query as InputStream, so this method converts String
+	// queries and returns List of parsable InputStream queries
 	public static List<InputStream> convertToParsableQueries(List<String> queries) {
 		List<InputStream> parsableQueries = new ArrayList<InputStream>();
 		for (int i = 0; i < queries.size(); i++) {
@@ -195,7 +204,8 @@ public class QueryExecutor {
 		return parsableQueries;
 	}
 
-	// Parser requires query as InputStream, so this method converts String query and returns parsable InputStream query
+	// Parser requires query as InputStream, so this method converts String
+	// query and returns parsable InputStream query
 	public static InputStream convertToParsableQuery(String query) {
 		return new ByteArrayInputStream(query.getBytes());
 	}
