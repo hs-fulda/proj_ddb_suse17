@@ -36,8 +36,8 @@ public class QueryExecutor {
 		// here.
 		GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
 
-		// This method should be called to parse all DML queries. It is not
-		queryType = parser.parseDMLQuery();
+		// This method should be called to parse all DML queries.
+		queryType = parser.ParseQuery();
 
 		switch (queryType) {
 		case QueryTypeConstant.CREATE_NON_PARTITIONED:
@@ -49,10 +49,20 @@ public class QueryExecutor {
 		case QueryTypeConstant.DROP:
 			result = dropTable(query);
 			break;
+		case QueryTypeConstant.DELETE:
+			result = insertTable(query);
+			break;
+		case QueryTypeConstant.INSERT:
+			result = insertTable(query);
+			break;
 		}
 
 		return result;
 
+	}
+
+	private static int insertTable(String query) {
+		return 0;
 	}
 
 	private static int createNonPartitioned(String query) throws FedException {
@@ -76,14 +86,22 @@ public class QueryExecutor {
 		Statement statementOfDB2 = statementsMap.get(2);
 		Statement statementOfDB3 = statementsMap.get(3);
 
-		String queryForDB1 = getCreatePartitionedQueryForDB1(query);
-		String queryForDB2 = getCreatePartitionedQueryForDB2(query);
-		String queryForDB3 = getCreatePartitionedQueryForDB3(query);
+		boolean createLessPartitionsThanDatabase = createLessPartitionsThanDatabase(query);
+
+		String queryForDB1 = getCreatePartitionedQueryForDB1(query, createLessPartitionsThanDatabase);
+		String queryForDB2 = getCreatePartitionedQueryForDB2(query, createLessPartitionsThanDatabase);
+		String queryForDB3 = getCreatePartitionedQueryForDB3(query, createLessPartitionsThanDatabase);
+
+		if (createLessPartitionsThanDatabase) {
+			queryForDB2 = queryForDB3;
+		}
 
 		try {
 			statementOfDB1.executeUpdate(queryForDB1);
 			statementOfDB2.executeUpdate(queryForDB2);
-			statementOfDB3.executeUpdate(queryForDB3);
+			if (!createLessPartitionsThanDatabase) {
+				statementOfDB3.executeUpdate(queryForDB3);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -93,7 +111,29 @@ public class QueryExecutor {
 		return 0;
 	}
 
-	private static String getCreatePartitionedQueryForDB1(String query) {
+	/**
+	 * @param query
+	 */
+	private static boolean createLessPartitionsThanDatabase(String query) {
+		boolean createLessPartitionsThanDatabases = false;
+		String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
+				query.lastIndexOf("("));
+		// Fetching range
+		int firstIndex = query.lastIndexOf(columnName + "(") + (columnName.length() + 1);
+		int secondIndex = query.lastIndexOf(",");
+
+		// If true it means it has one list of attribute for horizontal
+		// partitioning, so two tables should be created in first 2 DBs instead
+		// of 3 in all 3 DBs
+		if (secondIndex < firstIndex) {
+			secondIndex = query.lastIndexOf("))");
+			createLessPartitionsThanDatabases = true;
+		}
+
+		return createLessPartitionsThanDatabases;
+	}
+
+	private static String getCreatePartitionedQueryForDB1(String query, boolean createLessPartitionsThanDatabase) {
 		StringBuffer executableQuery = new StringBuffer();
 		StringBuffer basicQuery = new StringBuffer(query.substring(0, query.indexOf("HORIZONTAL")));
 
@@ -107,8 +147,17 @@ public class QueryExecutor {
 		String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 				query.lastIndexOf("("));
 
-		String maxRange = query.substring(query.indexOf(columnName + "(") + (columnName.length() + 1),
-				query.lastIndexOf(","));
+		// Fetching range
+		int firstIndex = query.lastIndexOf(columnName + "(") + (columnName.length() + 1);
+		int secondIndex = query.lastIndexOf(",");
+
+		// If true it means it has one list of attribute for horizontal
+		// partitioning
+		if (createLessPartitionsThanDatabase) {
+			secondIndex = query.lastIndexOf("))");
+		}
+
+		String maxRange = query.substring(firstIndex, secondIndex);
 
 		// Appends constraint name
 		basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
@@ -121,7 +170,11 @@ public class QueryExecutor {
 		return executableQuery.toString();
 	}
 
-	private static String getCreatePartitionedQueryForDB2(String query) {
+	private static String getCreatePartitionedQueryForDB2(String query, boolean createLessPartitionsThanDatabase) {
+		if (createLessPartitionsThanDatabase) {
+			return "";
+		}
+
 		StringBuffer executableQuery = new StringBuffer();
 		StringBuffer basicQuery = new StringBuffer(query.substring(0, query.indexOf("HORIZONTAL")));
 
@@ -140,7 +193,7 @@ public class QueryExecutor {
 				query.lastIndexOf("))"));
 
 		// Appends constraint name
-		basicQuery.append(tableName + "_RANGE_CHK" + columnName + " check (");
+		basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
 		basicQuery.append(columnName);
 		basicQuery.append(" between " + lowerRange + " and " + upperRange);
 		basicQuery.append(")");
@@ -151,9 +204,16 @@ public class QueryExecutor {
 		return executableQuery.toString();
 	}
 
-	private static String getCreatePartitionedQueryForDB3(String query) {
+	private static String getCreatePartitionedQueryForDB3(String query, boolean createLessPartitionsThanDatabase) {
 		StringBuffer executableQuery = new StringBuffer();
 		StringBuffer basicQuery = new StringBuffer(query.substring(0, query.indexOf("HORIZONTAL")));
+
+		String operator = "";
+		if (createLessPartitionsThanDatabase) {
+			operator = " > ";
+		} else {
+			operator = " >= ";
+		}
 
 		// Removes last ')' to further append constraint
 		basicQuery = new StringBuffer(basicQuery.substring(0, basicQuery.lastIndexOf(")")));
@@ -165,12 +225,17 @@ public class QueryExecutor {
 		String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 				query.lastIndexOf("("));
 
-		String maxRange = query.substring(query.indexOf(columnName + "(") + (columnName.length() + 1),
-				query.lastIndexOf(","));
+		String maxRange = "";
+		if (createLessPartitionsThanDatabase) {
+			maxRange = query.substring(query.indexOf(columnName + "(") + (columnName.length() + 1),
+					query.lastIndexOf("))"));
+		} else {
+			maxRange = query.substring(query.lastIndexOf(",") + 1, query.lastIndexOf("))"));
+		}
 
 		// Appends constraint name
-		basicQuery.append(tableName + "_RANGE_CHK" + columnName + " check (");
-		basicQuery.append(columnName + " >= " + maxRange);
+		basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
+		basicQuery.append(columnName + operator + maxRange);
 		basicQuery.append(")");
 
 		// Adds back ')' after constraint is appended
