@@ -8,7 +8,7 @@ public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try{
-			System.out.println(parser.parseDMLQuery());
+			System.out.println(parser.ParseQuery());
 		}catch(Exception e){
 		   System.out.println(e);
 		}
@@ -71,17 +71,23 @@ TOKEN : { < SYMBOL : "_" | "-" > }
 
 /* ================ Rules Start ============== */
 
-
+// Main Parser Call
+int ParseQuery() : {int queryType;}
+{
+	queryType=ParseDDLQuery(){return queryType;} |
+	queryType=ParseDMLQuery(){return queryType;}
+}
 
 // DDL Statement
-int parseDMLQuery() : {int queryType;}
+int ParseDDLQuery() : {int queryType;}
 {
 	queryType=DropTable(){return queryType;} |
-	queryType=CreateTable(){return queryType;} |
-	queryType=DeleteTable(){return queryType;} | 
-	queryType=InsertTable(){return queryType;}
-	
-
+	queryType=CreateTable(){return queryType;}
+}
+int DropTable() : {}
+{
+	<DROP><TABLE>Name()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
+	{return 3;}
 }
 int CreateTable() : {int queryType;}
 {
@@ -116,19 +122,16 @@ void TableConstraint() : {}
 	<CONSTRAINT>Name()(<PRIMARYKEY>|<UNIQUE>)<LPAREN>Name()<RPAREN>
 }
 
-// Drop Statement
-int DropTable() : {}
-{
-	<DROP><TABLE>Name()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
-	{return 3;}
-}
-
 
 // Select Statement
 
 
 // DML Statement
-
+int ParseDMLQuery() : {int queryType;}
+{
+	queryType=DeleteTable(){return queryType;} | 
+	queryType=InsertTable(){return queryType;}
+}
 int DeleteTable() : {}
 {
   <DELETE><FROM>Name()(WhereClause())?<SEMICOLON>
@@ -140,7 +143,6 @@ int InsertTable() : {}
 {
   <INSERT><INTO>Name()<VALUES><LPAREN>(Constants())((<COMMA>Constants())*)<RPAREN><SEMICOLON>
   {return 5;}
-  
 }
 
 
