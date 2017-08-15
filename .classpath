@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/Softwares/Development Stuff/Libraries/ojdbc6.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="D:/Uni/Master_GSD/1.Sem/Distributed Datasystem/ojdbc6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

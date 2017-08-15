@@ -39,8 +39,7 @@ public class FedConnection implements FedConnectionInterface {
 		statement = new FedStatement(this, statements);
 	}
 
-	@Override
-	public void setAutoCommit(boolean commit) throws FedException {
+		public void setAutoCommit(boolean commit) throws FedException {
 		if (close) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
 		}
@@ -55,7 +54,7 @@ public class FedConnection implements FedConnectionInterface {
 		}
 	}
 
-	@Override
+	
 	public boolean getAutoCommit() throws FedException {
 		if (close) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -64,7 +63,6 @@ public class FedConnection implements FedConnectionInterface {
 		return autoCommit;
 	}
 
-	@Override
 	public void commit() throws FedException {
 		if (close) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -78,7 +76,6 @@ public class FedConnection implements FedConnectionInterface {
 		}
 	}
 
-	@Override
 	public void rollback() throws FedException {
 		if (close) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -93,7 +90,6 @@ public class FedConnection implements FedConnectionInterface {
 		}
 	}
 
-	@Override
 	public void close() throws FedException {
 		try {
 			for (Connection connection : connectionsMap.values()) {
@@ -105,7 +101,7 @@ public class FedConnection implements FedConnectionInterface {
 		}
 	}
 
-	@Override
+	
 	public FedStatement getStatement() {
 		return statement;
 	}

@@ -11,7 +11,6 @@ import fdbs.ConnectionConstants;
 public class FedPseudoDriver implements FedPseudoDriverInterface {
 
 	// Gets FedConnection. FedConnection has 3 Database Connections in a Map
-	@Override
 	public FedConnection getConnection(String userName, String password) throws FedException {
 		FedConnection connection = null;
 		try {

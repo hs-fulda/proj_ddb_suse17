@@ -12,4 +12,5 @@ public class QueryTypeConstant {
 	public static final int SELECT_WITH_JOIN_ONLY = 8;
 	public static final int SELECT_WITH_JOIN_AND_NONJOIN = 9;
 	public static final int SELECT_WITH_GROUP = 10;
+	
 }

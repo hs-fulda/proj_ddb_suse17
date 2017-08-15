@@ -8,10 +8,19 @@ options {
 PARSER_BEGIN(GepardParser)
 package parser;
 public class GepardParser {
-		public static void main(String args[]) throws Exception {
-			GepardParser parser = new GepardParser(System.in);
-			System.out.println(parser.CreateTable());
-		}
+		 public static void main(String args[]) {
+                        GepardParser parser = new GepardParser(System.in);
+                        try{
+							System.out.println(parser.parseDMLQuery());
+
+
+
+						}catch(Exception e){
+					    System.out.println(e);
+
+						}
+
+                }
 }
 PARSER_END(GepardParser)
 
@@ -43,6 +52,9 @@ TOKEN : { < HORIZONTAL : "HORIZONTAL" | "horizontal"> }
 
 
 // DML Tokens
+TOKEN : { < DELETE : "DELETE" | "delete" > }
+TOKEN : { < FROM : "FROM" | "from" > }
+TOKEN : { < WHERE : "WHERE" | "where" > }
 
 
 
@@ -52,6 +64,8 @@ TOKEN : { < LPAREN : "(" > }
 TOKEN : { < RPAREN : ")" > }
 TOKEN : { < SEMICOLON : ";" > }
 TOKEN : { < COMMA : "," > }
+TOKEN : { < SINGLEQUOTE : "'" > }
+TOKEN : {<OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
 
 
 
@@ -74,7 +88,9 @@ TOKEN : { < SYMBOL : "_" | "-" > }
 int parseDMLQuery() : {int queryType;}
 {
 	queryType=DropTable(){return queryType;} |
-	queryType=CreateTable(){return queryType;}
+	queryType=CreateTable(){return queryType;} |
+	queryType=DeleteTable(){return queryType;}
+
 }
 int CreateTable() : {int queryType;}
 {
@@ -129,13 +145,29 @@ int DropTable() : {}
 
 // DML Statement
 
+int DeleteTable() : {}
+{
+  <DELETE><FROM>Name()(WhereClause())?<SEMICOLON>
+  {return 4;}
+  
+}
 
 
 
 // General Semantics
+void WhereClause() : {}
+{
+	<WHERE>Name()<OPERATOR>Constants()
+}
 void Name() : {}
 {
 	<LETTER>(<LETTER>|<DIGIT>|<SYMBOL>)*
 }
+
+void Constants() : {}
+{
+	<SINGLEQUOTE>Name()<SINGLEQUOTE>|(<DIGIT>)+
+}
+
 
 /* ================ Rules End ============== */

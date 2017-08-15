@@ -33,19 +33,29 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int HORIZONTAL = 15;
   /** RegularExpression Id. */
-  int LPAREN = 16;
+  int DELETE = 16;
   /** RegularExpression Id. */
-  int RPAREN = 17;
+  int FROM = 17;
   /** RegularExpression Id. */
-  int SEMICOLON = 18;
+  int WHERE = 18;
   /** RegularExpression Id. */
-  int COMMA = 19;
+  int LPAREN = 19;
   /** RegularExpression Id. */
-  int DIGIT = 20;
+  int RPAREN = 20;
   /** RegularExpression Id. */
-  int LETTER = 21;
+  int SEMICOLON = 21;
   /** RegularExpression Id. */
-  int SYMBOL = 22;
+  int COMMA = 22;
+  /** RegularExpression Id. */
+  int SINGLEQUOTE = 23;
+  /** RegularExpression Id. */
+  int OPERATOR = 24;
+  /** RegularExpression Id. */
+  int DIGIT = 25;
+  /** RegularExpression Id. */
+  int LETTER = 26;
+  /** RegularExpression Id. */
+  int SYMBOL = 27;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -68,10 +78,15 @@ public interface GepardParserConstants {
     "<PRIMARYKEY>",
     "<UNIQUE>",
     "<HORIZONTAL>",
+    "<DELETE>",
+    "<FROM>",
+    "<WHERE>",
     "\"(\"",
     "\")\"",
     "\";\"",
     "\",\"",
+    "\"\\\'\"",
+    "<OPERATOR>",
     "<DIGIT>",
     "<LETTER>",
     "<SYMBOL>",

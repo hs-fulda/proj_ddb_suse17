@@ -20,7 +20,7 @@ public class FedResultSet implements FedResultSetInterface {
 		isClose = false;
 	}
 
-	@Override
+	
 	public boolean next() throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -42,7 +42,7 @@ public class FedResultSet implements FedResultSetInterface {
 		return true;
 	}
 
-	@Override
+	
 	public String getString(int columnIndex) throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -56,7 +56,7 @@ public class FedResultSet implements FedResultSetInterface {
 		return value;
 	}
 
-	@Override
+	
 	public int getInt(int columnIndex) throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -70,7 +70,7 @@ public class FedResultSet implements FedResultSetInterface {
 		return value.intValue();
 	}
 
-	@Override
+	
 	public int getColumnCount() throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -84,7 +84,7 @@ public class FedResultSet implements FedResultSetInterface {
 		return value;
 	}
 
-	@Override
+	
 	public String getColumnName(int index) throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -98,7 +98,7 @@ public class FedResultSet implements FedResultSetInterface {
 		return value;
 	}
 
-	@Override
+	
 	public int getColumnType(int index) throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -112,7 +112,7 @@ public class FedResultSet implements FedResultSetInterface {
 		return value.intValue();
 	}
 
-	@Override
+	
 	public void close() throws FedException {
 		try {
 			currentResultSet.close();
