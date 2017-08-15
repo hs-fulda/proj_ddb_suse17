@@ -1,39 +1,25 @@
 options {
-	STATIC = false ;
+	STATIC = false;
 }
-
-
-
 
 PARSER_BEGIN(GepardParser)
 package parser;
 public class GepardParser {
-		 public static void main(String args[]) {
-                        GepardParser parser = new GepardParser(System.in);
-                        try{
-							System.out.println(parser.parseDMLQuery());
-
-
-
-						}catch(Exception e){
-					    System.out.println(e);
-
-						}
-
-                }
+	public static void main(String args[]) {
+		GepardParser parser = new GepardParser(System.in);
+		try{
+			System.out.println(parser.parseDMLQuery());
+		}catch(Exception e){
+		   System.out.println(e);
+		}
+	}
 }
 PARSER_END(GepardParser)
-
-
-
 
 /* ================ Tokens Start ============== */
 
 // Skip Tokens
 SKIP : { " " | "\r" | "\n" | "\t"}
-
-
-
 
 // DDL Tokens
 TOKEN : { < CREATE : "CREATE" | "create" > }
@@ -55,6 +41,9 @@ TOKEN : { < HORIZONTAL : "HORIZONTAL" | "horizontal"> }
 TOKEN : { < DELETE : "DELETE" | "delete" > }
 TOKEN : { < FROM : "FROM" | "from" > }
 TOKEN : { < WHERE : "WHERE" | "where" > }
+TOKEN : { < INSERT : "INSERT" | "insert" > }
+TOKEN : { < INTO : "INTO" | "into" > }
+TOKEN : { < VALUES : "VALUES" | "values" > }
 
 
 
@@ -89,7 +78,9 @@ int parseDMLQuery() : {int queryType;}
 {
 	queryType=DropTable(){return queryType;} |
 	queryType=CreateTable(){return queryType;} |
-	queryType=DeleteTable(){return queryType;}
+	queryType=DeleteTable(){return queryType;} | 
+	queryType=InsertTable(){return queryType;}
+	
 
 }
 int CreateTable() : {int queryType;}
@@ -125,9 +116,6 @@ void TableConstraint() : {}
 	<CONSTRAINT>Name()(<PRIMARYKEY>|<UNIQUE>)<LPAREN>Name()<RPAREN>
 }
 
-
-
-
 // Drop Statement
 int DropTable() : {}
 {
@@ -136,11 +124,7 @@ int DropTable() : {}
 }
 
 
-
-
 // Select Statement
-
-
 
 
 // DML Statement
@@ -149,6 +133,13 @@ int DeleteTable() : {}
 {
   <DELETE><FROM>Name()(WhereClause())?<SEMICOLON>
   {return 4;}
+  
+}
+
+int InsertTable() : {}
+{
+  <INSERT><INTO>Name()<VALUES><LPAREN>(Constants())((<COMMA>Constants())*)<RPAREN><SEMICOLON>
+  {return 5;}
   
 }
 
