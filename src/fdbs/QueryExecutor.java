@@ -66,32 +66,35 @@ public class QueryExecutor {
 	}
 
 	private static int createNonPartitioned(String query) throws FedException {
-		int result = -1;
-
 		try {
 			for (Statement statement : statementsMap.values()) {
-				result = statement.executeUpdate(query);
+				statement.executeUpdate(query);
 			}
 		} catch (SQLException e) {
 			throw new FedException(new Throwable(e.getMessage()));
 		}
 
-		return result;
+		// CREATE query is neither INSERT nor UPDATE so it will always return 0
+		// as it effects 0 tuples
+		return 0;
 	}
 
-	// To Do: Query for 1 list of attribute boundary (in horizontal
-	// partitioning) is not handled yet!
 	private static int createPartitioned(String query) throws FedException {
 		Statement statementOfDB1 = statementsMap.get(1);
 		Statement statementOfDB2 = statementsMap.get(2);
 		Statement statementOfDB3 = statementsMap.get(3);
 
+		// Sets true if the Create query has to be deployed on first 2 DBs, that
+		// means the list of attributes provided in Horizontal Partitioning has
+		// 1 attribute only
 		boolean createLessPartitionsThanDatabase = createLessPartitionsThanDatabase(query);
 
 		String queryForDB1 = getCreatePartitionedQueryForDB1(query, createLessPartitionsThanDatabase);
 		String queryForDB2 = getCreatePartitionedQueryForDB2(query, createLessPartitionsThanDatabase);
 		String queryForDB3 = getCreatePartitionedQueryForDB3(query, createLessPartitionsThanDatabase);
 
+		// Taking advantage to form query from DB3 to DB2 when the list the
+		// attribute provided in Horizontal Partitioning is only one.
 		if (createLessPartitionsThanDatabase) {
 			queryForDB2 = queryForDB3;
 		}
@@ -112,6 +115,9 @@ public class QueryExecutor {
 	}
 
 	/**
+	 * This method checks whether the list of attribute provided in Horizontal
+	 * Partitioning is one or not. returns true if list of attribute is 1
+	 * 
 	 * @param query
 	 */
 	private static boolean createLessPartitionsThanDatabase(String query) {
@@ -264,7 +270,7 @@ public class QueryExecutor {
 	public static List<InputStream> convertToParsableQueries(List<String> queries) {
 		List<InputStream> parsableQueries = new ArrayList<InputStream>();
 		for (int i = 0; i < queries.size(); i++) {
-			parsableQueries.add(new ByteArrayInputStream(queries.get(i).getBytes()));
+			parsableQueries.add(convertToParsableQuery(queries.get(i)));
 		}
 		return parsableQueries;
 	}
