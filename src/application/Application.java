@@ -38,17 +38,18 @@ public class Application {
 			// All scripts taken from file provided run here one by one
 			int totalOperations = 0;
 			for (String currentScript : scriptsFromSelectedFile) {
-				if (currentScript.trim().isEmpty()) {
+				currentScript = currentScript.toUpperCase().trim();
+				if (currentScript.isEmpty()) {
 					continue;
 				}
 
-				/*
-				 * TEMPORARY: It is a create query every time in the file so
-				 * executeUpdate is called, can call executeQuery depending of
-				 * type of query.
-				 */
+				// If the query is DDL or DML, executeUpdate should be called
+				// from FJDBC
+				if (isDDLOrDMLScript(currentScript))
+					fedStatement.executeUpdate(currentScript);
+				else
+					fedStatement.executeQuery(currentScript);
 
-				fedStatement.executeUpdate(currentScript);
 				totalOperations++;
 			}
 
@@ -61,6 +62,15 @@ public class Application {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * @param script
+	 * @return
+	 */
+	private static boolean isDDLOrDMLScript(String script) {
+		return script.startsWith("CREATE") || script.startsWith("DROP") || script.startsWith("INSERT")
+				|| script.startsWith("DELETE") || script.startsWith("UPDATE");
 	}
 
 	private static String getTimeTaken() {
