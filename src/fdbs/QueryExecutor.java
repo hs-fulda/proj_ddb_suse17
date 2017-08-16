@@ -28,6 +28,12 @@ public class QueryExecutor {
 
 	}
 
+	/**
+	 * @param query
+	 * @return
+	 * @throws FedException
+	 * @throws ParseException
+	 */
 	public static int executeUpdate(String query) throws FedException, ParseException {
 		int queryType = QueryTypeConstant.NONE;
 		int result = -1;
@@ -50,7 +56,7 @@ public class QueryExecutor {
 			result = dropTable(query);
 			break;
 		case QueryTypeConstant.DELETE:
-			result = insertTable(query);
+			result = insertTable(query); //Review: should it be deleteTable instead?
 			break;
 		case QueryTypeConstant.INSERT:
 			result = insertTable(query);

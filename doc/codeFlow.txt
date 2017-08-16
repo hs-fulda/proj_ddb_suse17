@@ -1,0 +1,13 @@
+package		public class	method 
+		FileUtility	getScriptsFromFile(File file)
+fjdbc		FedPseudoDriver getConnection	//gets FedConnection. FedConnection has 3 Database Connections in a Map
+fjdbc		FedConnection	setAutoCommit
+fjdbc		FedConnection	getStatement()
+app		OutputFormatter	printAstericks()
+// Time starts
+fjdbc		FedStatement	executeUpdate(String query)
+fdbs		QueryExecutor	executeUpdate(String query)
+parser		GepardParser	ParseQuery()
+LOOP
+application	Application	getTimeTaken()
+app		OutputFormatter	printAstericks()
