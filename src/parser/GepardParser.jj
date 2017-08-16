@@ -63,7 +63,7 @@ TOKEN : {<OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
 
 
 // Literal Tokens
-TOKEN : { < DIGIT : ["0"-"9"] > }
+TOKEN : { < DIGIT : ["0"-"9"] > } //To-do: support negative numbers as well
 TOKEN : { < LETTER : ["a"-"z","A"-"Z"] > }
 TOKEN : { < SYMBOL : "_" | "-" > }
 
