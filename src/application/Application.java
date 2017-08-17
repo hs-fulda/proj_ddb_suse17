@@ -10,24 +10,31 @@ import fjdbc.FedPseudoDriver;
 import fjdbc.FedStatement;
 import parser.ParseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Application {
 
 	private static long startTime;
 	private static long duration;
 
 	public static void main(String[] args) throws ParseException {
+		Logger logger = LoggerFactory.getLogger(Application.class);
+		logger.info("Hello World");
+		
 		// Selects files and stores scripts in a list
 		File selectedFile = FileUtility.getFile();
 		List<String> scriptsFromSelectedFile = FileUtility.getScriptsFromFile(selectedFile);
-
+/*
 		try {
+
 			// Gets connection based on Username and Password
 			FedConnection fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME,
 					ApplicationConstants.PASSWORD);
 			fedConnection.setAutoCommit(false);
 
 			FedStatement fedStatement = fedConnection.getStatement();
-
+*/
 			// Just a formatting to display result
 			OutputFormatter.printAstericks();
 			System.out.println("Executing script file \'" + selectedFile.getAbsolutePath() + "\' ...");
@@ -42,14 +49,14 @@ public class Application {
 				if (currentScript.isEmpty()) {
 					continue;
 				}
-
+/*
 				// If the query is DDL or DML, executeUpdate should be called
 				// from FJDBC
 				if (isDDLOrDMLScript(currentScript))
 					fedStatement.executeUpdate(currentScript);
 				else
 					fedStatement.executeQuery(currentScript);
-
+*/
 				totalOperations++;
 			}
 
@@ -57,10 +64,11 @@ public class Application {
 
 			// Prints Time Taken
 			System.out.println(getTimeTaken());
-			OutputFormatter.printAstericks();
+			OutputFormatter.printAstericks();	/*
 		} catch (FedException e) {
 			e.printStackTrace();
 		}
+*/
 
 	}
 
