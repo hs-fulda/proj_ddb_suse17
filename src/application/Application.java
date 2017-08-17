@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Application {
-	private final static Logger logger = LoggerFactory.getLogger(FedPseudoDriver.class);
+	private final static Logger logger = LoggerFactory.getLogger(Application.class);
 
 	private static long startTime;
 	private static long duration;
