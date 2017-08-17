@@ -24,14 +24,10 @@ public class Application {
 		String msg;
 		// Selects a script file and reads statements into a list
 		logger.info("Started the main.");
-		CustomLogger.printLog("Reading a script file with SQL statements...");
+		logger.info("Reading a script file with SQL statements...");
 		File selectedFile = FileUtility.getFile();
 		List<String> scriptsFromSelectedFile = FileUtility.getScriptsFromFile(selectedFile);
-		
-		CustomLogger Llogger = new CustomLogger();
-		Llogger.printLog("Reading complete.");
-		
-		CustomLogger.printLog("Reading complete.");
+		logger.info("Reading complete.");
 
 		try {
 

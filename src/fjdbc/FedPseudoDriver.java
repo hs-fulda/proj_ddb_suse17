@@ -1,7 +1,6 @@
 package fjdbc;
 
 import java.sql.Connection;
-import application.CustomLogger;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -13,7 +12,7 @@ public class FedPseudoDriver implements FedPseudoDriverInterface {
 	private final static Logger logger = LoggerFactory.getLogger(FedPseudoDriver.class);
 	// Gets FedConnection. FedConnection has 3 Database Connections in a Map
 	public FedConnection getConnection(String userName, String password) throws FedException {
-		//CustomLogger.printLog("public FedConnection getConnection");
+	  logger.info("public FedConnection getConnection");
 		FedConnection connection = null;
 		try {
 			HashMap<Integer, Connection> connectionsMap = new HashMap<Integer, Connection>();

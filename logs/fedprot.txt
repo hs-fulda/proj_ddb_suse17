@@ -1,2 +1,4 @@
-<17:34:02.052>Started the main. 
-<17:34:02.164>Reading a script file with SQL statements... 
+<21:18:39.329>Started the main. 
+<21:18:39.496>Reading a script file with SQL statements... 
+<21:18:45.027>Reading complete. 
+<21:18:45.030>public FedConnection getConnection 
