@@ -1,2 +1,2 @@
-<907.>Hello info 
-<958.>Hello debug 
+<17:34:02.052>Started the main. 
+<17:34:02.164>Reading a script file with SQL statements... 

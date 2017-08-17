@@ -14,19 +14,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Application {
+	private final static Logger logger = LoggerFactory.getLogger(FedPseudoDriver.class);
 
 	private static long startTime;
 	private static long duration;
 
 	public static void main(String[] args) throws ParseException {
-		Logger logger = LoggerFactory.getLogger(Application.class);
-		logger.info("Hello info");
-		logger.warn("Hello debug");
-		
-		// Selects files and stores scripts in a list
+		//Logger logger = LoggerFactory.getLogger(Application.class);
+		String msg;
+		// Selects a script file and reads statements into a list
+		logger.info("Started the main.");
+		CustomLogger.printLog("Reading a script file with SQL statements...");
 		File selectedFile = FileUtility.getFile();
 		List<String> scriptsFromSelectedFile = FileUtility.getScriptsFromFile(selectedFile);
-/*
+		
+		CustomLogger Llogger = new CustomLogger();
+		Llogger.printLog("Reading complete.");
+		
+		CustomLogger.printLog("Reading complete.");
+
 		try {
 
 			// Gets connection based on Username and Password
@@ -35,29 +41,34 @@ public class Application {
 			fedConnection.setAutoCommit(false);
 
 			FedStatement fedStatement = fedConnection.getStatement();
-*/
+
 			// Just a formatting to display result
 			OutputFormatter.printAstericks();
-			System.out.println("Executing script file \'" + selectedFile.getAbsolutePath() + "\' ...");
-
+			msg = "Executing script file \'" + selectedFile.getAbsolutePath() + "\' ...";
+			System.out.println(msg);
+			CustomLogger.printLog(msg);
 			// Time starts
 			startTime = System.currentTimeMillis();
 
 			// All scripts taken from file provided run here one by one
 			int totalOperations = 0;
+
 			for (String currentScript : scriptsFromSelectedFile) {
 				currentScript = currentScript.toUpperCase().trim();
 				if (currentScript.isEmpty()) {
 					continue;
 				}
-/*
+
 				// If the query is DDL or DML, executeUpdate should be called
 				// from FJDBC
-				if (isDDLOrDMLScript(currentScript))
+				if (isDDLOrDMLScript(currentScript)) {
 					fedStatement.executeUpdate(currentScript);
-				else
+					CustomLogger.printLog(currentScript);
+				} else {
 					fedStatement.executeQuery(currentScript);
-*/
+					CustomLogger.printLog(currentScript);
+				}
+
 				totalOperations++;
 			}
 
@@ -65,11 +76,10 @@ public class Application {
 
 			// Prints Time Taken
 			System.out.println(getTimeTaken());
-			OutputFormatter.printAstericks();	/*
+			OutputFormatter.printAstericks();
 		} catch (FedException e) {
 			e.printStackTrace();
 		}
-*/
 
 	}
 
