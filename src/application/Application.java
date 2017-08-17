@@ -20,7 +20,8 @@ public class Application {
 
 	public static void main(String[] args) throws ParseException {
 		Logger logger = LoggerFactory.getLogger(Application.class);
-		logger.info("Hello World");
+		logger.info("Hello info");
+		logger.warn("Hello debug");
 		
 		// Selects files and stores scripts in a list
 		File selectedFile = FileUtility.getFile();
