@@ -1,5 +1,6 @@
 options {
 	STATIC = false;
+	IGNORE_CASE = true;
 }
 
 PARSER_BEGIN(GepardParser)
@@ -22,28 +23,28 @@ PARSER_END(GepardParser)
 SKIP : { " " | "\r" | "\n" | "\t"}
 
 // DDL Tokens
-TOKEN : { < CREATE : "CREATE" | "create" > }
-TOKEN : { < DROP : "DROP" | "drop" > }
-TOKEN : { < TABLE : "TABLE" | "table" > }
+TOKEN : { < CREATE : "CREATE" > }
+TOKEN : { < DROP : "DROP" > }
+TOKEN : { < TABLE : "TABLE" > }
 TOKEN : { < INTEGER : "INTEGER" > }
 TOKEN : { < VARCHAR : "VARCHAR"> }
-TOKEN : { < CASCADE : "CASCADE" | "cascade" > }
-TOKEN : { < CONSTRAINT : "CONSTRAINT" | "constraint"> }
-TOKEN : { < CONSTRAINTS : "CONSTRAINTS" | "constraints"> }
-TOKEN : { < PRIMARYKEY : "PRIMARY KEY" | "primary key"> }
-TOKEN : { < UNIQUE : "UNIQUE" | "unique"> }
-TOKEN : { < HORIZONTAL : "HORIZONTAL" | "horizontal"> }
+TOKEN : { < CASCADE : "CASCADE" > }
+TOKEN : { < CONSTRAINT : "CONSTRAINT" > }
+TOKEN : { < CONSTRAINTS : "CONSTRAINTS" > }
+TOKEN : { < PRIMARYKEY : "PRIMARY KEY" > }
+TOKEN : { < UNIQUE : "UNIQUE" > }
+TOKEN : { < HORIZONTAL : "HORIZONTAL" > }
 
 
 
 
 // DML Tokens
-TOKEN : { < DELETE : "DELETE" | "delete" > }
-TOKEN : { < FROM : "FROM" | "from" > }
-TOKEN : { < WHERE : "WHERE" | "where" > }
-TOKEN : { < INSERT : "INSERT" | "insert" > }
-TOKEN : { < INTO : "INTO" | "into" > }
-TOKEN : { < VALUES : "VALUES" | "values" > }
+TOKEN : { < DELETE : "DELETE" > }
+TOKEN : { < FROM : "FROM" > }
+TOKEN : { < WHERE : "WHERE" > }
+TOKEN : { < INSERT : "INSERT" > }
+TOKEN : { < INTO : "INTO" > }
+TOKEN : { < VALUES : "VALUES" > }
 
 
 
@@ -54,7 +55,7 @@ TOKEN : { < RPAREN : ")" > }
 TOKEN : { < SEMICOLON : ";" > }
 TOKEN : { < COMMA : "," > }
 TOKEN : { < SINGLEQUOTE : "'" > }
-TOKEN : {<OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
+TOKEN : {< OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
 TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < MINUS : "-" > }
 
