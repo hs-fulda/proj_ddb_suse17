@@ -316,9 +316,10 @@ public class GepardParser implements GepardParserConstants {
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case UNDERSCORE:
+      case MINUS:
       case DIGIT:
       case LETTER:
-      case SYMBOL:
         ;
         break;
       default:
@@ -332,8 +333,11 @@ public class GepardParser implements GepardParserConstants {
       case DIGIT:
         jj_consume_token(DIGIT);
         break;
-      case SYMBOL:
-        jj_consume_token(SYMBOL);
+      case UNDERSCORE:
+        jj_consume_token(UNDERSCORE);
+        break;
+      case MINUS:
+        jj_consume_token(MINUS);
         break;
       default:
         jj_la1[16] = jj_gen;
@@ -350,24 +354,37 @@ public class GepardParser implements GepardParserConstants {
       Name();
       jj_consume_token(SINGLEQUOTE);
       break;
+    case MINUS:
     case DIGIT:
-      label_8:
-      while (true) {
-        jj_consume_token(DIGIT);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DIGIT:
-          ;
-          break;
-        default:
-          jj_la1[17] = jj_gen;
-          break label_8;
-        }
-      }
+      IntegerConstant();
+      break;
+    default:
+      jj_la1[17] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void IntegerConstant() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case MINUS:
+      jj_consume_token(MINUS);
       break;
     default:
       jj_la1[18] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+      ;
+    }
+    label_8:
+    while (true) {
+      jj_consume_token(DIGIT);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DIGIT:
+        ;
+        break;
+      default:
+        jj_la1[19] = jj_gen;
+        break label_8;
+      }
     }
   }
 
@@ -380,13 +397,13 @@ public class GepardParser implements GepardParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[19];
+  final private int[] jj_la1 = new int[20];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x90060,0x60,0x400,0x2000000,0x20000800,0x1008000,0x10000000,0x2000000,0x10000000,0x10000000,0x300,0x6000,0x90000,0x40000,0x2000000,0x70000000,0x70000000,0x10000000,0x14000000,};
+      jj_la1_0 = new int[] {0x90060,0x60,0x400,0x2000000,0x80000800,0x1008000,0x40000000,0x2000000,0x40000000,0x40000000,0x300,0x6000,0x90000,0x40000,0x2000000,0xf0000000,0xf0000000,0x64000000,0x20000000,0x40000000,};
    }
 
   /** Constructor with InputStream. */
@@ -400,7 +417,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -414,7 +431,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -424,7 +441,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -434,7 +451,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -443,7 +460,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -452,7 +469,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -503,12 +520,12 @@ public class GepardParser implements GepardParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[31];
+    boolean[] la1tokens = new boolean[32];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 19; i++) {
+    for (int i = 0; i < 20; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -517,7 +534,7 @@ public class GepardParser implements GepardParserConstants {
         }
       }
     }
-    for (int i = 0; i < 31; i++) {
+    for (int i = 0; i < 32; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

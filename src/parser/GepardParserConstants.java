@@ -57,11 +57,13 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int OPERATOR = 27;
   /** RegularExpression Id. */
-  int DIGIT = 28;
+  int UNDERSCORE = 28;
   /** RegularExpression Id. */
-  int LETTER = 29;
+  int MINUS = 29;
   /** RegularExpression Id. */
-  int SYMBOL = 30;
+  int DIGIT = 30;
+  /** RegularExpression Id. */
+  int LETTER = 31;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -96,9 +98,10 @@ public interface GepardParserConstants {
     "\",\"",
     "\"\\\'\"",
     "<OPERATOR>",
+    "\"_\"",
+    "\"-\"",
     "<DIGIT>",
     "<LETTER>",
-    "<SYMBOL>",
   };
 
 }
