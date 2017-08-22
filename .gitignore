@@ -12,3 +12,4 @@ local.properties
 .recommenders
 .classpath
 doc/~$*.docx
+/javacc-6.0/doc/
