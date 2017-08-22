@@ -11,59 +11,87 @@ public interface GepardParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int CREATE = 5;
+  int CREATE = 1;
   /** RegularExpression Id. */
-  int DROP = 6;
+  int DROP = 2;
   /** RegularExpression Id. */
-  int TABLE = 7;
+  int TABLE = 3;
   /** RegularExpression Id. */
-  int INTEGER = 8;
+  int INTEGER = 4;
   /** RegularExpression Id. */
-  int VARCHAR = 9;
+  int VARCHAR = 5;
   /** RegularExpression Id. */
-  int CASCADE = 10;
+  int CASCADE = 6;
   /** RegularExpression Id. */
-  int CONSTRAINT = 11;
+  int CONSTRAINT = 7;
   /** RegularExpression Id. */
-  int CONSTRAINTS = 12;
+  int CONSTRAINTS = 8;
   /** RegularExpression Id. */
-  int PRIMARYKEY = 13;
+  int PRIMARYKEY = 9;
   /** RegularExpression Id. */
-  int UNIQUE = 14;
+  int UNIQUE = 10;
   /** RegularExpression Id. */
-  int HORIZONTAL = 15;
+  int HORIZONTAL = 11;
   /** RegularExpression Id. */
-  int DELETE = 16;
+  int CHECK = 12;
   /** RegularExpression Id. */
-  int FROM = 17;
+  int IS = 13;
   /** RegularExpression Id. */
-  int WHERE = 18;
+  int NOT = 14;
   /** RegularExpression Id. */
-  int INSERT = 19;
+  int IN = 15;
   /** RegularExpression Id. */
-  int INTO = 20;
+  int FOREIGNKEY = 16;
   /** RegularExpression Id. */
-  int VALUES = 21;
+  int REFERENCES = 17;
   /** RegularExpression Id. */
-  int LPAREN = 22;
+  int BETWEEN = 18;
   /** RegularExpression Id. */
-  int RPAREN = 23;
+  int DELETE = 19;
   /** RegularExpression Id. */
-  int SEMICOLON = 24;
+  int FROM = 20;
   /** RegularExpression Id. */
-  int COMMA = 25;
+  int WHERE = 21;
   /** RegularExpression Id. */
-  int SINGLEQUOTE = 26;
+  int INSERT = 22;
   /** RegularExpression Id. */
-  int OPERATOR = 27;
+  int INTO = 23;
   /** RegularExpression Id. */
-  int UNDERSCORE = 28;
+  int VALUES = 24;
   /** RegularExpression Id. */
-  int MINUS = 29;
+  int LPAREN = 25;
   /** RegularExpression Id. */
-  int DIGIT = 30;
+  int RPAREN = 26;
   /** RegularExpression Id. */
-  int LETTER = 31;
+  int SEMICOLON = 27;
+  /** RegularExpression Id. */
+  int COMMA = 28;
+  /** RegularExpression Id. */
+  int SINGLEQUOTE = 29;
+  /** RegularExpression Id. */
+  int OPERATOR = 30;
+  /** RegularExpression Id. */
+  int UNDERSCORE = 31;
+  /** RegularExpression Id. */
+  int MINUS = 32;
+  /** RegularExpression Id. */
+  int NULL = 33;
+  /** RegularExpression Id. */
+  int DOT = 34;
+  /** RegularExpression Id. */
+  int AST = 35;
+  /** RegularExpression Id. */
+  int AND = 36;
+  /** RegularExpression Id. */
+  int OR = 37;
+  /** RegularExpression Id. */
+  int SELECT = 38;
+  /** RegularExpression Id. */
+  int COUNT = 39;
+  /** RegularExpression Id. */
+  int DIGIT = 40;
+  /** RegularExpression Id. */
+  int LETTER = 41;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -71,37 +99,48 @@ public interface GepardParserConstants {
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
-    "\" \"",
-    "\"\\r\"",
-    "\"\\n\"",
-    "\"\\t\"",
-    "<CREATE>",
-    "<DROP>",
-    "<TABLE>",
+    "\"CREATE \"",
+    "\"DROP \"",
+    "\"TABLE \"",
     "\"INTEGER\"",
     "\"VARCHAR\"",
-    "<CASCADE>",
+    "\"CASCADE \"",
     "<CONSTRAINT>",
-    "<CONSTRAINTS>",
+    "\"CONSTRAINTS\"",
     "<PRIMARYKEY>",
     "<UNIQUE>",
     "<HORIZONTAL>",
-    "<DELETE>",
-    "<FROM>",
-    "<WHERE>",
-    "<INSERT>",
-    "<INTO>",
+    "\"CHECK \"",
+    "\" IS \"",
+    "\"NOT \"",
+    "\"IN \"",
+    "\"FOREIGN KEY \"",
+    "\"REFERENCES \"",
+    "\"BETWEEN \"",
+    "\"DELETE \"",
+    "\"FROM \"",
+    "\"WHERE \"",
+    "\"INSERT \"",
+    "\"INTO \"",
     "<VALUES>",
-    "\"(\"",
-    "\")\"",
+    "<LPAREN>",
+    "<RPAREN>",
     "\";\"",
-    "\",\"",
+    "<COMMA>",
     "\"\\\'\"",
     "<OPERATOR>",
     "\"_\"",
     "\"-\"",
+    "\"NULL\"",
+    "\".\"",
+    "\"*\"",
+    "\" AND \"",
+    "\" OR \"",
+    "\"SELECT \"",
+    "\" COUNT\"",
     "<DIGIT>",
     "<LETTER>",
+    "\" \"",
   };
 
 }

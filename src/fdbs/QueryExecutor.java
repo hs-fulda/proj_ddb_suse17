@@ -3,11 +3,14 @@ package fdbs;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fjdbc.FedException;
 import parser.GepardParser;
@@ -32,13 +35,16 @@ public class QueryExecutor {
 	public static int executeUpdate(String query) throws FedException, ParseException {
 		int queryType = QueryTypeConstant.NONE;
 		int result = -1;
+		query = processQueryForParser(query);
 
 		// Every query needs ';' to parse, so being added here. Parsing starts
 		// here.
 		GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
 
 		// This method should be called to parse all DML queries.
-		queryType = parser.ParseQuery();
+		// If query is SET or ALTER, simply do not parse and execute on the DBs
+		if (!shouldNotParse(query.toUpperCase()))
+			queryType = parser.ParseQuery();
 
 		switch (queryType) {
 		case QueryTypeConstant.CREATE_NON_PARTITIONED:
@@ -56,44 +62,116 @@ public class QueryExecutor {
 		case QueryTypeConstant.INSERT:
 			result = insertTable(query);
 			break;
+		default:
+			result = executeDefaultQuery(query);
 		}
 
 		return result;
 
 	}
 
+	private static String processQueryForParser(String query) {
+		StringBuilder sb = new StringBuilder(query);
+
+		List<Pattern> patterns = new ArrayList<Pattern>();
+		patterns.add(Pattern.compile("\t"));
+		patterns.add(Pattern.compile("\n"));
+		patterns.add(Pattern.compile("\r"));
+
+		// There are many doubles spaces, so we some are left unreplaced thus
+		// creating problem for parser, so we want to check as much as 10 times
+		// to make sure query is finely formatted.
+		int counter = 10;
+		while (counter > 0) {
+			patterns.add(Pattern.compile("  "));
+			counter--;
+		}
+
+		for (Pattern pattern : patterns) {
+			Matcher m = pattern.matcher(sb);
+			sb = new StringBuilder(m.replaceAll(" "));
+		}
+
+		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		processQueryForParser("create table FLUGHAFEN (" + "FHC		varchar(3)," + "LAND		varchar(3),"
+				+ "STADT		varchar(50)," + "NAME		varchar(50)," + "constraint FLUGHAFEN_PS"
+				+ "		primary key (FHC)" + ");");
+	}
+
+	private static boolean shouldNotParse(String query) {
+		return query.startsWith("SET") || query.startsWith("ALTER");
+	}
+
+	private static int executeDefaultQuery(String query) {
+		// Simple SET query, i.e. set echo on, is not executable from JDBC
+		if (query.toUpperCase().startsWith("SET"))
+			return 0;
+
+		try {
+			for (Statement statement : statementsMap.values()) {
+				statement.executeUpdate(query);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		// CREATE query is neither INSERT nor UPDATE so it will always return 0
+		// as it effects 0 tuples
+		return 0;
+	}
+
 	private static int deleteTable(String query) {
 		return 0;
 	}
 
-	private static int insertTable(String query) {
+	private static int insertTable(String query) throws FedException {
+		try {
+			for (Statement statement : statementsMap.values()) {
+				statement.executeUpdate(query);
+			}
+		} catch (SQLException e) {
+			throw new FedException(new Throwable(e.getMessage()));
+		}
+
+		// CREATE query is neither INSERT nor UPDATE so it will always return 0
+		// as it effects 0 tuples
 		return 0;
 	}
 
 	private static int createNonPartitioned(String query) throws FedException {
-		
+		String connectionDB = "";
+		Integer connectionNumber = -1;
+
 		try {
 			Statement statement = null;
 			for (Integer statementKey : statementsMap.keySet()) {
-				statement = statementsMap.get(statementKey);
-				statement.executeUpdate(query);
-				
+
 				// Logger
-				String connectionDB = "";
-				if(statementKey == 1) {
+				connectionNumber = statementKey;
+				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
 				}
-				if(statementKey == 2) {
+				if (statementKey == 2) {
 					connectionDB = ConnectionConstants.CONNECTION_2_SID;
 				}
-				if(statementKey == 3) {
+				if (statementKey == 3) {
 					connectionDB = ConnectionConstants.CONNECTION_3_SID;
 				}
-				logger.info("Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
-				logger.info("Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+
+				statement = statementsMap.get(statementKey);
+				statement.executeUpdate(query);
+
+				logger.info(
+						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				logger.info("Sent " + connectionDB + ": "
+						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
-			throw new FedException(new Throwable(e.getMessage()));
+			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			throw new FedException(new Throwable(message));
 		}
 
 		// CREATE query is neither INSERT nor UPDATE so it will always return 0
@@ -274,13 +352,32 @@ public class QueryExecutor {
 
 	private static int dropTable(String query) throws FedException {
 		int result = -1;
+		String connectionDB = "";
+		Integer connectionNumber = -1;
 
 		try {
-			for (Statement statement : statementsMap.values()) {
-				result = statement.executeUpdate(query);
+			Statement statement = null;
+			for (Integer statementKey : statementsMap.keySet()) {
+
+				// Logger
+				connectionNumber = statementKey;
+				if (statementKey == 1) {
+					connectionDB = ConnectionConstants.CONNECTION_1_SID;
+				}
+				if (statementKey == 2) {
+					connectionDB = ConnectionConstants.CONNECTION_2_SID;
+				}
+				if (statementKey == 3) {
+					connectionDB = ConnectionConstants.CONNECTION_3_SID;
+				}
+
+				statement = statementsMap.get(statementKey);
+				statement.executeUpdate(query);
+
 			}
 		} catch (SQLException e) {
-			throw new FedException(new Throwable(e.getMessage()));
+			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			throw new FedException(new Throwable(message));
 		}
 
 		return result;

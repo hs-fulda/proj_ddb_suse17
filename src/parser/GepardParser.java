@@ -3,8 +3,10 @@ package parser;
 public class GepardParser implements GepardParserConstants {
         public static void main(String args[]) {
                 GepardParser parser = new GepardParser(System.in);
-                try{
+                try {
+                        //parser.NonJoinCondition();
                         System.out.println(parser.ParseQuery());
+                        System.out.println("Validated");
                 }catch(Exception e){
                    System.out.println(e);
                 }
@@ -59,7 +61,7 @@ public class GepardParser implements GepardParserConstants {
   final public int DropTable() throws ParseException {
     jj_consume_token(DROP);
     jj_consume_token(TABLE);
-    Name();
+    TableName();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CASCADE:
       jj_consume_token(CASCADE);
@@ -78,7 +80,7 @@ public class GepardParser implements GepardParserConstants {
                      int queryType;
     jj_consume_token(CREATE);
     jj_consume_token(TABLE);
-    Name();
+    TableName();
     jj_consume_token(LPAREN);
     TableColumn();
     label_1:
@@ -93,6 +95,9 @@ public class GepardParser implements GepardParserConstants {
       }
       jj_consume_token(COMMA);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case UNDERSCORE:
+      case MINUS:
+      case DIGIT:
       case LETTER:
         TableColumn();
         break;
@@ -107,7 +112,7 @@ public class GepardParser implements GepardParserConstants {
     }
     jj_consume_token(RPAREN);
     queryType = PartitionedOrNonPartitioned();
-                                                                                                                                             {if (true) return queryType;}
+                                                                                                                                                  {if (true) return queryType;}
     throw new Error("Missing return statement in function");
   }
 
@@ -222,23 +227,224 @@ public class GepardParser implements GepardParserConstants {
     Name();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case PRIMARYKEY:
-      jj_consume_token(PRIMARYKEY);
-      break;
     case UNIQUE:
-      jj_consume_token(UNIQUE);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case PRIMARYKEY:
+        jj_consume_token(PRIMARYKEY);
+        break;
+      case UNIQUE:
+        jj_consume_token(UNIQUE);
+        break;
+      default:
+        jj_la1[11] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      jj_consume_token(LPAREN);
+      NameWithoutSpace();
+      jj_consume_token(RPAREN);
+      break;
+    case CHECK:
+      CheckConstraints();
+      break;
+    case FOREIGNKEY:
+      ForeignKeyConstraint();
       break;
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[12] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+  }
+
+  final public void CheckConstraints() throws ParseException {
+    jj_consume_token(CHECK);
     jj_consume_token(LPAREN);
     Name();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IS:
+      CheckConstraint();
+      break;
+    case IN:
+      CheckConstraintWithIn();
+      break;
+    case BETWEEN:
+      CheckConstraintWithBetween();
+      break;
+    case OPERATOR:
+      CheckConstraintWithOperator();
+      break;
+    default:
+      jj_la1[13] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    jj_consume_token(RPAREN);
+  }
+
+  final public void CheckConstraint() throws ParseException {
+    jj_consume_token(IS);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
+      jj_consume_token(NOT);
+      break;
+    default:
+      jj_la1[14] = jj_gen;
+      ;
+    }
+    jj_consume_token(NULL);
+  }
+
+  final public void CheckConstraintWithIn() throws ParseException {
+    jj_consume_token(IN);
+    jj_consume_token(LPAREN);
+    ListOfConstants();
+    jj_consume_token(RPAREN);
+  }
+
+  final public void CheckConstraintWithBetween() throws ParseException {
+    jj_consume_token(BETWEEN);
+    Constant();
+    jj_consume_token(AND);
+    Constant();
+  }
+
+  final public void CheckConstraintWithOperator() throws ParseException {
+    jj_consume_token(OPERATOR);
+    NameWithoutSpace();
+  }
+
+  final public void ForeignKeyConstraint() throws ParseException {
+    jj_consume_token(FOREIGNKEY);
+    jj_consume_token(LPAREN);
+    NameWithoutSpace();
+    jj_consume_token(RPAREN);
+    jj_consume_token(REFERENCES);
+    Name();
+    jj_consume_token(LPAREN);
+    NameWithoutSpace();
     jj_consume_token(RPAREN);
   }
 
 // Select Statement
+  final public int Select() throws ParseException {
+                int queryType;
+    jj_consume_token(SELECT);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case COUNT:
+      queryType = SelectCountAllTable();
+                                                 {if (true) return queryType;}
+      break;
+    case UNDERSCORE:
+    case MINUS:
+    case AST:
+    case DIGIT:
+    case LETTER:
+      queryType = SelectNoGroup();
+                                                                                              {if (true) return queryType;}
+      break;
+    default:
+      jj_la1[15] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
 
+  final public void ListOfAttributes() throws ParseException {
+    TableAttribute();
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[16] = jj_gen;
+        break label_6;
+      }
+      jj_consume_token(COMMA);
+      TableAttribute();
+    }
+  }
+
+  final public void TableAttribute() throws ParseException {
+    Name();
+    jj_consume_token(DOT);
+    Name();
+  }
+
+  final public void NonJoinCondition() throws ParseException {
+    jj_consume_token(LPAREN);
+    TableAttribute();
+    jj_consume_token(OPERATOR);
+    Constant();
+    jj_consume_token(RPAREN);
+  }
+
+  final public void NonJoinConditions() throws ParseException {
+    NonJoinCondition();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AND:
+    case OR:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AND:
+        jj_consume_token(AND);
+        break;
+      case OR:
+        jj_consume_token(OR);
+        break;
+      default:
+        jj_la1[17] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      NonJoinCondition();
+      break;
+    default:
+      jj_la1[18] = jj_gen;
+      ;
+    }
+  }
+
+  final public void Count() throws ParseException {
+    jj_consume_token(COUNT);
+    jj_consume_token(LPAREN);
+    jj_consume_token(AST);
+    jj_consume_token(RPAREN);
+  }
+
+  final public int SelectCountAllTable() throws ParseException {
+    Count();
+    jj_consume_token(FROM);
+    Name();
+    jj_consume_token(SEMICOLON);
+ {if (true) return 11;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public int SelectNoGroup() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AST:
+      jj_consume_token(AST);
+      break;
+    case UNDERSCORE:
+    case MINUS:
+    case DIGIT:
+    case LETTER:
+      ListOfAttributes();
+      break;
+    default:
+      jj_la1[19] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    jj_consume_token(FROM);
+    ListOfTables();
+    jj_consume_token(SEMICOLON);
+                                                          {if (true) return 12;}
+    throw new Error("Missing return statement in function");
+  }
 
 // DML Statement
   final public int ParseDMLQuery() throws ParseException {
@@ -253,7 +459,7 @@ public class GepardParser implements GepardParserConstants {
                                 {if (true) return queryType;}
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[20] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -269,7 +475,7 @@ public class GepardParser implements GepardParserConstants {
       WhereClause();
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[21] = jj_gen;
       ;
     }
     jj_consume_token(SEMICOLON);
@@ -283,19 +489,19 @@ public class GepardParser implements GepardParserConstants {
     Name();
     jj_consume_token(VALUES);
     jj_consume_token(LPAREN);
-    Constants();
-    label_6:
+    Constant();
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
         ;
         break;
       default:
-        jj_la1[14] = jj_gen;
-        break label_6;
+        jj_la1[22] = jj_gen;
+        break label_7;
       }
       jj_consume_token(COMMA);
-      Constants();
+      Constant();
     }
     jj_consume_token(RPAREN);
     jj_consume_token(SEMICOLON);
@@ -308,24 +514,12 @@ public class GepardParser implements GepardParserConstants {
     jj_consume_token(WHERE);
     Name();
     jj_consume_token(OPERATOR);
-    Constants();
+    Constant();
   }
 
   final public void Name() throws ParseException {
-    jj_consume_token(LETTER);
-    label_7:
+    label_8:
     while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case UNDERSCORE:
-      case MINUS:
-      case DIGIT:
-      case LETTER:
-        ;
-        break;
-      default:
-        jj_la1[15] = jj_gen;
-        break label_7;
-      }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LETTER:
         jj_consume_token(LETTER);
@@ -340,26 +534,145 @@ public class GepardParser implements GepardParserConstants {
         jj_consume_token(MINUS);
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[23] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case UNDERSCORE:
+      case MINUS:
+      case DIGIT:
+      case LETTER:
+        ;
+        break;
+      default:
+        jj_la1[24] = jj_gen;
+        break label_8;
+      }
+    }
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 42:
+      jj_consume_token(42);
+      break;
+    default:
+      jj_la1[25] = jj_gen;
+      ;
+    }
+  }
+
+  final public void NameWithoutSpace() throws ParseException {
+    label_9:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LETTER:
+        jj_consume_token(LETTER);
+        break;
+      case DIGIT:
+        jj_consume_token(DIGIT);
+        break;
+      case UNDERSCORE:
+        jj_consume_token(UNDERSCORE);
+        break;
+      case MINUS:
+        jj_consume_token(MINUS);
+        break;
+      default:
+        jj_la1[26] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case UNDERSCORE:
+      case MINUS:
+      case DIGIT:
+      case LETTER:
+        ;
+        break;
+      default:
+        jj_la1[27] = jj_gen;
+        break label_9;
       }
     }
   }
 
-  final public void Constants() throws ParseException {
+  final public void TableName() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LETTER:
+      jj_consume_token(LETTER);
+      break;
+    case UNDERSCORE:
+      jj_consume_token(UNDERSCORE);
+      break;
+    default:
+      jj_la1[28] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    label_10:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case UNDERSCORE:
+      case DIGIT:
+      case LETTER:
+        ;
+        break;
+      default:
+        jj_la1[29] = jj_gen;
+        break label_10;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LETTER:
+        jj_consume_token(LETTER);
+        break;
+      case UNDERSCORE:
+        jj_consume_token(UNDERSCORE);
+        break;
+      case DIGIT:
+        jj_consume_token(DIGIT);
+        break;
+      default:
+        jj_la1[30] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 42:
+      jj_consume_token(42);
+      break;
+    default:
+      jj_la1[31] = jj_gen;
+      ;
+    }
+  }
+
+  final public void ListOfTables() throws ParseException {
+    TableName();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case COMMA:
+      jj_consume_token(COMMA);
+      TableName();
+      break;
+    default:
+      jj_la1[32] = jj_gen;
+      ;
+    }
+  }
+
+  final public void Constant() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SINGLEQUOTE:
-      jj_consume_token(SINGLEQUOTE);
-      Name();
-      jj_consume_token(SINGLEQUOTE);
+      StringConstant();
       break;
     case MINUS:
     case DIGIT:
       IntegerConstant();
       break;
+    case NULL:
+      jj_consume_token(NULL);
+      break;
     default:
-      jj_la1[17] = jj_gen;
+      jj_la1[33] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -371,10 +684,10 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(MINUS);
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[34] = jj_gen;
       ;
     }
-    label_8:
+    label_11:
     while (true) {
       jj_consume_token(DIGIT);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -382,9 +695,32 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[19] = jj_gen;
-        break label_8;
+        jj_la1[35] = jj_gen;
+        break label_11;
       }
+    }
+  }
+
+  final public void StringConstant() throws ParseException {
+    jj_consume_token(SINGLEQUOTE);
+    NameWithoutSpace();
+    jj_consume_token(SINGLEQUOTE);
+  }
+
+  final public void ListOfConstants() throws ParseException {
+    Constant();
+    label_12:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[36] = jj_gen;
+        break label_12;
+      }
+      jj_consume_token(COMMA);
+      Constant();
     }
   }
 
@@ -397,13 +733,18 @@ public class GepardParser implements GepardParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[20];
+  final private int[] jj_la1 = new int[37];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
+      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x90060,0x60,0x400,0x2000000,0x80000800,0x1008000,0x40000000,0x2000000,0x40000000,0x40000000,0x300,0x6000,0x90000,0x40000,0x2000000,0xf0000000,0xf0000000,0x64000000,0x20000000,0x40000000,};
+      jj_la1_0 = new int[] {0x480006,0x6,0x40,0x10000000,0x80000080,0x8000800,0x0,0x10000000,0x0,0x0,0x30,0x600,0x11600,0x4004a000,0x4000,0x80000000,0x10000000,0x0,0x0,0x80000000,0x480000,0x200000,0x10000000,0x80000000,0x80000000,0x0,0x80000000,0x80000000,0x80000000,0x80000000,0x80000000,0x0,0x10000000,0x20000000,0x0,0x0,0x10000000,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x301,0x0,0x100,0x0,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x389,0x0,0x30,0x30,0x309,0x0,0x0,0x0,0x301,0x301,0x400,0x301,0x301,0x200,0x300,0x300,0x400,0x0,0x103,0x1,0x100,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -417,7 +758,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -431,7 +772,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -441,7 +782,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -451,7 +792,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -460,7 +801,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -469,7 +810,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -520,21 +861,24 @@ public class GepardParser implements GepardParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[32];
+    boolean[] la1tokens = new boolean[43];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 37; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 43; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
