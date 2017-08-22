@@ -7,13 +7,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import fjdbc.FedException;
 import parser.GepardParser;
 import parser.ParseException;
 
 public class QueryExecutor {
-
+	private static Logger logger = Logger.getLogger("MyLog");
 	// This map holds the JDBC Statement, it it initialized automatically when
 	// FedStatement is initialized.
 	private static HashMap<Integer, Statement> statementsMap;
@@ -70,9 +71,26 @@ public class QueryExecutor {
 	}
 
 	private static int createNonPartitioned(String query) throws FedException {
+		
 		try {
-			for (Statement statement : statementsMap.values()) {
+			Statement statement = null;
+			for (Integer statementKey : statementsMap.keySet()) {
+				statement = statementsMap.get(statementKey);
 				statement.executeUpdate(query);
+				
+				// Logger
+				String connectionDB = "";
+				if(statementKey == 1) {
+					connectionDB = ConnectionConstants.CONNECTION_1_SID;
+				}
+				if(statementKey == 2) {
+					connectionDB = ConnectionConstants.CONNECTION_2_SID;
+				}
+				if(statementKey == 3) {
+					connectionDB = ConnectionConstants.CONNECTION_3_SID;
+				}
+				logger.info("Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				logger.info("Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
 			throw new FedException(new Throwable(e.getMessage()));
