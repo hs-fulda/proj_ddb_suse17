@@ -5,6 +5,7 @@ options {
 
 PARSER_BEGIN(GepardParser)
 //package parser;
+package tests;
 public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
