@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import fjdbc.FedException;
 import fjdbc.FedPseudoDriver;
 import fjdbc.FedStatement;
 import parser.ParseException;
-
+import java.util.logging.*;
 public class Application {
 
 	private static long startTime;
@@ -19,8 +20,34 @@ public class Application {
 		// Selects files and stores scripts in a list
 		File selectedFile = FileUtility.getFile();
 		List<String> scriptsFromSelectedFile = FileUtility.getScriptsFromFile(selectedFile);
+		// Initializing logger
+		Logger logger = Logger.getLogger("MyLog");
+	    FileHandler fh;
+	    // Setting the format
+	    System.setProperty("java.util.logging.SimpleFormatter.format", "<%1$tT.%1$tL>%5$s %n");
 
+	    try {
+            
+            // This block configure the logger with handler and formatter
+            fh = new FileHandler("logs/fedprot.txt");
+            logger.addHandler(fh);
+            //logger.setLevel(Level.ALL);
+            SimpleFormatter formatter = new SimpleFormatter();
+            
+            fh.setFormatter(formatter);
+            
+             
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	    
+	    
+	    
+	    
 		try {
+			logger.info("Start FDBS");			
 			// Gets connection based on Username and Password
 			FedConnection fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME,
 					ApplicationConstants.PASSWORD);
