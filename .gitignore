@@ -10,7 +10,6 @@ local.properties
 .settings/
 .loadpath
 .recommenders
-.classpath
 doc/~$*.docx
 /javacc-6.0/doc/
 /src/tests/*.class
