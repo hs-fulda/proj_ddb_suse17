@@ -56,6 +56,11 @@ public class FileUtility {
 
 			while (read.hasNext()) {
 				String script = read.next().trim();
+				
+				// If there is an empty string then do not add as a script
+				if(script.isEmpty())
+					continue;
+				
 				scripts.add(script);
 			}
 			read.close();
