@@ -4,12 +4,14 @@ options {
 }
 
 PARSER_BEGIN(GepardParser)
-package parser;
+//package parser;
 public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try{
-			System.out.println(parser.ParseQuery());
+			parser.NonJoinCondition();
+			//System.out.println(parser.Select());
+			System.out.println("Validated");
 		}catch(Exception e){
 		   System.out.println(e);
 		}
@@ -58,11 +60,19 @@ TOKEN : { < SINGLEQUOTE : "'" > }
 TOKEN : {< OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
 TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < MINUS : "-" > }
+TOKEN : { < NULL : "NULL" > }
+TOKEN : { < DOT : "." > }
+TOKEN : { < AST : "*" > }
+
+
 
 
 // Select Tokens
-
-
+TOKEN : { < AND : "AND" > }
+TOKEN : { < OR : "OR" > }
+TOKEN : { < SELECT : "SELECT" > }
+TOKEN : { < COUNT : "COUNT" > }
+TOKEN : { < CONSTANT : "CONSTANT" > }
 
 // Literal Tokens
 TOKEN : { < DIGIT : ["0"-"9"] > }
@@ -126,6 +136,46 @@ void TableConstraint() : {}
 
 // Select Statement
 
+int Select() : {int queryType;}
+{
+	<SELECT>(queryType=SelectCountAllTable(){return queryType;}|queryType=SelectNoGroup(){return queryType;})
+}
+
+void ListOfAttributes() : {}
+{
+	TableAttribute()(<COMMA>TableAttribute())*
+}
+void TableAttribute() : {}
+{
+	Name()<DOT>Name()
+}
+void NonJoinCondition() : {}
+{
+	<LPAREN>TableAttribute()<OPERATOR>Constant()<RPAREN>
+}
+
+void NonJoinConditions() : {}
+{
+	NonJoinCondition()((<AND>|<OR>)NonJoinCondition())?
+}
+
+void Count(): {}
+{
+ <COUNT><LPAREN><AST><RPAREN>
+}
+
+
+int SelectCountAllTable(): {}
+{
+Count()<FROM>Name()<SEMICOLON>
+{return 11;}
+}
+
+int SelectNoGroup() : {}
+{
+(<AST>|ListOfAttributes())<FROM>ListOfTables()<SEMICOLON>{return 12;}
+}
+
 
 // DML Statement
 int ParseDMLQuery() : {int queryType;}
@@ -142,7 +192,7 @@ int DeleteTable() : {}
 
 int InsertTable() : {}
 {
-  <INSERT><INTO>Name()<VALUES><LPAREN>(Constants())((<COMMA>Constants())*)<RPAREN><SEMICOLON>
+  <INSERT><INTO>Name()<VALUES><LPAREN>(Constant())((<COMMA>Constant())*)<RPAREN><SEMICOLON>
   {return 5;}
 }
 
@@ -151,21 +201,32 @@ int InsertTable() : {}
 // General Semantics
 void WhereClause() : {}
 {
-	<WHERE>Name()<OPERATOR>Constants()
+	<WHERE>Name()<OPERATOR>Constant()
 }
 void Name() : {}
 {
-	<LETTER>(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)*
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)*
 }
-
-void Constants() : {}
+void TableName() : {}
 {
-	<SINGLEQUOTE>Name()<SINGLEQUOTE>|IntegerConstant()
+	(<LETTER>|<UNDERSCORE>)(<LETTER>|<UNDERSCORE>|<DIGIT>)*
+}
+void ListOfTables() : {}
+{
+	TableName()(<COMMA>TableName())?
+
+}
+void Constant() : {}
+{
+	StringConstant()|IntegerConstant()|<NULL>
 }
 void IntegerConstant(): {}
 {
 	 (<MINUS>)?(<DIGIT>)+
 }
-
+void StringConstant(): {}
+{
+	 <SINGLEQUOTE>Name()<SINGLEQUOTE>
+}
 
 /* ================ Rules End ============== */
