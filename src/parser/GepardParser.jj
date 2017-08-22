@@ -138,7 +138,7 @@ void TableConstraint() : {}
 
 int Select() : {int queryType;}
 {
-	<SELECT>(queryType=SelectCountAllTable(){return queryType;}|queryType=SelectNoGroup(){return queryType;})
+	<SELECT>queryType=SelectCountAllTable(){return queryType;}|queryType=SelectNoGroup(){return queryType;}
 }
 
 void ListOfAttributes() : {}
