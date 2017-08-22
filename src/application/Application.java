@@ -38,14 +38,9 @@ public class Application {
 			// All scripts taken from file provided run here one by one
 			int totalOperations = 0;
 			for (String currentScript : scriptsFromSelectedFile) {
-				currentScript = currentScript.toUpperCase().trim();
-				if (currentScript.isEmpty()) {
-					continue;
-				}
-
 				// If the query is DDL or DML, executeUpdate should be called
 				// from FJDBC
-				if (isDDLOrDMLScript(currentScript))
+				if (isDDLOrDMLScript(currentScript.toUpperCase()))
 					fedStatement.executeUpdate(currentScript);
 				else
 					fedStatement.executeQuery(currentScript);
