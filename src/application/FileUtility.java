@@ -1,7 +1,10 @@
 package application;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -51,7 +54,7 @@ public class FileUtility {
 		List<String> scripts = new ArrayList<String>();
 
 		try {
-			Scanner read = new Scanner(file);
+			Scanner read = new Scanner(file, "UTF-8");
 			read.useDelimiter(";");
 
 			while (read.hasNext()) {

@@ -48,6 +48,8 @@ public class QueryExecutor {
 		if (!shouldNotParse(query.toUpperCase()))
 			queryType = parser.ParseQuery();
 
+		query = UnicodeManager.replaceUnicodesWithChars(query);
+		
 		switch (queryType) {
 		case QueryTypeConstant.CREATE_NON_PARTITIONED:
 			result = createNonPartitioned(query);
@@ -94,7 +96,19 @@ public class QueryExecutor {
 			sb = new StringBuilder(m.replaceAll(" "));
 		}
 
-		return sb.toString();
+		query = sb.toString();
+		
+		Pattern pattern = Pattern.compile("'([^',]*[ ]+)'");
+		Matcher m = pattern.matcher(query);
+		while(m.find()) {
+			String searchStr = m.group();
+			query = query.replaceAll(searchStr, searchStr.replaceAll(" ", ""));
+		}
+		
+		// Replaces umlauts with unicodes to parse successfully
+		query = UnicodeManager.getUnicodedQuery(query);
+		
+		return query;
 	}
 
 	public static void main(String[] args) {
@@ -147,7 +161,7 @@ public class QueryExecutor {
 				}
 
 				statement = statementsMap.get(statementKey);
-				statement.executeUpdate(query);
+				result = statement.executeUpdate(query);
 
 			}
 		} catch (SQLException e) {
@@ -164,17 +178,41 @@ public class QueryExecutor {
 	}
 
 	private static int insertTable(String query) throws FedException {
+		int result = -1;
+		String connectionDB = "";
+		Integer connectionNumber = -1;
+		
+		Statement statement = null;
 		try {
-			for (Statement statement : statementsMap.values()) {
-				statement.executeUpdate(query);
+			for (Integer statementKey : statementsMap.keySet()) {
+
+				// Logger
+				connectionNumber = statementKey;
+				if (statementKey == 1) {
+					connectionDB = ConnectionConstants.CONNECTION_1_SID;
+				}
+				if (statementKey == 2) {
+					connectionDB = ConnectionConstants.CONNECTION_2_SID;
+				}
+				if (statementKey == 3) {
+					connectionDB = ConnectionConstants.CONNECTION_3_SID;
+				}
+
+				statement = statementsMap.get(statementKey);
+				result = statement.executeUpdate(query);
+
 			}
 		} catch (SQLException e) {
-			throw new FedException(new Throwable(e.getMessage()));
+			// Rollback if there is an error in any database while deleting
+			// table. We can rollback only if autocommit is off, so checking that
+			if (fedStatement.getConnection().getAutoCommit() == false)
+				fedStatement.getConnection().rollback();
+
+			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			throw new FedException(new Throwable(message));
 		}
 
-		// CREATE query is neither INSERT nor UPDATE so it will always return 0
-		// as it effects 0 tuples
-		return 0;
+		return result;
 	}
 
 	private static int createNonPartitioned(String query) throws FedException {
