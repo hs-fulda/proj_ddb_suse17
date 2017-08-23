@@ -97,8 +97,16 @@ public class GepardParser implements GepardParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNDERSCORE:
       case MINUS:
+      case FSLASH:
       case DIGIT:
       case LETTER:
+      case 44:
+      case 45:
+      case 46:
+      case 47:
+      case 48:
+      case 49:
+      case 50:
         TableColumn();
         break;
       case CONSTRAINT:
@@ -338,8 +346,16 @@ public class GepardParser implements GepardParserConstants {
     case UNDERSCORE:
     case MINUS:
     case AST:
+    case FSLASH:
     case DIGIT:
     case LETTER:
+    case 44:
+    case 45:
+    case 46:
+    case 47:
+    case 48:
+    case 49:
+    case 50:
       queryType = SelectNoGroup();
                                                                                               {if (true) return queryType;}
       break;
@@ -430,8 +446,16 @@ public class GepardParser implements GepardParserConstants {
       break;
     case UNDERSCORE:
     case MINUS:
+    case FSLASH:
     case DIGIT:
     case LETTER:
+    case 44:
+    case 45:
+    case 46:
+    case 47:
+    case 48:
+    case 49:
+    case 50:
       ListOfAttributes();
       break;
     default:
@@ -472,7 +496,7 @@ public class GepardParser implements GepardParserConstants {
     NameWithoutSpace();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
-    case 42:
+    case 43:
       WhereClauseForDelete();
       break;
     default:
@@ -512,8 +536,8 @@ public class GepardParser implements GepardParserConstants {
 
   final public void WhereClauseForDelete() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
-      jj_consume_token(42);
+    case 43:
+      jj_consume_token(43);
       break;
     default:
       jj_la1[23] = jj_gen;
@@ -549,6 +573,30 @@ public class GepardParser implements GepardParserConstants {
       case MINUS:
         jj_consume_token(MINUS);
         break;
+      case FSLASH:
+        jj_consume_token(FSLASH);
+        break;
+      case 44:
+        jj_consume_token(44);
+        break;
+      case 45:
+        jj_consume_token(45);
+        break;
+      case 46:
+        jj_consume_token(46);
+        break;
+      case 47:
+        jj_consume_token(47);
+        break;
+      case 48:
+        jj_consume_token(48);
+        break;
+      case 49:
+        jj_consume_token(49);
+        break;
+      case 50:
+        jj_consume_token(50);
+        break;
       default:
         jj_la1[24] = jj_gen;
         jj_consume_token(-1);
@@ -557,8 +605,16 @@ public class GepardParser implements GepardParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNDERSCORE:
       case MINUS:
+      case FSLASH:
       case DIGIT:
       case LETTER:
+      case 44:
+      case 45:
+      case 46:
+      case 47:
+      case 48:
+      case 49:
+      case 50:
         ;
         break;
       default:
@@ -567,8 +623,8 @@ public class GepardParser implements GepardParserConstants {
       }
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
-      jj_consume_token(42);
+    case 43:
+      jj_consume_token(43);
       break;
     default:
       jj_la1[26] = jj_gen;
@@ -592,6 +648,30 @@ public class GepardParser implements GepardParserConstants {
       case MINUS:
         jj_consume_token(MINUS);
         break;
+      case FSLASH:
+        jj_consume_token(FSLASH);
+        break;
+      case 44:
+        jj_consume_token(44);
+        break;
+      case 45:
+        jj_consume_token(45);
+        break;
+      case 46:
+        jj_consume_token(46);
+        break;
+      case 47:
+        jj_consume_token(47);
+        break;
+      case 48:
+        jj_consume_token(48);
+        break;
+      case 49:
+        jj_consume_token(49);
+        break;
+      case 50:
+        jj_consume_token(50);
+        break;
       default:
         jj_la1[27] = jj_gen;
         jj_consume_token(-1);
@@ -600,8 +680,16 @@ public class GepardParser implements GepardParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNDERSCORE:
       case MINUS:
+      case FSLASH:
       case DIGIT:
       case LETTER:
+      case 44:
+      case 45:
+      case 46:
+      case 47:
+      case 48:
+      case 49:
+      case 50:
         ;
         break;
       default:
@@ -653,8 +741,8 @@ public class GepardParser implements GepardParserConstants {
       }
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
-      jj_consume_token(42);
+    case 43:
+      jj_consume_token(43);
       break;
     default:
       jj_la1[32] = jj_gen;
@@ -760,7 +848,7 @@ public class GepardParser implements GepardParserConstants {
       jj_la1_0 = new int[] {0x480006,0x6,0x40,0x10000000,0x80000080,0x8000800,0x0,0x10000000,0x0,0x0,0x30,0x600,0x11600,0x4004a000,0x4000,0x80000000,0x10000000,0x0,0x0,0x80000000,0x480000,0x200000,0x10000000,0x0,0x80000000,0x80000000,0x0,0x80000000,0x80000000,0x80000000,0x80000000,0x80000000,0x0,0x10000000,0x20000000,0x0,0x0,0x10000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x301,0x0,0x100,0x0,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x389,0x0,0x30,0x30,0x309,0x0,0x400,0x0,0x400,0x301,0x301,0x400,0x301,0x301,0x200,0x300,0x300,0x400,0x0,0x103,0x1,0x100,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x7f611,0x0,0x200,0x0,0x200,0x200,0x0,0x0,0x0,0x0,0x0,0x7f719,0x0,0x60,0x60,0x7f619,0x0,0x800,0x0,0x800,0x7f611,0x7f611,0x800,0x7f611,0x7f611,0x400,0x600,0x600,0x800,0x0,0x203,0x1,0x200,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -877,7 +965,7 @@ public class GepardParser implements GepardParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[43];
+    boolean[] la1tokens = new boolean[51];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -894,7 +982,7 @@ public class GepardParser implements GepardParserConstants {
         }
       }
     }
-    for (int i = 0; i < 43; i++) {
+    for (int i = 0; i < 51; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

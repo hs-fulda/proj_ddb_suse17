@@ -67,6 +67,7 @@ TOKEN : { < MINUS : "-" > }
 TOKEN : { < NULL : "NULL" > }
 TOKEN : { < DOT : "." > }
 TOKEN : { < AST : "*" > }
+TOKEN : { < FSLASH : "/" > }
 
 
 
@@ -218,7 +219,7 @@ int DeleteTable() : {}
 }
 int InsertTable() : {}
 {
-  <INSERT><INTO>Name()<VALUES><LPAREN>(Constant())((<COMMA>Constant())*)<RPAREN><SEMICOLON>
+  <INSERT><INTO>Name()<VALUES><LPAREN>Constant()(<COMMA>Constant())*<RPAREN><SEMICOLON>
   {return 5;}
 }
 void WhereClauseForDelete() : {}
@@ -235,11 +236,11 @@ void WhereClause() : {}
 }
 void Name() : {}
 {
-	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)+([" "])
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+([" "])
 }
 void NameWithoutSpace() : {}
 {
-	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)+
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+
 }
 void TableName() : {}
 {

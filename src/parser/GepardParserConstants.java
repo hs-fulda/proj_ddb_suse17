@@ -81,17 +81,19 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int AST = 35;
   /** RegularExpression Id. */
-  int AND = 36;
+  int FSLASH = 36;
   /** RegularExpression Id. */
-  int OR = 37;
+  int AND = 37;
   /** RegularExpression Id. */
-  int SELECT = 38;
+  int OR = 38;
   /** RegularExpression Id. */
-  int COUNT = 39;
+  int SELECT = 39;
   /** RegularExpression Id. */
-  int DIGIT = 40;
+  int COUNT = 40;
   /** RegularExpression Id. */
-  int LETTER = 41;
+  int DIGIT = 41;
+  /** RegularExpression Id. */
+  int LETTER = 42;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -134,6 +136,7 @@ public interface GepardParserConstants {
     "\"NULL\"",
     "\".\"",
     "\"*\"",
+    "\"/\"",
     "\" AND \"",
     "\" OR \"",
     "\"SELECT \"",
@@ -141,6 +144,13 @@ public interface GepardParserConstants {
     "<DIGIT>",
     "<LETTER>",
     "\" \"",
+    "\"\\u00c3\\u201e\"",
+    "\"\\u00c3\\u0153\"",
+    "\"\\u00c3\\u2013\"",
+    "\"\\u00c3\\u00a4\"",
+    "\"\\u00c3\\u00bc\"",
+    "\"\\u00c3\\u00b6\"",
+    "\"\\u00c3\\u0178\"",
   };
 
 }
