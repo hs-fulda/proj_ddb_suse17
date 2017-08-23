@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +18,6 @@ import parser.GepardParser;
 import parser.ParseException;
 
 public class QueryExecutor {
-	private static Logger logger = Logger.getLogger("MyLog");
 
 	private static FedStatement fedStatement;
 	// This map holds the JDBC Statement, it it initialized automatically when
@@ -184,9 +184,10 @@ public class QueryExecutor {
 		try {
 			Statement statement = null;
 			for (Integer statementKey : statementsMap.keySet()) {
-
-				// Logger
-				connectionNumber = statementKey;
+				
+				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				
+				connectionNumber = statementKey;				
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
 				}
@@ -196,17 +197,17 @@ public class QueryExecutor {
 				if (statementKey == 3) {
 					connectionDB = ConnectionConstants.CONNECTION_3_SID;
 				}
-
+				//CustomLogger.log(Level.INFO, "Sending to "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 				statement = statementsMap.get(statementKey);
 				statement.executeUpdate(query);
-
-				logger.info(
-						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
-				logger.info("Sent " + connectionDB + ": "
-						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				
+				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				
 			}
 		} catch (SQLException e) {
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage()); 
 			throw new FedException(new Throwable(message));
 		}
 
@@ -219,7 +220,8 @@ public class QueryExecutor {
 		Statement statementOfDB1 = statementsMap.get(1);
 		Statement statementOfDB2 = statementsMap.get(2);
 		Statement statementOfDB3 = statementsMap.get(3);
-
+		
+		
 		// Sets true if the Create query has to be deployed on first 2 DBs, that
 		// means the list of attributes provided in Horizontal Partitioning has
 		// 1 attribute only
@@ -228,7 +230,7 @@ public class QueryExecutor {
 		String queryForDB1 = getCreatePartitionedQueryForDB1(query, createLessPartitionsThanDatabase);
 		String queryForDB2 = getCreatePartitionedQueryForDB2(query, createLessPartitionsThanDatabase);
 		String queryForDB3 = getCreatePartitionedQueryForDB3(query, createLessPartitionsThanDatabase);
-
+		
 		// Taking advantage to form query from DB3 to DB2 when the list the
 		// attribute provided in Horizontal Partitioning is only one.
 		if (createLessPartitionsThanDatabase) {
@@ -236,12 +238,19 @@ public class QueryExecutor {
 		}
 
 		try {
+			CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 			statementOfDB1.executeUpdate(queryForDB1);
+			CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_1_SID+": "+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+			CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			statementOfDB2.executeUpdate(queryForDB2);
+			CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_2_SID+": "+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			if (!createLessPartitionsThanDatabase) {
+				CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				statementOfDB3.executeUpdate(queryForDB3);
+				CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_3_SID+": "+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
+			//System.out.println(e.getCause());
 			e.printStackTrace();
 		}
 

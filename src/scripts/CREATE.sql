@@ -1,13 +1,13 @@
-create table FLUGHAFEN (
+create table FLUGHAFENSJ (
 FHC		VARCHAR(3),
 LAND		VARCHAR(3),
 STADT		VARCHAR(50),
 NAME		VARCHAR(50),
-constraint FLUGHAFEN_PS
+constraint FLUGHAFENSJ_PS
 		primary key (FHC)
 );
 
-create table FLUG (
+create table FLUGSJ (
 FNR             INTEGER,
 FLC		VARCHAR(2),
 FLNR		INTEGER,		
@@ -15,18 +15,18 @@ VON		VARCHAR(3),
 NACH		VARCHAR(3),
 AB		INTEGER,
 AN		INTEGER,
-constraint FLUG_PS
+constraint FLUGSJ_PS
 		primary key (FNR)
 )
 HORIZONTAL (AB(0800,1200));
 
 
-create table PASSAGIER (
+create table PASSAGIERSJ (
 PNR		INTEGER,
 NAME		VARCHAR(40),
 VORNAME		VARCHAR(40),		
 LAND		VARCHAR(3),
-constraint PASSAGIER_PS
+constraint PASSAGIERSJ_PS
 		primary key (PNR)
 )
 HORIZONTAL (PNR(35,70));

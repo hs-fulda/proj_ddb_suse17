@@ -4,13 +4,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import fdbs.ConnectionConstants;
+import fdbs.CustomLogger;
 
 public class FedPseudoDriver implements FedPseudoDriverInterface {
-
+	
+	
 	// Gets FedConnection. FedConnection has 3 Database Connections in a Map
 	public FedConnection getConnection(String userName, String password) throws FedException {
+		CustomLogger.log(Level.INFO, "Start FDBS"); 
 		FedConnection connection = null;
 		try {
 			HashMap<Integer, Connection> connectionsMap = new HashMap<Integer, Connection>();
