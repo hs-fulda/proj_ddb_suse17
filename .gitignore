@@ -12,5 +12,5 @@ local.properties
 .recommenders
 doc/~$*.docx
 /javacc-6.0/doc/
-/src/tests/*.class
-/src/tests/*.java
+src/tests/*.java
+src/tests/*.class
