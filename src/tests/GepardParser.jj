@@ -17,7 +17,7 @@ public class GepardParser {
 			//parser.ListOfTables();		// OK
 			
 			//parser.NonJoinCondition();
-			//System.out.println(parser.Select());
+			System.out.println(parser.SelectCountAllTable());
 			System.out.println("Validated");
 		}catch(Exception e){
 		   System.out.println(e);

@@ -9,6 +9,11 @@ public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try {
+			//parser.SelectNoGroup();		//OK
+			//parser.ListOfAttributes();	// OK
+			//parser.TableAttribute();		// OK, using "Table." raises an exception Encountered " "TABLE" "table (token)
+			//parser.TableName();			// OK
+			//parser.ListOfTables();		// OK
 			//parser.NonJoinCondition();
 			System.out.println(parser.ParseQuery());
 			System.out.println("Validated");
@@ -175,7 +180,7 @@ void ListOfAttributes() : {}
 }
 void TableAttribute() : {}
 {
-	Name()<DOT>Name()
+	TableName()<DOT>TableName()
 }
 void NonJoinCondition() : {}
 {
@@ -201,7 +206,14 @@ Count()<FROM>Name()<SEMICOLON>
 
 int SelectNoGroup() : {}
 {
-(<AST>|ListOfAttributes())<FROM>ListOfTables()<SEMICOLON>{return 12;}
+(<AST>|ListOfAttributes())
+<FROM>ListOfTables()
+(<WHERE>fdbs_where_clause())?
+<SEMICOLON>{return 12;}
+}
+void fdbs_where_clause() : {}
+{//ToDO
+	<LETTER>
 }
 
 
