@@ -9,8 +9,9 @@ public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try{
-			parser.Constant();
-			System.out.println("Validate"());
+			parser.ListOfAttributes();
+			//System.out.println(parser.Select());
+			System.out.println("Validated");
 		}catch(Exception e){
 		   System.out.println(e);
 		}
@@ -60,12 +61,18 @@ TOKEN : {< OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
 TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < MINUS : "-" > }
 TOKEN : { < NULL : "NULL" > }
+TOKEN : { < DOT : "." > }
+TOKEN : { < AST : "*" > }
+
 
 
 
 // Select Tokens
-
-
+TOKEN : { < AND : "AND" > }
+TOKEN : { < OR : "OR" > }
+TOKEN : { < SELECT : "SELECT" > }
+TOKEN : { < COUNT : "COUNT" > }
+TOKEN : { < CONSTANT : "CONSTANT" > }
 
 // Literal Tokens
 TOKEN : { < DIGIT : ["0"-"9"] > }
@@ -129,6 +136,46 @@ void TableConstraint() : {}
 
 // Select Statement
 
+int Select() : {int queryType;}
+{
+	<SELECT>(queryType=SelectCountAllTable(){return queryType;}|queryType=SelectNoGroup(){return queryType;})
+}
+
+void ListOfAttributes() : {}
+{
+	TableAttribute()(<COMMA>TableAttribute())*<FROM>
+}
+void TableAttribute() : {}
+{
+	Name()<DOT>Name()
+}
+void NonJoinCondition() : {}
+{
+	<LPAREN>TableAttribute()<OPERATOR>Constant()<RPAREN>
+}
+
+void NonJoinConditions() : {}
+{
+	NonJoinCondition()((<AND>|<OR>)NonJoinCondition())?
+}
+
+void Count(): {}
+{
+ <COUNT><LPAREN><AST><RPAREN>
+}
+
+
+int SelectCountAllTable(): {}
+{
+Count()<FROM>Name()<SEMICOLON>
+{return 11;}
+}
+
+int SelectNoGroup() : {}
+{
+(<AST>|ListOfAttributes())<FROM>ListOfTables()<SEMICOLON>{return 12;}
+}
+
 
 // DML Statement
 int ParseDMLQuery() : {int queryType;}
@@ -158,9 +205,17 @@ void WhereClause() : {}
 }
 void Name() : {}
 {
-	<LETTER>(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)*
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)*
 }
+void TableName() : {}
+{
+	(<LETTER>|<UNDERSCORE>)(<LETTER>|<UNDERSCORE>|<DIGIT>)*
+}
+void ListOfTables() : {}
+{
+	TableName()(<COMMA>TableName())?
 
+}
 void Constant() : {}
 {
 	StringConstant()|IntegerConstant()|<NULL>
@@ -171,7 +226,7 @@ void IntegerConstant(): {}
 }
 void StringConstant(): {}
 {
-	 <SINGLEQUOTE>((["."])+)?<SINGLEQUOTE>
+	 <SINGLEQUOTE>Name()<SINGLEQUOTE>
 }
 
 /* ================ Rules End ============== */
