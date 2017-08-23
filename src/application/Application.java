@@ -66,6 +66,10 @@ public class Application {
 				// from FJDBC
 				if (isDDLOrDMLScript(currentScript.toUpperCase()))
 					fedStatement.executeUpdate(currentScript);
+				else if (isCommit(currentScript.toUpperCase()))
+					fedConnection.commit();
+				else if (isRollback(currentScript.toUpperCase()))
+					fedConnection.rollback();
 				else
 					fedStatement.executeQuery(currentScript);
 
@@ -81,6 +85,14 @@ public class Application {
 			System.out.println(e);
 		}
 
+	}
+
+	private static boolean isRollback(String script) {
+		return script.startsWith("ROLLBACK");
+	}
+
+	private static boolean isCommit(String script) {
+		return script.startsWith("COMMIT");
 	}
 
 	/**

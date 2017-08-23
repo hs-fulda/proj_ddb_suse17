@@ -1,6 +1,5 @@
 package fjdbc;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,10 +25,10 @@ public class FedStatement implements FedStatementInterface {
 		isClose = false;
 
 		// Initialize query executor to use JDBC statements
+		QueryExecutor.setFedStatement(this);
 		QueryExecutor.setStatementsMap(statementsMap);
 	}
 
-	
 	public int executeUpdate(String query) throws FedException {
 		int result = -1;
 		if (isClose) {
@@ -44,7 +43,6 @@ public class FedStatement implements FedStatementInterface {
 		return result;
 	}
 
-	
 	public FedConnection getConnection() throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
@@ -52,7 +50,6 @@ public class FedStatement implements FedStatementInterface {
 		return connection;
 	}
 
-	
 	public void close() throws FedException {
 		try {
 			// Closes all JDBC Statements
@@ -70,7 +67,7 @@ public class FedStatement implements FedStatementInterface {
 	 * Not used yet, might/might not needs to be changed. So can't comment on it
 	 * at the moment.
 	 */
-	
+
 	public FedResultSet executeQuery(String sql) throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));

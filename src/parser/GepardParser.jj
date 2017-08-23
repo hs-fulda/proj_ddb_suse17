@@ -213,15 +213,17 @@ int ParseDMLQuery() : {int queryType;}
 }
 int DeleteTable() : {}
 {
-  <DELETE><FROM>Name()(WhereClause())?<SEMICOLON>
+  <DELETE><FROM>NameWithoutSpace()(WhereClauseForDelete())?<SEMICOLON>
   {return 4;}
-  
 }
-
 int InsertTable() : {}
 {
   <INSERT><INTO>Name()<VALUES><LPAREN>(Constant())((<COMMA>Constant())*)<RPAREN><SEMICOLON>
   {return 5;}
+}
+void WhereClauseForDelete() : {}
+{
+	([" "])<WHERE>Name()<OPERATOR>Constant()
 }
 
 

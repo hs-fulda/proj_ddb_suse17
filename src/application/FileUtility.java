@@ -56,11 +56,15 @@ public class FileUtility {
 
 			while (read.hasNext()) {
 				String script = read.next().trim();
-				
+
 				// If there is an empty string then do not add as a script
-				if(script.isEmpty())
+				if (script.isEmpty())
 					continue;
-				
+
+				// Remove lines from script that are comments or special lines
+				// like -- or /* //
+				script = fetchValidScript(script);
+
 				scripts.add(script);
 			}
 			read.close();
@@ -69,6 +73,19 @@ public class FileUtility {
 		}
 
 		return scripts;
+	}
+
+	private static String fetchValidScript(String script) {
+		StringBuffer validScript = new StringBuffer();
+		Scanner input = new Scanner(script);
+		while (input.hasNextLine()) {
+			String line = input.nextLine();
+			if (line.startsWith("--") || line.startsWith("\\\\") || line.startsWith("//") || line.startsWith("/*") || line.startsWith("#") || line.trim().isEmpty())
+				continue;
+			else
+				validScript.append(line);
+		}
+		return validScript.toString();
 	}
 
 }

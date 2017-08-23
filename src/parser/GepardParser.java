@@ -469,10 +469,11 @@ public class GepardParser implements GepardParserConstants {
   final public int DeleteTable() throws ParseException {
     jj_consume_token(DELETE);
     jj_consume_token(FROM);
-    Name();
+    NameWithoutSpace();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
-      WhereClause();
+    case 42:
+      WhereClauseForDelete();
       break;
     default:
       jj_la1[21] = jj_gen;
@@ -509,6 +510,21 @@ public class GepardParser implements GepardParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+  final public void WhereClauseForDelete() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 42:
+      jj_consume_token(42);
+      break;
+    default:
+      jj_la1[23] = jj_gen;
+      ;
+    }
+    jj_consume_token(WHERE);
+    Name();
+    jj_consume_token(OPERATOR);
+    Constant();
+  }
+
 // General Semantics
   final public void WhereClause() throws ParseException {
     jj_consume_token(WHERE);
@@ -534,7 +550,7 @@ public class GepardParser implements GepardParserConstants {
         jj_consume_token(MINUS);
         break;
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[24] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -546,7 +562,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[25] = jj_gen;
         break label_8;
       }
     }
@@ -555,7 +571,7 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(42);
       break;
     default:
-      jj_la1[25] = jj_gen;
+      jj_la1[26] = jj_gen;
       ;
     }
   }
@@ -577,7 +593,7 @@ public class GepardParser implements GepardParserConstants {
         jj_consume_token(MINUS);
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[27] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -589,7 +605,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[28] = jj_gen;
         break label_9;
       }
     }
@@ -604,7 +620,7 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(UNDERSCORE);
       break;
     default:
-      jj_la1[28] = jj_gen;
+      jj_la1[29] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -617,7 +633,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[29] = jj_gen;
+        jj_la1[30] = jj_gen;
         break label_10;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -631,7 +647,7 @@ public class GepardParser implements GepardParserConstants {
         jj_consume_token(DIGIT);
         break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[31] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -641,7 +657,7 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(42);
       break;
     default:
-      jj_la1[31] = jj_gen;
+      jj_la1[32] = jj_gen;
       ;
     }
   }
@@ -654,7 +670,7 @@ public class GepardParser implements GepardParserConstants {
       TableName();
       break;
     default:
-      jj_la1[32] = jj_gen;
+      jj_la1[33] = jj_gen;
       ;
     }
   }
@@ -672,7 +688,7 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(NULL);
       break;
     default:
-      jj_la1[33] = jj_gen;
+      jj_la1[34] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -684,7 +700,7 @@ public class GepardParser implements GepardParserConstants {
       jj_consume_token(MINUS);
       break;
     default:
-      jj_la1[34] = jj_gen;
+      jj_la1[35] = jj_gen;
       ;
     }
     label_11:
@@ -695,7 +711,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[35] = jj_gen;
+        jj_la1[36] = jj_gen;
         break label_11;
       }
     }
@@ -716,7 +732,7 @@ public class GepardParser implements GepardParserConstants {
         ;
         break;
       default:
-        jj_la1[36] = jj_gen;
+        jj_la1[37] = jj_gen;
         break label_12;
       }
       jj_consume_token(COMMA);
@@ -733,7 +749,7 @@ public class GepardParser implements GepardParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[37];
+  final private int[] jj_la1 = new int[38];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -741,10 +757,10 @@ public class GepardParser implements GepardParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x480006,0x6,0x40,0x10000000,0x80000080,0x8000800,0x0,0x10000000,0x0,0x0,0x30,0x600,0x11600,0x4004a000,0x4000,0x80000000,0x10000000,0x0,0x0,0x80000000,0x480000,0x200000,0x10000000,0x80000000,0x80000000,0x0,0x80000000,0x80000000,0x80000000,0x80000000,0x80000000,0x0,0x10000000,0x20000000,0x0,0x0,0x10000000,};
+      jj_la1_0 = new int[] {0x480006,0x6,0x40,0x10000000,0x80000080,0x8000800,0x0,0x10000000,0x0,0x0,0x30,0x600,0x11600,0x4004a000,0x4000,0x80000000,0x10000000,0x0,0x0,0x80000000,0x480000,0x200000,0x10000000,0x0,0x80000000,0x80000000,0x0,0x80000000,0x80000000,0x80000000,0x80000000,0x80000000,0x0,0x10000000,0x20000000,0x0,0x0,0x10000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x301,0x0,0x100,0x0,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x389,0x0,0x30,0x30,0x309,0x0,0x0,0x0,0x301,0x301,0x400,0x301,0x301,0x200,0x300,0x300,0x400,0x0,0x103,0x1,0x100,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x301,0x0,0x100,0x0,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x389,0x0,0x30,0x30,0x309,0x0,0x400,0x0,0x400,0x301,0x301,0x400,0x301,0x301,0x200,0x300,0x300,0x400,0x0,0x103,0x1,0x100,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -758,7 +774,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -772,7 +788,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -782,7 +798,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -792,7 +808,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -801,7 +817,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -810,7 +826,7 @@ public class GepardParser implements GepardParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -866,7 +882,7 @@ public class GepardParser implements GepardParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 37; i++) {
+    for (int i = 0; i < 38; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

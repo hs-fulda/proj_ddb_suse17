@@ -3,7 +3,6 @@ package fdbs;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +12,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fjdbc.FedException;
+import fjdbc.FedStatement;
 import parser.GepardParser;
 import parser.ParseException;
 
 public class QueryExecutor {
 	private static Logger logger = Logger.getLogger("MyLog");
+
+	private static FedStatement fedStatement;
 	// This map holds the JDBC Statement, it it initialized automatically when
 	// FedStatement is initialized.
 	private static HashMap<Integer, Statement> statementsMap;
@@ -123,8 +125,42 @@ public class QueryExecutor {
 		return 0;
 	}
 
-	private static int deleteTable(String query) {
-		return 0;
+	private static int deleteTable(String query) throws FedException {
+		int result = -1;
+		String connectionDB = "";
+		Integer connectionNumber = -1;
+
+		Statement statement = null;
+		try {
+			for (Integer statementKey : statementsMap.keySet()) {
+
+				// Logger
+				connectionNumber = statementKey;
+				if (statementKey == 1) {
+					connectionDB = ConnectionConstants.CONNECTION_1_SID;
+				}
+				if (statementKey == 2) {
+					connectionDB = ConnectionConstants.CONNECTION_2_SID;
+				}
+				if (statementKey == 3) {
+					connectionDB = ConnectionConstants.CONNECTION_3_SID;
+				}
+
+				statement = statementsMap.get(statementKey);
+				statement.executeUpdate(query);
+
+			}
+		} catch (SQLException e) {
+			// Rollback if there is an error in any database while deleting
+			// table. We can rollback only if autocommit is off, so checking that
+			if (fedStatement.getConnection().getAutoCommit() == false)
+				fedStatement.getConnection().rollback();
+
+			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			throw new FedException(new Throwable(message));
+		}
+
+		return result;
 	}
 
 	private static int insertTable(String query) throws FedException {
@@ -398,6 +434,10 @@ public class QueryExecutor {
 	// query and returns parsable InputStream query
 	public static InputStream convertToParsableQuery(String query) {
 		return new ByteArrayInputStream(query.getBytes());
+	}
+
+	public static void setFedStatement(FedStatement statement) {
+		fedStatement = statement;
 	}
 
 }
