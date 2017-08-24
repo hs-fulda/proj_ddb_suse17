@@ -1,7 +1,6 @@
 package application;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -10,9 +9,6 @@ import fjdbc.FedException;
 import fjdbc.FedPseudoDriver;
 import fjdbc.FedStatement;
 import parser.ParseException;
-import java.util.logging.*;
-
-import fdbs.CustomLogger;
 
 public class Application {
 
@@ -23,12 +19,9 @@ public class Application {
 		// Selects files and stores scripts in a list
 		File selectedFile = FileUtility.getFile();
 		List<String> scriptsFromSelectedFile = FileUtility.getScriptsFromFile(selectedFile);
-		
-		
-		
 
 		try {
-			
+
 			// Gets connection based on Username and Password
 			FedConnection fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME,
 					ApplicationConstants.PASSWORD);

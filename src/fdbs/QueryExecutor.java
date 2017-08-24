@@ -105,16 +105,10 @@ public class QueryExecutor {
 			query = query.replaceAll(searchStr, searchStr.replaceAll(" ", ""));
 		}
 		
-		// Replaces umlauts with unicodes to parse successfully
+		// Replaces umlauts with unicodes to parse successfully because JavaCC replaces umlauts with unicodes too
 		query = UnicodeManager.getUnicodedQuery(query);
 		
 		return query;
-	}
-
-	public static void main(String[] args) {
-		processQueryForParser("create table FLUGHAFEN (" + "FHC		varchar(3)," + "LAND		varchar(3),"
-				+ "STADT		varchar(50)," + "NAME		varchar(50)," + "constraint FLUGHAFEN_PS"
-				+ "		primary key (FHC)" + ");");
 	}
 
 	private static boolean shouldNotParse(String query) {
@@ -279,9 +273,11 @@ public class QueryExecutor {
 			CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 			statementOfDB1.executeUpdate(queryForDB1);
 			CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_1_SID+": "+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+			
 			CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			statementOfDB2.executeUpdate(queryForDB2);
 			CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_2_SID+": "+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+			
 			if (!createLessPartitionsThanDatabase) {
 				CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				statementOfDB3.executeUpdate(queryForDB3);
