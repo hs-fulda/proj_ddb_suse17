@@ -14,3 +14,4 @@ doc/~$*.docx
 /javacc-6.0/doc/
 src/tests/*.java
 src/tests/*.class
+src/application/ApplicationConstants.java
