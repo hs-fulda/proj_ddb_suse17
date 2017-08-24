@@ -1,0 +1,17 @@
+/target/
+.metadata
+/bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+doc/~$*.docx
+/javacc-6.0/doc/
+src/tests/*.java
+src/tests/*.class
+src/application/ApplicationConstants.java

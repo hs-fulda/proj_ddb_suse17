@@ -1,0 +1,1 @@
+create table FLUGSJHAFENSJ (FHC varchar(3), LAND varchar(3), STADT varchar(50), NAME varchar(50), constraint FLUGSJHAFENSJ_PS primary key (FHC));

@@ -1,0 +1,1 @@
+drop table PASSAGIER cascade constraints;

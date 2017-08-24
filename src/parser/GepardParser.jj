@@ -1,0 +1,271 @@
+options {
+	STATIC = false;
+	IGNORE_CASE = true;
+}
+
+PARSER_BEGIN(GepardParser)
+package parser;
+public class GepardParser {
+	public static void main(String args[]) {
+		GepardParser parser = new GepardParser(System.in);
+		try {
+			//parser.NonJoinCondition();
+			System.out.println(parser.ParseQuery());
+			System.out.println("Validated");
+		}catch(Exception e){
+		   System.out.println(e);
+		}
+	}
+}
+PARSER_END(GepardParser)
+
+/* ================ Tokens Start ============== */
+
+// DDL Tokens
+TOKEN : { < CREATE : "CREATE " > }
+TOKEN : { < DROP : "DROP " > }
+TOKEN : { < TABLE : "TABLE " > }
+TOKEN : { < INTEGER : "INTEGER" > }
+TOKEN : { < VARCHAR : "VARCHAR"> }
+TOKEN : { < CASCADE : "CASCADE " > }
+TOKEN : { < CONSTRAINT : "CONSTRAINT"([" "])? > }
+TOKEN : { < CONSTRAINTS : "CONSTRAINTS" > }
+TOKEN : { < PRIMARYKEY : "PRIMARY KEY"([" "])? > }
+TOKEN : { < UNIQUE : "UNIQUE"([" "])? > }
+TOKEN : { < HORIZONTAL : "HORIZONTAL"([" "])? > }
+TOKEN : { < CHECK : "CHECK " > }
+TOKEN : { < IS : " IS " > }
+TOKEN : { < NOT : "NOT " > }
+TOKEN : { < IN : "IN " > }
+TOKEN : { < FOREIGNKEY : "FOREIGN KEY " > }
+TOKEN : { < REFERENCES : "REFERENCES " > }
+TOKEN : { < BETWEEN : "BETWEEN " > }
+
+
+
+
+// DML Tokens
+TOKEN : { < DELETE : "DELETE " > }
+TOKEN : { < FROM : "FROM " > }
+TOKEN : { < WHERE : "WHERE " > }
+TOKEN : { < INSERT : "INSERT " > }
+TOKEN : { < INTO : "INTO " > }
+TOKEN : { < VALUES : "VALUES"([" "])? > }
+
+
+
+
+// Special Character Tokens
+TOKEN : { < LPAREN : "("([" "])? > }
+TOKEN : { < RPAREN : ")"([" "])? > }
+TOKEN : { < SEMICOLON : ";" > }
+TOKEN : { < COMMA : ","([" "])? > }
+TOKEN : { < SINGLEQUOTE : "'" > }
+TOKEN : { < OPERATOR: ([" "])?("=" | "!=" | ">=" | ">" | "<=" | "<")([" "])? > }
+TOKEN : { < UNDERSCORE : "_" > }
+TOKEN : { < MINUS : "-" > }
+TOKEN : { < NULL : "NULL" > }
+TOKEN : { < DOT : "." > }
+TOKEN : { < AST : "*" > }
+TOKEN : { < FSLASH : "/" > }
+
+
+
+
+// Select Tokens
+TOKEN : { < AND : " AND " > }
+TOKEN : { < OR : " OR " > }
+TOKEN : { < SELECT : "SELECT " > }
+TOKEN : { < COUNT : " COUNT" > }
+
+// Literal Tokens
+TOKEN : { < DIGIT : ["0"-"9"] > }
+TOKEN : { < LETTER : ["a"-"z","A"-"Z"] > }
+
+/* ================ Tokens End ============== */
+
+/* ================ Rules Start ============== */
+
+// Main Parser Call
+int ParseQuery() : {int queryType;}
+{
+	queryType=ParseDDLQuery(){return queryType;} |
+	queryType=ParseDMLQuery(){return queryType;}
+}
+
+// DDL Statement
+int ParseDDLQuery() : {int queryType;}
+{
+	queryType=DropTable(){return queryType;} |
+	queryType=CreateTable(){return queryType;}
+}
+int DropTable() : {}
+{
+	<DROP><TABLE>TableName()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
+	{return 3;}
+}
+int CreateTable() : {int queryType;}
+{
+	<CREATE><TABLE>TableName()<LPAREN>TableColumn()(<COMMA>(TableColumn()|TableConstraint()))*<RPAREN>queryType=PartitionedOrNonPartitioned(){return queryType;}
+}
+int PartitionedOrNonPartitioned() : {}
+{
+	CreateTableNonPartitioned(){return 1;}|CreateTablePartitioned(){return 2;}
+}
+void CreateTableNonPartitioned() : {}
+{
+	<SEMICOLON>
+}
+void CreateTablePartitioned() : {}
+{
+	HorizontalSyntax()
+}
+void HorizontalSyntax() : {}
+{
+	<HORIZONTAL><LPAREN>Name()<LPAREN>ListOfBoundaries()<RPAREN><RPAREN><SEMICOLON>
+}
+void ListOfBoundaries() : {}
+{
+	(<DIGIT>)+(<COMMA>(<DIGIT>)+)*
+}
+void TableColumn() : {}
+{
+	Name()(<INTEGER>|(<VARCHAR><LPAREN>(<DIGIT>)+<RPAREN>))
+}
+void TableConstraint() : {}
+{
+	<CONSTRAINT>Name()((<PRIMARYKEY>|<UNIQUE>)<LPAREN>NameWithoutSpace()<RPAREN>|CheckConstraints()|ForeignKeyConstraint())
+}
+void CheckConstraints() : {}
+{
+	<CHECK><LPAREN>Name()(CheckConstraint()|CheckConstraintWithIn()|CheckConstraintWithBetween()|CheckConstraintWithOperator())<RPAREN>
+}
+void CheckConstraint() : {}
+{
+	<IS>(<NOT>)?<NULL>
+}
+void CheckConstraintWithIn() : {}
+{
+	<IN><LPAREN>ListOfConstants()<RPAREN>
+}
+void CheckConstraintWithBetween() : {}
+{
+	<BETWEEN>Constant()<AND>Constant()
+}
+void CheckConstraintWithOperator() : {}
+{
+	<OPERATOR>NameWithoutSpace()
+}
+void ForeignKeyConstraint() : {}
+{
+	<FOREIGNKEY><LPAREN>NameWithoutSpace()<RPAREN><REFERENCES>Name()<LPAREN>NameWithoutSpace()<RPAREN>
+}
+
+
+
+// Select Statement
+
+int Select() : {int queryType;}
+{
+	<SELECT>(queryType=SelectCountAllTable(){return queryType;}|queryType=SelectNoGroup(){return queryType;})
+}
+
+void ListOfAttributes() : {}
+{
+	TableAttribute()(<COMMA>TableAttribute())*
+}
+void TableAttribute() : {}
+{
+	Name()<DOT>Name()
+}
+void NonJoinCondition() : {}
+{
+	<LPAREN>TableAttribute()<OPERATOR>Constant()<RPAREN>
+}
+
+void NonJoinConditions() : {}
+{
+	NonJoinCondition()((<AND>|<OR>)NonJoinCondition())?
+}
+
+void Count(): {}
+{
+ <COUNT><LPAREN><AST><RPAREN>
+}
+
+
+int SelectCountAllTable(): {}
+{
+Count()<FROM>Name()<SEMICOLON>
+{return 11;}
+}
+
+int SelectNoGroup() : {}
+{
+(<AST>|ListOfAttributes())<FROM>ListOfTables()<SEMICOLON>{return 12;}
+}
+
+
+// DML Statement
+int ParseDMLQuery() : {int queryType;}
+{
+	queryType=DeleteTable(){return queryType;} | 
+	queryType=InsertTable(){return queryType;}
+}
+int DeleteTable() : {}
+{
+  <DELETE><FROM>NameWithoutSpace()(WhereClauseForDelete())?<SEMICOLON>
+  {return 4;}
+}
+int InsertTable() : {}
+{
+  <INSERT><INTO>Name()<VALUES><LPAREN>Constant()(<COMMA>Constant())*<RPAREN><SEMICOLON>
+  {return 5;}
+}
+void WhereClauseForDelete() : {}
+{
+	([" "])<WHERE>Name()<OPERATOR>Constant()
+}
+
+
+
+// General Semantics
+void WhereClause() : {}
+{
+	<WHERE>Name()<OPERATOR>Constant()
+}
+void Name() : {}
+{
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+([" "])
+}
+void NameWithoutSpace() : {}
+{
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+
+}
+void TableName() : {}
+{
+	(<LETTER>|<UNDERSCORE>)(<LETTER>|<UNDERSCORE>|<DIGIT>)*([" "])
+}
+void ListOfTables() : {}
+{
+	TableName()(<COMMA>TableName())?
+
+}
+void Constant() : {}
+{
+	StringConstant()|IntegerConstant()|<NULL>
+}
+void IntegerConstant(): {}
+{
+	 (<MINUS>)?(<DIGIT>)+
+}
+void StringConstant(): {}
+{
+	 <SINGLEQUOTE>NameWithoutSpace()<SINGLEQUOTE>
+}
+void ListOfConstants() : {}
+{
+	Constant()(<COMMA>Constant())*
+}
+
+/* ================ Rules End ============== */
