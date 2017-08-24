@@ -14,7 +14,7 @@ public class FedPseudoDriver implements FedPseudoDriverInterface {
 	
 	// Gets FedConnection. FedConnection has 3 Database Connections in a Map
 	public FedConnection getConnection(String userName, String password) throws FedException {
-		CustomLogger.log(Level.INFO, "Start FDBS"); 
+		CustomLogger.log(Level.INFO, "Start FDBS");
 		FedConnection connection = null;
 		try {
 			HashMap<Integer, Connection> connectionsMap = new HashMap<Integer, Connection>();

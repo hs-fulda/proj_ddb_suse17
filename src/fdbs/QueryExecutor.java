@@ -36,19 +36,28 @@ public class QueryExecutor {
 	public static int executeUpdate(String query) throws FedException, ParseException {
 		int queryType = QueryTypeConstant.NONE;
 		int result = -1;
+
+		// Removes tabs, extra spaces and lines for parser to understand
+		// according to the grammar.
+		// NOTE: We use this method because skippng tabs, spaces and new lines
+		// does not work efficiently.
 		query = processQueryForParser(query);
 
 		// Every query needs ';' to parse, so being added here. Parsing starts
 		// here.
 		GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
 
-		// This method should be called to parse all DML queries.
-		// If query is SET or ALTER, simply do not parse and execute on the DBs
+		// If query is SET or ALTER, simply does not parse and executes directly
+		// on the DBs
 		if (!shouldNotParse(query.toUpperCase()))
+			// This method is a general method from where all grammar starts.
 			queryType = parser.ParseQuery();
 
+		// Special characters like Umlauts were replaced with Unicodes while
+		// running processQueryForParser method because JavaCC does not support
+		// umlauts because instead produces unicode of corresponding umlaut
 		query = UnicodeManager.replaceUnicodesWithChars(query);
-		
+
 		switch (queryType) {
 		case QueryTypeConstant.CREATE_NON_PARTITIONED:
 			result = createNonPartitioned(query);
@@ -96,17 +105,18 @@ public class QueryExecutor {
 		}
 
 		query = sb.toString();
-		
+
 		Pattern pattern = Pattern.compile("'([^',]*[ ]+)'");
 		Matcher m = pattern.matcher(query);
-		while(m.find()) {
+		while (m.find()) {
 			String searchStr = m.group();
 			query = query.replaceAll(searchStr, searchStr.replaceAll(" ", ""));
 		}
-		
-		// Replaces umlauts with unicodes to parse successfully because JavaCC replaces umlauts with unicodes too
+
+		// Replaces umlauts with unicodes to parse successfully because JavaCC
+		// replaces umlauts with unicodes too
 		query = UnicodeManager.getUnicodedQuery(query);
-		
+
 		return query;
 	}
 
@@ -114,7 +124,7 @@ public class QueryExecutor {
 		return query.startsWith("SET") || query.startsWith("ALTER");
 	}
 
-	private static int executeDefaultQuery(String query) throws FedException{
+	private static int executeDefaultQuery(String query) throws FedException {
 		int result = -1;
 		String connectionDB = "";
 		Integer connectionNumber = -1;
@@ -126,7 +136,8 @@ public class QueryExecutor {
 		try {
 			for (Integer statementKey : statementsMap.keySet()) {
 				// Logger
-				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				CustomLogger.log(Level.INFO,
+						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -140,7 +151,8 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				result = statement.executeUpdate(query);
-				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
+						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
@@ -163,7 +175,8 @@ public class QueryExecutor {
 			for (Integer statementKey : statementsMap.keySet()) {
 
 				// Logger
-				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				CustomLogger.log(Level.INFO,
+						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -177,18 +190,20 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				result = statement.executeUpdate(query);
-				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
+						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
 			// Rollback if there is an error in any database while deleting
-			// table. We can rollback only if autocommit is off, so checking that
+			// table. We can rollback only if autocommit is off, so checking
+			// that
 			if (fedStatement.getConnection().getAutoCommit() == false)
 				fedStatement.getConnection().rollback();
 
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
 			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 			throw new FedException(new Throwable(message));
-			
+
 		}
 
 		return result;
@@ -198,13 +213,14 @@ public class QueryExecutor {
 		int result = -1;
 		String connectionDB = "";
 		Integer connectionNumber = -1;
-		
+
 		Statement statement = null;
 		try {
 			for (Integer statementKey : statementsMap.keySet()) {
 
 				// Logger
-				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				CustomLogger.log(Level.INFO,
+						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -218,11 +234,13 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				result = statement.executeUpdate(query);
-				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
+						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
 			// Rollback if there is an error in any database while deleting
-			// table. We can rollback only if autocommit is off, so checking that
+			// table. We can rollback only if autocommit is off, so checking
+			// that
 			if (fedStatement.getConnection().getAutoCommit() == false)
 				fedStatement.getConnection().rollback();
 
@@ -241,10 +259,11 @@ public class QueryExecutor {
 		try {
 			Statement statement = null;
 			for (Integer statementKey : statementsMap.keySet()) {
-				
-				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
-				
-				connectionNumber = statementKey;				
+
+				CustomLogger.log(Level.INFO,
+						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+
+				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
 				}
@@ -254,17 +273,18 @@ public class QueryExecutor {
 				if (statementKey == 3) {
 					connectionDB = ConnectionConstants.CONNECTION_3_SID;
 				}
-				
+
 				statement = statementsMap.get(statementKey);
 				statement.executeUpdate(query);
-				
-				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
-				
+
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
+						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+
 			}
 		} catch (SQLException e) {
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
-			
-			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage()); 
+
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 			throw new FedException(new Throwable(message));
 		}
 
@@ -277,8 +297,7 @@ public class QueryExecutor {
 		Statement statementOfDB1 = statementsMap.get(1);
 		Statement statementOfDB2 = statementsMap.get(2);
 		Statement statementOfDB3 = statementsMap.get(3);
-		
-		
+
 		// Sets true if the Create query has to be deployed on first 2 DBs, that
 		// means the list of attributes provided in Horizontal Partitioning has
 		// 1 attribute only
@@ -287,7 +306,7 @@ public class QueryExecutor {
 		String queryForDB1 = getCreatePartitionedQueryForDB1(query, createLessPartitionsThanDatabase);
 		String queryForDB2 = getCreatePartitionedQueryForDB2(query, createLessPartitionsThanDatabase);
 		String queryForDB3 = getCreatePartitionedQueryForDB3(query, createLessPartitionsThanDatabase);
-		
+
 		// Taking advantage to form query from DB3 to DB2 when the list the
 		// attribute provided in Horizontal Partitioning is only one.
 		if (createLessPartitionsThanDatabase) {
@@ -295,29 +314,36 @@ public class QueryExecutor {
 		}
 
 		try {
-			CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+			CustomLogger.log(Level.INFO, "Received FJDBC:"
+					+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			statementOfDB1.executeUpdate(queryForDB1);
-			CustomLogger.log(Level.INFO, "Sent:"+ConnectionConstants.CONNECTION_1_SID+": "+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
-		}
-		catch (SQLException e) {
-			CustomLogger.log(Level.SEVERE, "Sending failed to " + ConnectionConstants.CONNECTION_1_SID + ": " + e.getMessage()); 
+			CustomLogger.log(Level.INFO, "Sent:" + ConnectionConstants.CONNECTION_1_SID + ": "
+					+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+		} catch (SQLException e) {
+			CustomLogger.log(Level.SEVERE,
+					"Sending failed to " + ConnectionConstants.CONNECTION_1_SID + ": " + e.getMessage());
 		}
 		try {
-			CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+			CustomLogger.log(Level.INFO, "Received FJDBC:"
+					+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			statementOfDB2.executeUpdate(queryForDB2);
-			CustomLogger.log(Level.INFO, "Sent:"+ConnectionConstants.CONNECTION_2_SID+": "+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+			CustomLogger.log(Level.INFO, "Sent:" + ConnectionConstants.CONNECTION_2_SID + ": "
+					+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+		} catch (SQLException e) {
+			CustomLogger.log(Level.SEVERE,
+					"Sending failed to " + ConnectionConstants.CONNECTION_2_SID + ": " + e.getMessage());
 		}
-		catch (SQLException e) {
-				CustomLogger.log(Level.SEVERE, "Sending failed to " + ConnectionConstants.CONNECTION_2_SID + ": " + e.getMessage()); 
-		}
-		try {	
+		try {
 			if (!createLessPartitionsThanDatabase) {
-				CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				CustomLogger.log(Level.INFO, "Received FJDBC:"
+						+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				statementOfDB3.executeUpdate(queryForDB3);
-				CustomLogger.log(Level.INFO, "Sent:"+ConnectionConstants.CONNECTION_3_SID+": "+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				CustomLogger.log(Level.INFO, "Sent:" + ConnectionConstants.CONNECTION_3_SID + ": "
+						+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
-			CustomLogger.log(Level.SEVERE, "Sending failed to " + ConnectionConstants.CONNECTION_3_SID + ": " + e.getMessage()); 
+			CustomLogger.log(Level.SEVERE,
+					"Sending failed to " + ConnectionConstants.CONNECTION_3_SID + ": " + e.getMessage());
 		}
 
 		// CREATE query is neither INSERT nor UPDATE so it will always return 0
@@ -471,7 +497,8 @@ public class QueryExecutor {
 			for (Integer statementKey : statementsMap.keySet()) {
 
 				// Logger
-				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				CustomLogger.log(Level.INFO,
+						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -485,12 +512,13 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				statement.executeUpdate(query);
-				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
+						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 
 			}
 		} catch (SQLException e) {
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
-			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage()); 
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 			throw new FedException(new Throwable(message));
 		}
 

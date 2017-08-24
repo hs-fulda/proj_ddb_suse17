@@ -78,6 +78,8 @@ public class FileUtility {
 		return scripts;
 	}
 
+	
+	// Does not consider comments (e.g. -- // /* \\ # as scripts
 	private static String fetchValidScript(String script) {
 		StringBuffer validScript = new StringBuffer();
 		Scanner input = new Scanner(script);
