@@ -9,8 +9,8 @@ public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try {
-			//parser.NonJoinCondition();
-			System.out.println(parser.ParseQuery());
+			parser.ListOfTables();
+			//System.out.println(parser.ParseQuery());
 			System.out.println("Validated");
 		}catch(Exception e){
 		   System.out.println(e);
