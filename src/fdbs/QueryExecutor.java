@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,17 +114,38 @@ public class QueryExecutor {
 		return query.startsWith("SET") || query.startsWith("ALTER");
 	}
 
-	private static int executeDefaultQuery(String query) {
+	private static int executeDefaultQuery(String query) throws FedException{
+		int result = -1;
+		String connectionDB = "";
+		Integer connectionNumber = -1;
+		Statement statement = null;
 		// Simple SET query, i.e. set echo on, is not executable from JDBC
 		if (query.toUpperCase().startsWith("SET"))
 			return 0;
 
 		try {
-			for (Statement statement : statementsMap.values()) {
-				statement.executeUpdate(query);
+			for (Integer statementKey : statementsMap.keySet()) {
+				// Logger
+				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				connectionNumber = statementKey;
+				if (statementKey == 1) {
+					connectionDB = ConnectionConstants.CONNECTION_1_SID;
+				}
+				if (statementKey == 2) {
+					connectionDB = ConnectionConstants.CONNECTION_2_SID;
+				}
+				if (statementKey == 3) {
+					connectionDB = ConnectionConstants.CONNECTION_3_SID;
+				}
+
+				statement = statementsMap.get(statementKey);
+				result = statement.executeUpdate(query);
+				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
+			throw new FedException(new Throwable(message));
 		}
 
 		// CREATE query is neither INSERT nor UPDATE so it will always return 0
@@ -143,6 +163,7 @@ public class QueryExecutor {
 			for (Integer statementKey : statementsMap.keySet()) {
 
 				// Logger
+				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -156,7 +177,7 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				result = statement.executeUpdate(query);
-
+				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
 			// Rollback if there is an error in any database while deleting
@@ -165,7 +186,9 @@ public class QueryExecutor {
 				fedStatement.getConnection().rollback();
 
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 			throw new FedException(new Throwable(message));
+			
 		}
 
 		return result;
@@ -181,6 +204,7 @@ public class QueryExecutor {
 			for (Integer statementKey : statementsMap.keySet()) {
 
 				// Logger
+				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -194,7 +218,7 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				result = statement.executeUpdate(query);
-
+				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 			}
 		} catch (SQLException e) {
 			// Rollback if there is an error in any database while deleting
@@ -203,6 +227,7 @@ public class QueryExecutor {
 				fedStatement.getConnection().rollback();
 
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 			throw new FedException(new Throwable(message));
 		}
 
@@ -229,7 +254,7 @@ public class QueryExecutor {
 				if (statementKey == 3) {
 					connectionDB = ConnectionConstants.CONNECTION_3_SID;
 				}
-				//CustomLogger.log(Level.INFO, "Sending to "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+				
 				statement = statementsMap.get(statementKey);
 				statement.executeUpdate(query);
 				
@@ -270,22 +295,29 @@ public class QueryExecutor {
 		}
 
 		try {
-			CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+			CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 			statementOfDB1.executeUpdate(queryForDB1);
-			CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_1_SID+": "+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
-			
-			CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+			CustomLogger.log(Level.INFO, "Sent:"+ConnectionConstants.CONNECTION_1_SID+": "+ queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
+		}
+		catch (SQLException e) {
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + ConnectionConstants.CONNECTION_1_SID + ": " + e.getMessage()); 
+		}
+		try {
+			CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			statementOfDB2.executeUpdate(queryForDB2);
-			CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_2_SID+": "+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
-			
+			CustomLogger.log(Level.INFO, "Sent:"+ConnectionConstants.CONNECTION_2_SID+": "+ queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+		}
+		catch (SQLException e) {
+				CustomLogger.log(Level.SEVERE, "Sending failed to " + ConnectionConstants.CONNECTION_2_SID + ": " + e.getMessage()); 
+		}
+		try {	
 			if (!createLessPartitionsThanDatabase) {
-				CustomLogger.log(Level.INFO, "Received FJDBC:N " + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 				statementOfDB3.executeUpdate(queryForDB3);
-				CustomLogger.log(Level.INFO, "Sent:N "+ConnectionConstants.CONNECTION_3_SID+": "+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+				CustomLogger.log(Level.INFO, "Sent:"+ConnectionConstants.CONNECTION_3_SID+": "+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 			}
 		} catch (SQLException e) {
-			//System.out.println(e.getCause());
-			e.printStackTrace();
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + ConnectionConstants.CONNECTION_3_SID + ": " + e.getMessage()); 
 		}
 
 		// CREATE query is neither INSERT nor UPDATE so it will always return 0
@@ -439,6 +471,7 @@ public class QueryExecutor {
 			for (Integer statementKey : statementsMap.keySet()) {
 
 				// Logger
+				CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 				connectionNumber = statementKey;
 				if (statementKey == 1) {
 					connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -452,10 +485,12 @@ public class QueryExecutor {
 
 				statement = statementsMap.get(statementKey);
 				statement.executeUpdate(query);
+				CustomLogger.log(Level.INFO, "Sent "+connectionDB+": "+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ")); 
 
 			}
 		} catch (SQLException e) {
 			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
+			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage()); 
 			throw new FedException(new Throwable(message));
 		}
 
