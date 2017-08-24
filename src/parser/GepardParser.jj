@@ -8,9 +8,9 @@ package parser;
 public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
-		try{
-			parser.ListOfAttributes();
-			//System.out.println(parser.Select());
+		try {
+			//parser.NonJoinCondition();
+			System.out.println(parser.ParseQuery());
 			System.out.println("Validated");
 		}catch(Exception e){
 		   System.out.println(e);
@@ -21,43 +21,47 @@ PARSER_END(GepardParser)
 
 /* ================ Tokens Start ============== */
 
-// Skip Tokens
-SKIP : { " " | "\r" | "\n" | "\t"}
-
 // DDL Tokens
-TOKEN : { < CREATE : "CREATE" > }
-TOKEN : { < DROP : "DROP" > }
-TOKEN : { < TABLE : "TABLE" > }
+TOKEN : { < CREATE : "CREATE " > }
+TOKEN : { < DROP : "DROP " > }
+TOKEN : { < TABLE : "TABLE " > }
 TOKEN : { < INTEGER : "INTEGER" > }
 TOKEN : { < VARCHAR : "VARCHAR"> }
-TOKEN : { < CASCADE : "CASCADE" > }
-TOKEN : { < CONSTRAINT : "CONSTRAINT" > }
+TOKEN : { < CASCADE : "CASCADE " > }
+TOKEN : { < CONSTRAINT : "CONSTRAINT"([" "])? > }
 TOKEN : { < CONSTRAINTS : "CONSTRAINTS" > }
-TOKEN : { < PRIMARYKEY : "PRIMARY KEY" > }
-TOKEN : { < UNIQUE : "UNIQUE" > }
-TOKEN : { < HORIZONTAL : "HORIZONTAL" > }
+TOKEN : { < PRIMARYKEY : "PRIMARY KEY"([" "])? > }
+TOKEN : { < UNIQUE : "UNIQUE"([" "])? > }
+TOKEN : { < HORIZONTAL : "HORIZONTAL"([" "])? > }
+TOKEN : { < CHECK : "CHECK " > }
+TOKEN : { < IS : " IS " > }
+TOKEN : { < NOT : "NOT " > }
+TOKEN : { < IN : "IN " > }
+TOKEN : { < FOREIGNKEY : "FOREIGN KEY " > }
+TOKEN : { < REFERENCES : "REFERENCES " > }
+TOKEN : { < BETWEEN : "BETWEEN " > }
 
 
 
 
 // DML Tokens
-TOKEN : { < DELETE : "DELETE" > }
-TOKEN : { < FROM : "FROM" > }
-TOKEN : { < WHERE : "WHERE" > }
-TOKEN : { < INSERT : "INSERT" > }
-TOKEN : { < INTO : "INTO" > }
-TOKEN : { < VALUES : "VALUES" > }
+TOKEN : { < DELETE : "DELETE " > }
+TOKEN : { < FROM : "FROM " > }
+TOKEN : { < WHERE : "WHERE " > }
+TOKEN : { < INSERT : "INSERT " > }
+TOKEN : { < INTO : "INTO " > }
+TOKEN : { < VALUES : "VALUES"([" "])? > }
 
 
 
 
 // Special Character Tokens
-TOKEN : { < LPAREN : "(" > }
-TOKEN : { < RPAREN : ")" > }
+TOKEN : { < LPAREN : "("([" "])? > }
+TOKEN : { < RPAREN : ")"([" "])? > }
 TOKEN : { < SEMICOLON : ";" > }
-TOKEN : { < COMMA : "," > }
+TOKEN : { < COMMA : ","([" "])? > }
 TOKEN : { < SINGLEQUOTE : "'" > }
-TOKEN : {< OPERATOR: "=" | "!=" | ">=" | ">" | "<=" | "<" >}
+TOKEN : { < OPERATOR: ([" "])?("=" | "!=" | ">=" | ">" | "<=" | "<")([" "])? > }
 TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < MINUS : "-" > }
 TOKEN : { < NULL : "NULL" > }
@@ -69,11 +73,10 @@ TOKEN : { < FSLASH : "/" > }
 
 
 // Select Tokens
-TOKEN : { < AND : "AND" > }
-TOKEN : { < OR : "OR" > }
-TOKEN : { < SELECT : "SELECT" > }
-TOKEN : { < COUNT : "COUNT" > }
-TOKEN : { < CONSTANT : "CONSTANT" > }
+TOKEN : { < AND : " AND " > }
+TOKEN : { < OR : " OR " > }
+TOKEN : { < SELECT : "SELECT " > }
+TOKEN : { < COUNT : " COUNT" > }
 
 // Literal Tokens
 TOKEN : { < DIGIT : ["0"-"9"] > }
@@ -98,12 +101,12 @@ int ParseDDLQuery() : {int queryType;}
 }
 int DropTable() : {}
 {
-	<DROP><TABLE>Name()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
+	<DROP><TABLE>TableName()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
 	{return 3;}
 }
 int CreateTable() : {int queryType;}
 {
-	<CREATE><TABLE>Name()<LPAREN>TableColumn()(<COMMA>(TableColumn()|TableConstraint()))*<RPAREN>queryType=PartitionedOrNonPartitioned(){return queryType;}
+	<CREATE><TABLE>TableName()<LPAREN>TableColumn()(<COMMA>(TableColumn()|TableConstraint()))*<RPAREN>queryType=PartitionedOrNonPartitioned(){return queryType;}
 }
 int PartitionedOrNonPartitioned() : {}
 {
@@ -131,8 +134,33 @@ void TableColumn() : {}
 }
 void TableConstraint() : {}
 {
-	<CONSTRAINT>Name()(<PRIMARYKEY>|<UNIQUE>)<LPAREN>Name()<RPAREN>
+	<CONSTRAINT>Name()((<PRIMARYKEY>|<UNIQUE>)<LPAREN>NameWithoutSpace()<RPAREN>|CheckConstraints()|ForeignKeyConstraint())
 }
+void CheckConstraints() : {}
+{
+	<CHECK><LPAREN>Name()(CheckConstraint()|CheckConstraintWithIn()|CheckConstraintWithBetween()|CheckConstraintWithOperator())<RPAREN>
+}
+void CheckConstraint() : {}
+{
+	<IS>(<NOT>)?<NULL>
+}
+void CheckConstraintWithIn() : {}
+{
+	<IN><LPAREN>ListOfConstants()<RPAREN>
+}
+void CheckConstraintWithBetween() : {}
+{
+	<BETWEEN>Constant()<AND>Constant()
+}
+void CheckConstraintWithOperator() : {}
+{
+	<OPERATOR>NameWithoutSpace()
+}
+void ForeignKeyConstraint() : {}
+{
+	<FOREIGNKEY><LPAREN>NameWithoutSpace()<RPAREN><REFERENCES>Name()<LPAREN>NameWithoutSpace()<RPAREN>
+}
+
 
 
 // Select Statement
@@ -144,7 +172,7 @@ int Select() : {int queryType;}
 
 void ListOfAttributes() : {}
 {
-	TableAttribute()(<COMMA>TableAttribute())*<FROM>
+	TableAttribute()(<COMMA>TableAttribute())*
 }
 void TableAttribute() : {}
 {
@@ -159,8 +187,6 @@ void NonJoinConditions() : {}
 {
 	NonJoinCondition()((<AND>|<OR>)NonJoinCondition())?
 }
-
-
 
 void Count(): {}
 {
@@ -188,15 +214,17 @@ int ParseDMLQuery() : {int queryType;}
 }
 int DeleteTable() : {}
 {
-  <DELETE><FROM>Name()(WhereClause())?<SEMICOLON>
+  <DELETE><FROM>NameWithoutSpace()(WhereClauseForDelete())?<SEMICOLON>
   {return 4;}
-  
 }
-
 int InsertTable() : {}
 {
   <INSERT><INTO>Name()<VALUES><LPAREN>Constant()(<COMMA>Constant())*<RPAREN><SEMICOLON>
   {return 5;}
+}
+void WhereClauseForDelete() : {}
+{
+	([" "])<WHERE>Name()<OPERATOR>Constant()
 }
 
 
@@ -217,13 +245,7 @@ void NameWithoutSpace() : {}
 void TableName() : {}
 {
 	(<LETTER>|<UNDERSCORE>)(<LETTER>|<UNDERSCORE>|<DIGIT>)*([" "])
-	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>)*
 }
-void TableName() : {}
-{
-	(<LETTER>|<UNDERSCORE>)(<LETTER>|<UNDERSCORE>|<DIGIT>)*
-}+
-
 void ListOfTables() : {}
 {
 	TableName()(<COMMA>TableName())?

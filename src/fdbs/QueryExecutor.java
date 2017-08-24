@@ -346,7 +346,7 @@ public class QueryExecutor {
 
 		// Appends constraint name
 		basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
-		basicQuery.append(columnName + " <= " + maxRange);
+		basicQuery.append(columnName + " < " + maxRange);
 		basicQuery.append(")");
 
 		// Adds back ')' after constraint is appended
@@ -395,9 +395,9 @@ public class QueryExecutor {
 
 		String operator = "";
 		if (createLessPartitionsThanDatabase) {
-			operator = " > ";
-		} else {
 			operator = " >= ";
+		} else {
+			operator = " > ";
 		}
 
 		// Removes last ')' to further append constraint
