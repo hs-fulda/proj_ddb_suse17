@@ -237,8 +237,8 @@ public class QueryExecutor {
 		String connectionDB = "";
 		int statementKey = 1;
 
-		Statement statement = null;
-
+		java.sql.Statement statement = null;
+			//Map of 3 oracle.jdbc.driver.OracleStatement objects
 		while (statementKey <= statementsMap.size()) {
 
 			statement = statementsMap.get(statementKey);
@@ -268,8 +268,8 @@ public class QueryExecutor {
 				} else if (fedStatement.getConnection().getAutoCommit() == false) {
 					fedStatement.getConnection().rollback();
 
-					String message = "Connect " + statementKey + " " + connectionDB + ": " + "e.getMessage()";
-					CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + "e.getMessage()");
+					String message = "Connect " + statementKey + " " + connectionDB + ": " + e.getMessage();
+					CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 					throw new FedException(new Throwable(message));
 				}
 				e.printStackTrace();
@@ -316,8 +316,8 @@ public class QueryExecutor {
 				} else if (fedStatement.getConnection().getAutoCommit() == false) {
 					fedStatement.getConnection().rollback();
 
-					String message = "Connect " + statementKey + " " + connectionDB + ": " + "e.getMessage()";
-					CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + "e.getMessage()");
+					String message = "Connect " + statementKey + " " + connectionDB + ": " + e.getMessage();
+					CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
 					throw new FedException(new Throwable(message));
 				}
 				e.printStackTrace();
