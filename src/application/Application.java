@@ -62,7 +62,7 @@ public class Application {
     } catch (FedException e) {
       System.out.println(e);
     }
-    // close all JDBC connections
+    // @author: Anfilov. Close all JDBC connections
     finally {
       fedConnection.close();
     }
