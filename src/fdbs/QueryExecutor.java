@@ -3,6 +3,7 @@ package fdbs;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,11 +38,22 @@ public class QueryExecutor {
 		int queryType = QueryTypeConstant.NONE;
 		int result = -1;
 
+		/* Some complex preprocess start */
+
 		// Removes tabs, extra spaces and lines for parser to understand
 		// according to the grammar.
 		// NOTE: We use this method because skippng tabs, spaces and new lines
 		// does not work efficiently.
+		boolean isInsertQuery = query.toUpperCase().startsWith("INSERT");
+		String preserveWhereClause = "";
+		if (isInsertQuery) {
+			preserveWhereClause = query.substring(query.toUpperCase().indexOf("VALUES") + 6);
+			query = query.substring(0, query.toUpperCase().indexOf("VALUES") + 6);
+		}
+
 		query = processQueryForParser(query);
+
+		/* Some complex preprocess end */
 
 		// Every query needs ';' to parse, so being added here. Parsing starts
 		// here.
@@ -53,10 +65,19 @@ public class QueryExecutor {
 			// This method is a general method from where all grammar starts.
 			queryType = parser.ParseQuery();
 
+		/* Some complex post process start before going to database */
+
 		// Special characters like Umlauts were replaced with Unicodes while
 		// running processQueryForParser method because JavaCC does not support
 		// umlauts because instead produces unicode of corresponding umlaut
 		query = UnicodeManager.replaceUnicodesWithChars(query);
+		query = replace3DashesWithSpace(query);
+		query = replaceBraces(query);
+
+		if (isInsertQuery) {
+			query += preserveWhereClause;
+		}
+		/* Some complex post process end before going to database */
 
 		switch (queryType) {
 		case QueryTypeConstant.CREATE_NON_PARTITIONED:
@@ -80,6 +101,28 @@ public class QueryExecutor {
 
 		return result;
 
+	}
+
+	private static String replaceBraces(String query) {
+		query = query.replaceAll("[(]{3}", "(");
+		query = query.replaceAll("//////", ")");
+		return query;
+	}
+
+	// Replaces dashes back space ( ), was added to parse successfully
+	// because I am unable to handle space in between string constant in
+	// Parser
+	private static String replace3DashesWithSpace(String query) {
+		// Replaces underscores back space ( ), was added to parse successfully
+		// because I am unable to handle space in between string constant in
+		// Parser
+		Pattern pattern = Pattern.compile("'(.+[---]+.+)'");
+		Matcher m = pattern.matcher(query);
+		while (m.find()) {
+			String searchStr = m.group();
+			query = query.replaceAll(searchStr, searchStr.replaceAll("---", " "));
+		}
+		return query;
 	}
 
 	private static String processQueryForParser(String query) {
@@ -106,11 +149,35 @@ public class QueryExecutor {
 
 		query = sb.toString();
 
+		// Removes all spaces in string constant because they are redundant e.g.
+		// 'ABC ' become 'ABC'
 		Pattern pattern = Pattern.compile("'([^',]*[ ]+)'");
 		Matcher m = pattern.matcher(query);
 		while (m.find()) {
 			String searchStr = m.group();
 			query = query.replaceAll(searchStr, searchStr.replaceAll(" ", ""));
+		}
+
+		// Replaces spaces in between string constant with ___ (with replace
+		// back)
+		// It is done because I am unable to handle space between string
+		// constant parser, it gives ever no matter what I do. e.g. 'ABC XYZ'
+		// becomes 'ABC___XYZ'
+		pattern = Pattern.compile("'([^',]*[ ]+.+)'");
+		m = pattern.matcher(query);
+		while (m.find()) {
+			String searchStr = m.group();
+			query = query.replaceAll(searchStr, searchStr.replaceAll(" ", "---"));
+		}
+
+		// Replaces ( and ) because ) is showing conflict in parser and can not
+		// add it in String constant, so work around.
+		pattern = Pattern.compile("'.*[^,][(].*[)].*'");
+		m = pattern.matcher(query);
+		while (m.find()) {
+			String searchStr = m.group();
+			query = query.replaceAll(searchStr, searchStr.replaceAll("[(]{1}", "((("));
+			query = query.replaceAll(searchStr, searchStr.replaceAll(")", "//////"));
 		}
 
 		// Replaces umlauts with unicodes to parse successfully because JavaCC
@@ -168,41 +235,45 @@ public class QueryExecutor {
 	private static int deleteTable(String query) throws FedException {
 		int result = -1;
 		String connectionDB = "";
-		Integer connectionNumber = -1;
+		int statementKey = 1;
 
 		Statement statement = null;
-		try {
-			for (Integer statementKey : statementsMap.keySet()) {
 
-				// Logger
-				CustomLogger.log(Level.INFO,
-						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
-				connectionNumber = statementKey;
-				if (statementKey == 1) {
-					connectionDB = ConnectionConstants.CONNECTION_1_SID;
-				}
-				if (statementKey == 2) {
-					connectionDB = ConnectionConstants.CONNECTION_2_SID;
-				}
-				if (statementKey == 3) {
-					connectionDB = ConnectionConstants.CONNECTION_3_SID;
-				}
+		while (statementKey <= statementsMap.size()) {
 
-				statement = statementsMap.get(statementKey);
-				result = statement.executeUpdate(query);
-				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
-						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+			statement = statementsMap.get(statementKey);
+
+			// Logger
+			CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
+
+			if (statementKey == 1) {
+				connectionDB = ConnectionConstants.CONNECTION_1_SID;
 			}
-		} catch (SQLException e) {
-			// Rollback if there is an error in any database while deleting
-			// table. We can rollback only if autocommit is off, so checking
-			// that
-			if (fedStatement.getConnection().getAutoCommit() == false)
-				fedStatement.getConnection().rollback();
+			if (statementKey == 2) {
+				connectionDB = ConnectionConstants.CONNECTION_2_SID;
+			}
+			if (statementKey == 3) {
+				connectionDB = ConnectionConstants.CONNECTION_3_SID;
+			}
 
-			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
-			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
-			throw new FedException(new Throwable(message));
+			try {
+				result = statement.executeUpdate(query);
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
+				statementKey++;
+			} catch (SQLException e) {
+
+				if (e instanceof SQLIntegrityConstraintViolationException) {
+					statementKey++;
+					continue;
+				} else if (fedStatement.getConnection().getAutoCommit() == false) {
+					fedStatement.getConnection().rollback();
+
+					String message = "Connect " + statementKey + " " + connectionDB + ": " + "e.getMessage()";
+					CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + "e.getMessage()");
+					throw new FedException(new Throwable(message));
+				}
+				e.printStackTrace();
+			}
 
 		}
 
@@ -212,41 +283,46 @@ public class QueryExecutor {
 	private static int insertTable(String query) throws FedException {
 		int result = -1;
 		String connectionDB = "";
-		Integer connectionNumber = -1;
+		int statementKey = 1;
 
 		Statement statement = null;
-		try {
-			for (Integer statementKey : statementsMap.keySet()) {
 
-				// Logger
-				CustomLogger.log(Level.INFO,
-						"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
-				connectionNumber = statementKey;
-				if (statementKey == 1) {
-					connectionDB = ConnectionConstants.CONNECTION_1_SID;
-				}
-				if (statementKey == 2) {
-					connectionDB = ConnectionConstants.CONNECTION_2_SID;
-				}
-				if (statementKey == 3) {
-					connectionDB = ConnectionConstants.CONNECTION_3_SID;
-				}
+		while (statementKey <= statementsMap.size()) {
 
-				statement = statementsMap.get(statementKey);
-				result = statement.executeUpdate(query);
-				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": "
-						+ query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+			statement = statementsMap.get(statementKey);
+
+			// Logger
+			CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
+
+			if (statementKey == 1) {
+				connectionDB = ConnectionConstants.CONNECTION_1_SID;
 			}
-		} catch (SQLException e) {
-			// Rollback if there is an error in any database while deleting
-			// table. We can rollback only if autocommit is off, so checking
-			// that
-			if (fedStatement.getConnection().getAutoCommit() == false)
-				fedStatement.getConnection().rollback();
+			if (statementKey == 2) {
+				connectionDB = ConnectionConstants.CONNECTION_2_SID;
+			}
+			if (statementKey == 3) {
+				connectionDB = ConnectionConstants.CONNECTION_3_SID;
+			}
 
-			String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getMessage();
-			CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getMessage());
-			throw new FedException(new Throwable(message));
+			try {
+				result = statement.executeUpdate(query);
+				CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
+				statementKey++;
+			} catch (SQLException e) {
+
+				if (e instanceof SQLIntegrityConstraintViolationException) {
+					statementKey++;
+					continue;
+				} else if (fedStatement.getConnection().getAutoCommit() == false) {
+					fedStatement.getConnection().rollback();
+
+					String message = "Connect " + statementKey + " " + connectionDB + ": " + "e.getMessage()";
+					CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + "e.getMessage()");
+					throw new FedException(new Throwable(message));
+				}
+				e.printStackTrace();
+			}
+
 		}
 
 		return result;

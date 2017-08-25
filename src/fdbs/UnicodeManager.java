@@ -29,25 +29,25 @@ public class UnicodeManager {
 
 	public static String getUnicodedQuery(String query) {
 		if (query.contains("Ä")) {
-			query = query.replaceAll("Ä", getUnicodeFromChar("Ä"));
+			query = query.replaceAll("Ä", "\\u00c3\\u201e");
 		}
 		if (query.contains("Ü")) {
-			query = query.replaceAll("Ü", getUnicodeFromChar("Ü"));
+			query = query.replaceAll("Ü", "\\u00c3\\u0153");
 		}
 		if (query.contains("Ö")) {
-			query = query.replaceAll("Ö", getUnicodeFromChar("Ö"));
+			query = query.replaceAll("Ö", "\\u00c3\\u2013");
 		}
 		if (query.contains("ä")) {
-			query = query.replaceAll("ä", getUnicodeFromChar("ä"));
+			query = query.replaceAll("ä", "\\u00c3\\u00a4");
 		}
 		if (query.contains("ü")) {
-			query = query.replaceAll("ü", getUnicodeFromChar("ü"));
+			query = query.replaceAll("ü", "\\u00c3\\u00bc");
 		}
 		if (query.contains("ö")) {
-			query = query.replaceAll("ö", getUnicodeFromChar("ö"));
+			query = query.replaceAll("ö", "\\u00c3\\u00b6");
 		}
 		if (query.contains("ß")) {
-			query = query.replaceAll("ß", getUnicodeFromChar("ß"));
+			query = query.replaceAll("ß", "\\u00c3\\u0178");
 		}
 
 		return query;

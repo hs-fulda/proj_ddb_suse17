@@ -1,6 +1,7 @@
 options {
 	STATIC = false;
 	IGNORE_CASE = true;
+	UNICODE_INPUT = true;
 }
 
 PARSER_BEGIN(GepardParser)
@@ -9,7 +10,7 @@ public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try {
-			parser.ListOfTables();
+			//parser.ListOfTables();
 			//System.out.println(parser.ParseQuery());
 			System.out.println("Validated");
 		}catch(Exception e){
@@ -23,17 +24,14 @@ PARSER_END(GepardParser)
 
 // DDL Tokens
 TOKEN : { < CREATE : "CREATE " > }
-TOKEN : { < DROP : "DROP " > }
 TOKEN : { < TABLE : "TABLE " > }
 TOKEN : { < INTEGER : "INTEGER" > }
 TOKEN : { < VARCHAR : "VARCHAR"> }
-TOKEN : { < CASCADE : "CASCADE " > }
-TOKEN : { < CONSTRAINT : "CONSTRAINT"([" "])? > }
-TOKEN : { < CONSTRAINTS : "CONSTRAINTS" > }
+TOKEN : { < CONSTRAINT : "CONSTRAINT " > }
+TOKEN : { < CHECK : "CHECK " > }
 TOKEN : { < PRIMARYKEY : "PRIMARY KEY"([" "])? > }
 TOKEN : { < UNIQUE : "UNIQUE"([" "])? > }
 TOKEN : { < HORIZONTAL : "HORIZONTAL"([" "])? > }
-TOKEN : { < CHECK : "CHECK " > }
 TOKEN : { < IS : " IS " > }
 TOKEN : { < NOT : "NOT " > }
 TOKEN : { < IN : "IN " > }
@@ -41,28 +39,45 @@ TOKEN : { < FOREIGNKEY : "FOREIGN KEY " > }
 TOKEN : { < REFERENCES : "REFERENCES " > }
 TOKEN : { < BETWEEN : "BETWEEN " > }
 
-
+TOKEN : { < DROP : "DROP " > }
+TOKEN : { < CASCADE : "CASCADE " > }
+TOKEN : { < CONSTRAINTS : "CONSTRAINTS" > }
 
 
 // DML Tokens
 TOKEN : { < DELETE : "DELETE " > }
-TOKEN : { < FROM : "FROM " > }
-TOKEN : { < WHERE : "WHERE " > }
+
 TOKEN : { < INSERT : "INSERT " > }
 TOKEN : { < INTO : "INTO " > }
 TOKEN : { < VALUES : "VALUES"([" "])? > }
 
 
+// Select Tokens
+TOKEN : { < SELECT : "SELECT " > }
 
 
-// Special Character Tokens
+
+// Where Tokens
+TOKEN : { < WHERE : "WHERE " > }
+TOKEN : { < AND : " AND " > }
+TOKEN : { < OR : " OR " > }
+TOKEN : { < COUNT : " COUNT" > }
+TOKEN : { < SUM : " SUM" > }
+TOKEN : { < GROUPBY : " GROUP BY" > }
+
+
+
+// Other Tokens
+TOKEN : { < FROM : "FROM " > }
+TOKEN : { < DIGIT : ["0"-"9"] > }
+TOKEN : { < LETTER : ["a"-"z","A"-"Z"] > }
 TOKEN : { < LPAREN : "("([" "])? > }
 TOKEN : { < RPAREN : ")"([" "])? > }
-TOKEN : { < SEMICOLON : ";" > }
+TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < COMMA : ","([" "])? > }
+TOKEN : { < SEMICOLON : ";" > }
 TOKEN : { < SINGLEQUOTE : "'" > }
 TOKEN : { < OPERATOR: ([" "])?("=" | "!=" | ">=" | ">" | "<=" | "<")([" "])? > }
-TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < MINUS : "-" > }
 TOKEN : { < NULL : "NULL" > }
 TOKEN : { < DOT : "." > }
@@ -70,39 +85,26 @@ TOKEN : { < AST : "*" > }
 TOKEN : { < FSLASH : "/" > }
 
 
+/* ================= Tokens End =============== */
 
+/* ================= Rules Start ============== */
 
-// Select Tokens
-TOKEN : { < AND : " AND " > }
-TOKEN : { < OR : " OR " > }
-TOKEN : { < SELECT : "SELECT " > }
-TOKEN : { < COUNT : " COUNT" > }
-
-// Literal Tokens
-TOKEN : { < DIGIT : ["0"-"9"] > }
-TOKEN : { < LETTER : ["a"-"z","A"-"Z"] > }
-
-/* ================ Tokens End ============== */
-
-/* ================ Rules Start ============== */
 
 // Main Parser Call
 int ParseQuery() : {int queryType;}
 {
 	queryType=ParseDDLQuery(){return queryType;} |
-	queryType=ParseDMLQuery(){return queryType;}
+	queryType=ParseDMLQuery(){return queryType;} |
+	queryType=ParseSelectQuery(){return queryType;}
 }
 
-// DDL Statement
+
+// DDL
 int ParseDDLQuery() : {int queryType;}
 {
-	queryType=DropTable(){return queryType;} |
-	queryType=CreateTable(){return queryType;}
-}
-int DropTable() : {}
-{
-	<DROP><TABLE>TableName()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
-	{return 3;}
+	queryType=CreateTable(){return queryType;} |
+	queryType=DropTable(){return queryType;}
+	
 }
 int CreateTable() : {int queryType;}
 {
@@ -122,25 +124,21 @@ void CreateTablePartitioned() : {}
 }
 void HorizontalSyntax() : {}
 {
-	<HORIZONTAL><LPAREN>Name()<LPAREN>ListOfBoundaries()<RPAREN><RPAREN><SEMICOLON>
+	<HORIZONTAL><LPAREN>NameWithSpace()<LPAREN>ListOfBoundaries()<RPAREN><RPAREN><SEMICOLON>
 }
 void ListOfBoundaries() : {}
 {
 	(<DIGIT>)+(<COMMA>(<DIGIT>)+)*
 }
-void TableColumn() : {}
-{
-	Name()(<INTEGER>|(<VARCHAR><LPAREN>(<DIGIT>)+<RPAREN>))
-}
 void TableConstraint() : {}
 {
-	<CONSTRAINT>Name()((<PRIMARYKEY>|<UNIQUE>)<LPAREN>NameWithoutSpace()<RPAREN>|CheckConstraints()|ForeignKeyConstraint())
+	<CONSTRAINT>ConstraintName()((<PRIMARYKEY>|<UNIQUE>)<LPAREN>NameWithoutSpace()<RPAREN>|CheckConstraints()|ForeignKeyConstraint())
 }
 void CheckConstraints() : {}
 {
-	<CHECK><LPAREN>Name()(CheckConstraint()|CheckConstraintWithIn()|CheckConstraintWithBetween()|CheckConstraintWithOperator())<RPAREN>
+	<CHECK><LPAREN>NameWithSpace()(CheckConstraintWithIs()|CheckConstraintWithIn()|CheckConstraintWithBetween()|CheckConstraintWithOperator())<RPAREN>
 }
-void CheckConstraint() : {}
+void CheckConstraintWithIs() : {}
 {
 	<IS>(<NOT>)?<NULL>
 }
@@ -158,55 +156,17 @@ void CheckConstraintWithOperator() : {}
 }
 void ForeignKeyConstraint() : {}
 {
-	<FOREIGNKEY><LPAREN>NameWithoutSpace()<RPAREN><REFERENCES>Name()<LPAREN>NameWithoutSpace()<RPAREN>
+	<FOREIGNKEY><LPAREN>NameWithoutSpace()<RPAREN><REFERENCES>NameWithSpace()<LPAREN>NameWithoutSpace()<RPAREN>
 }
 
-
-
-// Select Statement
-
-int Select() : {int queryType;}
+int DropTable() : {}
 {
-	<SELECT>(queryType=SelectCountAllTable(){return queryType;}|queryType=SelectNoGroup(){return queryType;})
-}
-
-void ListOfAttributes() : {}
-{
-	TableAttribute()(<COMMA>TableAttribute())*
-}
-void TableAttribute() : {}
-{
-	Name()<DOT>Name()
-}
-void NonJoinCondition() : {}
-{
-	<LPAREN>TableAttribute()<OPERATOR>Constant()<RPAREN>
-}
-
-void NonJoinConditions() : {}
-{
-	NonJoinCondition()((<AND>|<OR>)NonJoinCondition())?
-}
-
-void Count(): {}
-{
- <COUNT><LPAREN><AST><RPAREN>
+	<DROP><TABLE>TableName()(<CASCADE><CONSTRAINTS>)?<SEMICOLON>
+	{return 3;}
 }
 
 
-int SelectCountAllTable(): {}
-{
-Count()<FROM>Name()<SEMICOLON>
-{return 11;}
-}
-
-int SelectNoGroup() : {}
-{
-(<AST>|ListOfAttributes())<FROM>ListOfTables()<SEMICOLON>{return 12;}
-}
-
-
-// DML Statement
+// DML
 int ParseDMLQuery() : {int queryType;}
 {
 	queryType=DeleteTable(){return queryType;} | 
@@ -219,37 +179,59 @@ int DeleteTable() : {}
 }
 int InsertTable() : {}
 {
-  <INSERT><INTO>Name()<VALUES><LPAREN>Constant()(<COMMA>Constant())*<RPAREN><SEMICOLON>
+  <INSERT><INTO>NameWithSpace()<VALUES>
   {return 5;}
 }
 void WhereClauseForDelete() : {}
 {
-	([" "])<WHERE>Name()<OPERATOR>Constant()
+	([" "])<WHERE>NameWithSpace()<OPERATOR>Constant()
 }
 
 
 
-// General Semantics
-void WhereClause() : {}
+// Select
+int ParseSelectQuery() : {int queryType;}
 {
-	<WHERE>Name()<OPERATOR>Constant()
+	<SELECT>{return 9;}
 }
-void Name() : {}
+void Count(): {}
+{
+ <COUNT><LPAREN><AST><RPAREN>
+}
+
+
+
+
+void TableName() : {}
+{
+	NameWithSpace()
+}
+void TableColumn() : {}
+{
+	NameWithSpace()(<INTEGER>|(<VARCHAR><LPAREN>IntegerPositive()<RPAREN>))
+}
+void TableColumnSize(): {}
+{
+	 IntegerPositive()
+}
+void ConstraintName() : {}
+{
+	NameWithSpace()
+}
+
+
+// Other Grammar
+void IntegerPositive() : {}
+{
+	(<DIGIT>)+
+}
+void NameWithSpace() : {}
 {
 	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+([" "])
 }
 void NameWithoutSpace() : {}
 {
-	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+
-}
-void TableName() : {}
-{
-	(<LETTER>|<UNDERSCORE>)(<LETTER>|<UNDERSCORE>|<DIGIT>)*([" "])
-}
-void ListOfTables() : {}
-{
-	TableName()(<COMMA>TableName())?
-
+	(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<LPAREN>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+
 }
 void Constant() : {}
 {
@@ -261,11 +243,12 @@ void IntegerConstant(): {}
 }
 void StringConstant(): {}
 {
-	 <SINGLEQUOTE>NameWithoutSpace()<SINGLEQUOTE>
+	<SINGLEQUOTE>(NameWithoutSpace())?<SINGLEQUOTE>
 }
 void ListOfConstants() : {}
 {
 	Constant()(<COMMA>Constant())*
 }
 
-/* ================ Rules End ============== */
+
+/* ================== Rules End =============== */

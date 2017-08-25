@@ -1,10 +1,10 @@
 package application;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -53,39 +53,58 @@ public class FileUtility {
 	public static List<String> getScriptsFromFile(File file) {
 		List<String> scripts = new ArrayList<String>();
 
+		BufferedReader br = null;
 		try {
-			Scanner read = new Scanner(file, "UTF-8");
-			read.useDelimiter(";");
+			StringBuilder script = new StringBuilder();
+			String line;
 
-			while (read.hasNext()) {
-				String script = read.next().trim();
+			br = new BufferedReader(new FileReader(file));
 
-				// If there is an empty string then do not add as a script
-				if (script.isEmpty())
+			while ((line = br.readLine()) != null) {
+				line = fetchValidScript(line);
+
+				if (line.trim().isEmpty())
 					continue;
 
-				// Remove lines from script that are comments or special lines
-				// like -- or /* //
-				script = fetchValidScript(script);
+				if (line.contains(";")) {
+					String[] strArr = line.split(";");
+					for (String str : strArr) {
+						if (str.isEmpty())
+							continue;
 
-				scripts.add(script);
+						script.append(str);
+					}
+
+					if (script.length() > 0) {
+						scripts.add(script.toString());
+					}
+					script = new StringBuilder();
+				} else {
+					script.append(line);
+				}
 			}
-			read.close();
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 
 		return scripts;
 	}
 
-	
 	// Does not consider comments (e.g. -- // /* \\ # as scripts
 	private static String fetchValidScript(String script) {
-		StringBuffer validScript = new StringBuffer();
-		Scanner input = new Scanner(script);
+		StringBuilder validScript = new StringBuilder();
+		Scanner input = new Scanner(script.toString());
 		while (input.hasNextLine()) {
 			String line = input.nextLine();
-			if (line.startsWith("--") || line.startsWith("\\\\") || line.startsWith("//") || line.startsWith("/*") || line.startsWith("#") || line.trim().isEmpty())
+			if (line.startsWith("--") || line.startsWith("\\\\") || line.startsWith("//") || line.startsWith("/*")
+					|| line.startsWith("#") || line.trim().isEmpty())
 				continue;
 			else
 				validScript.append(line);

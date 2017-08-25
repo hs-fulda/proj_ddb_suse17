@@ -13,87 +13,91 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int CREATE = 1;
   /** RegularExpression Id. */
-  int DROP = 2;
+  int TABLE = 2;
   /** RegularExpression Id. */
-  int TABLE = 3;
+  int INTEGER = 3;
   /** RegularExpression Id. */
-  int INTEGER = 4;
+  int VARCHAR = 4;
   /** RegularExpression Id. */
-  int VARCHAR = 5;
+  int CONSTRAINT = 5;
   /** RegularExpression Id. */
-  int CASCADE = 6;
+  int CHECK = 6;
   /** RegularExpression Id. */
-  int CONSTRAINT = 7;
+  int PRIMARYKEY = 7;
   /** RegularExpression Id. */
-  int CONSTRAINTS = 8;
+  int UNIQUE = 8;
   /** RegularExpression Id. */
-  int PRIMARYKEY = 9;
+  int HORIZONTAL = 9;
   /** RegularExpression Id. */
-  int UNIQUE = 10;
+  int IS = 10;
   /** RegularExpression Id. */
-  int HORIZONTAL = 11;
+  int NOT = 11;
   /** RegularExpression Id. */
-  int CHECK = 12;
+  int IN = 12;
   /** RegularExpression Id. */
-  int IS = 13;
+  int FOREIGNKEY = 13;
   /** RegularExpression Id. */
-  int NOT = 14;
+  int REFERENCES = 14;
   /** RegularExpression Id. */
-  int IN = 15;
+  int BETWEEN = 15;
   /** RegularExpression Id. */
-  int FOREIGNKEY = 16;
+  int DROP = 16;
   /** RegularExpression Id. */
-  int REFERENCES = 17;
+  int CASCADE = 17;
   /** RegularExpression Id. */
-  int BETWEEN = 18;
+  int CONSTRAINTS = 18;
   /** RegularExpression Id. */
   int DELETE = 19;
   /** RegularExpression Id. */
-  int FROM = 20;
+  int INSERT = 20;
   /** RegularExpression Id. */
-  int WHERE = 21;
+  int INTO = 21;
   /** RegularExpression Id. */
-  int INSERT = 22;
+  int VALUES = 22;
   /** RegularExpression Id. */
-  int INTO = 23;
+  int SELECT = 23;
   /** RegularExpression Id. */
-  int VALUES = 24;
+  int WHERE = 24;
   /** RegularExpression Id. */
-  int LPAREN = 25;
+  int AND = 25;
   /** RegularExpression Id. */
-  int RPAREN = 26;
+  int OR = 26;
   /** RegularExpression Id. */
-  int SEMICOLON = 27;
+  int COUNT = 27;
   /** RegularExpression Id. */
-  int COMMA = 28;
+  int SUM = 28;
   /** RegularExpression Id. */
-  int SINGLEQUOTE = 29;
+  int GROUPBY = 29;
   /** RegularExpression Id. */
-  int OPERATOR = 30;
+  int FROM = 30;
   /** RegularExpression Id. */
-  int UNDERSCORE = 31;
+  int DIGIT = 31;
   /** RegularExpression Id. */
-  int MINUS = 32;
+  int LETTER = 32;
   /** RegularExpression Id. */
-  int NULL = 33;
+  int LPAREN = 33;
   /** RegularExpression Id. */
-  int DOT = 34;
+  int RPAREN = 34;
   /** RegularExpression Id. */
-  int AST = 35;
+  int UNDERSCORE = 35;
   /** RegularExpression Id. */
-  int FSLASH = 36;
+  int COMMA = 36;
   /** RegularExpression Id. */
-  int AND = 37;
+  int SEMICOLON = 37;
   /** RegularExpression Id. */
-  int OR = 38;
+  int SINGLEQUOTE = 38;
   /** RegularExpression Id. */
-  int SELECT = 39;
+  int OPERATOR = 39;
   /** RegularExpression Id. */
-  int COUNT = 40;
+  int MINUS = 40;
   /** RegularExpression Id. */
-  int DIGIT = 41;
+  int NULL = 41;
   /** RegularExpression Id. */
-  int LETTER = 42;
+  int DOT = 42;
+  /** RegularExpression Id. */
+  int AST = 43;
+  /** RegularExpression Id. */
+  int FSLASH = 44;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -102,47 +106,49 @@ public interface GepardParserConstants {
   String[] tokenImage = {
     "<EOF>",
     "\"CREATE \"",
-    "\"DROP \"",
     "\"TABLE \"",
     "\"INTEGER\"",
     "\"VARCHAR\"",
-    "\"CASCADE \"",
-    "<CONSTRAINT>",
-    "\"CONSTRAINTS\"",
+    "\"CONSTRAINT \"",
+    "\"CHECK \"",
     "<PRIMARYKEY>",
     "<UNIQUE>",
     "<HORIZONTAL>",
-    "\"CHECK \"",
     "\" IS \"",
     "\"NOT \"",
     "\"IN \"",
     "\"FOREIGN KEY \"",
     "\"REFERENCES \"",
     "\"BETWEEN \"",
+    "\"DROP \"",
+    "\"CASCADE \"",
+    "\"CONSTRAINTS\"",
     "\"DELETE \"",
-    "\"FROM \"",
-    "\"WHERE \"",
     "\"INSERT \"",
     "\"INTO \"",
     "<VALUES>",
+    "\"SELECT \"",
+    "\"WHERE \"",
+    "\" AND \"",
+    "\" OR \"",
+    "\" COUNT\"",
+    "\" SUM\"",
+    "\" GROUP BY\"",
+    "\"FROM \"",
+    "<DIGIT>",
+    "<LETTER>",
     "<LPAREN>",
     "<RPAREN>",
-    "\";\"",
+    "\"_\"",
     "<COMMA>",
+    "\";\"",
     "\"\\\'\"",
     "<OPERATOR>",
-    "\"_\"",
     "\"-\"",
     "\"NULL\"",
     "\".\"",
     "\"*\"",
     "\"/\"",
-    "\" AND \"",
-    "\" OR \"",
-    "\"SELECT \"",
-    "\" COUNT\"",
-    "<DIGIT>",
-    "<LETTER>",
     "\" \"",
     "\"\\u00c3\\u201e\"",
     "\"\\u00c3\\u0153\"",
