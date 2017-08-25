@@ -10,8 +10,8 @@ public class GepardParser {
 	public static void main(String args[]) {
 		GepardParser parser = new GepardParser(System.in);
 		try {
-			//parser.ListOfTables();
-			//System.out.println(parser.ParseQuery());
+			//parser.WhereClause();
+			System.out.println(parser.ParseQuery());
 			System.out.println("Validated");
 		}catch(Exception e){
 		   System.out.println(e);
@@ -61,9 +61,10 @@ TOKEN : { < SELECT : "SELECT " > }
 TOKEN : { < WHERE : "WHERE " > }
 TOKEN : { < AND : " AND " > }
 TOKEN : { < OR : " OR " > }
-TOKEN : { < COUNT : " COUNT" > }
-TOKEN : { < SUM : " SUM" > }
-TOKEN : { < GROUPBY : " GROUP BY" > }
+TOKEN : { < COUNT : "COUNT"([" "])? > }
+TOKEN : { < SUM : "SUM"([" "])? > }
+TOKEN : { < GROUPBY : "GROUP BY " > }
+TOKEN : { < HAVING : " HAVING " > }
 
 
 
@@ -72,7 +73,7 @@ TOKEN : { < FROM : "FROM " > }
 TOKEN : { < DIGIT : ["0"-"9"] > }
 TOKEN : { < LETTER : ["a"-"z","A"-"Z"] > }
 TOKEN : { < LPAREN : "("([" "])? > }
-TOKEN : { < RPAREN : ")"([" "])? > }
+TOKEN : { < RPAREN : ")"([" "])* > }
 TOKEN : { < UNDERSCORE : "_" > }
 TOKEN : { < COMMA : ","([" "])? > }
 TOKEN : { < SEMICOLON : ";" > }
@@ -192,19 +193,44 @@ void WhereClauseForDelete() : {}
 // Select
 int ParseSelectQuery() : {int queryType;}
 {
-	<SELECT>{return 9;}
+	<SELECT>(queryType=SelectCountAllTable(){return queryType;}|queryType=SelectGroupOrNoGroup(){return queryType;}|queryType=SelectWithAst(){return queryType;})
+}
+int SelectCountAllTable(): {}
+{
+ Count()([" "])<FROM>TableName()<SEMICOLON>{return 7;}
 }
 void Count(): {}
 {
  <COUNT><LPAREN><AST><RPAREN>
 }
+int SelectGroupOrNoGroup() : {int queryType;}
+{
+	TableAttribute() (<COMMA>)? ( TableAttribute()(<COMMA>TableAttribute())*([" "]) <FROM>ListOfTables()(WhereClause())?<SEMICOLON>{return 8;} | ( Count()|Sum() )([" "]<FROM>TableName()(WhereClause())?<GROUPBY>TableAttribute()(<HAVING>(Count()|Sum())<OPERATOR>Constant())?<SEMICOLON>){return 9;})
+}
+
+int SelectWithAst() : {int queryType;}
+{
+	<AST>([" "])<FROM>ListOfTables()(WhereClause())?<SEMICOLON>{return 8;}
+}
+void TableAttribute() : {}
+{
+	TableName()<DOT>NameWithoutSpace()
+}
+void Sum(): {}
+{
+	<SUM><LPAREN>NameWithoutSpace()(<DOT>NameWithoutSpace())?<RPAREN>
+}
 
 
 
 
+void ListOfTables() : {}
+{
+	TableName()(<COMMA>TableName())?
+}
 void TableName() : {}
 {
-	NameWithSpace()
+	(<LETTER>|<UNDERSCORE>)(<LETTER>|<DIGIT>|<UNDERSCORE>|<MINUS>|<FSLASH>|"Ä"|"Ü"|"Ö"|"ä"|"ü"|"ö"|"ß")+([" "])
 }
 void TableColumn() : {}
 {
@@ -217,6 +243,18 @@ void TableColumnSize(): {}
 void ConstraintName() : {}
 {
 	NameWithSpace()
+}
+
+
+
+// Where Clause
+void WhereClause() : {}
+{
+	<WHERE>WhereCondition()((<AND>|<OR>)WhereCondition())*
+}
+void WhereCondition() : {}
+{
+	NameWithoutSpace()(<DOT>NameWithoutSpace())?<OPERATOR>(TableAttribute()|Constant())(<RPAREN>)?
 }
 
 

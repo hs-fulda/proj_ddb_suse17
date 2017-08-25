@@ -69,35 +69,37 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int GROUPBY = 29;
   /** RegularExpression Id. */
-  int FROM = 30;
+  int HAVING = 30;
   /** RegularExpression Id. */
-  int DIGIT = 31;
+  int FROM = 31;
   /** RegularExpression Id. */
-  int LETTER = 32;
+  int DIGIT = 32;
   /** RegularExpression Id. */
-  int LPAREN = 33;
+  int LETTER = 33;
   /** RegularExpression Id. */
-  int RPAREN = 34;
+  int LPAREN = 34;
   /** RegularExpression Id. */
-  int UNDERSCORE = 35;
+  int RPAREN = 35;
   /** RegularExpression Id. */
-  int COMMA = 36;
+  int UNDERSCORE = 36;
   /** RegularExpression Id. */
-  int SEMICOLON = 37;
+  int COMMA = 37;
   /** RegularExpression Id. */
-  int SINGLEQUOTE = 38;
+  int SEMICOLON = 38;
   /** RegularExpression Id. */
-  int OPERATOR = 39;
+  int SINGLEQUOTE = 39;
   /** RegularExpression Id. */
-  int MINUS = 40;
+  int OPERATOR = 40;
   /** RegularExpression Id. */
-  int NULL = 41;
+  int MINUS = 41;
   /** RegularExpression Id. */
-  int DOT = 42;
+  int NULL = 42;
   /** RegularExpression Id. */
-  int AST = 43;
+  int DOT = 43;
   /** RegularExpression Id. */
-  int FSLASH = 44;
+  int AST = 44;
+  /** RegularExpression Id. */
+  int FSLASH = 45;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -131,9 +133,10 @@ public interface GepardParserConstants {
     "\"WHERE \"",
     "\" AND \"",
     "\" OR \"",
-    "\" COUNT\"",
-    "\" SUM\"",
-    "\" GROUP BY\"",
+    "<COUNT>",
+    "<SUM>",
+    "\"GROUP BY \"",
+    "\" HAVING \"",
     "\"FROM \"",
     "<DIGIT>",
     "<LETTER>",
