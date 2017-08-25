@@ -286,13 +286,13 @@ public class QueryExecutor {
 		int statementKey = 1;
 
 		Statement statement = null;
-
+		// Logger
+		CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
 		while (statementKey <= statementsMap.size()) {
 
 			statement = statementsMap.get(statementKey);
 
-			// Logger
-			CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
+			
 
 			if (statementKey == 1) {
 				connectionDB = ConnectionConstants.CONNECTION_1_SID;
