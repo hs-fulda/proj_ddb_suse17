@@ -12,7 +12,7 @@ public interface FedResultSetInterface {
 
 	public String getColumnName(int index) throws FedException;
 
-	public int getColumnType(int index) throws FedException;
+	public String getColumnType(int index) throws FedException;
 
 	public void close() throws FedException;
 

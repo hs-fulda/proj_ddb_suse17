@@ -1,6 +1,7 @@
 package fjdbc;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class FedResultSet implements FedResultSetInterface {
 		try {
 			hasNext = currentResultSet.next();
 		} catch (SQLException e) {
-			throw new FedException(new Throwable(e.getMessage()));
+//			throw new FedException(new Throwable(e.getMessage()));
 		}
 		if (hasNext) {
 			return true;
@@ -38,8 +39,14 @@ public class FedResultSet implements FedResultSetInterface {
 		if (resultSets.isEmpty()) {
 			return false;
 		}
+		
 		currentResultSet = resultSets.remove(0);
-		return true;
+		try {
+			hasNext = currentResultSet.next();
+		} catch (SQLException e) {
+			return false;
+		}
+		return hasNext;
 	}
 
 	
@@ -99,17 +106,21 @@ public class FedResultSet implements FedResultSetInterface {
 	}
 
 	
-	public int getColumnType(int index) throws FedException {
+	public String getColumnType(int index) throws FedException {
 		if (isClose) {
 			throw new FedException(new Throwable("FedConnection resource is closed."));
 		}
-		Integer value = null;
+		//Integer value = null;
+		String v = null;
 		try {
-			value = currentResultSet.getMetaData().getColumnType(index);
+		  	ResultSetMetaData rsmd = currentResultSet.getMetaData();
+		  	v = rsmd.getColumnTypeName(index).replaceAll("[0-9]","");
+		  	//System.out.println(rsmd.getColumnTypeName(index)+"\t\t\t"+rsmd.getColumnName(index));
+			//System.out.println(v);
 		} catch (SQLException e) {
 			throw new FedException(new Throwable(e.getMessage()));
 		}
-		return value.intValue();
+		return v;
 	}
 
 	

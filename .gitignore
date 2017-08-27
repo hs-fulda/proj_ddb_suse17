@@ -16,3 +16,4 @@ src/tests/*.java
 src/tests/*.class
 src/parser/*.class
 src/application/ApplicationConstants.java
+src/application/ApplicationConstants.java
