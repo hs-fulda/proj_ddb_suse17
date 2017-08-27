@@ -53,7 +53,6 @@ public class Application {
 	  FedResultSet resultSet = fedStatement.executeQuery(currentScript);
 	  printResult(resultSet);
 	}
-
 	totalOperations++;
       }
 
@@ -98,24 +97,23 @@ public class Application {
       // columnValues.add(columnValue);
       counter++;
     }
- 
+    
      while (resultSet.next()) {
         StringBuilder record = new StringBuilder();
         counter = 0;
         while (counter < numberOfColumns) {          	
         	String columnType = columnTypes.get(counter);  	
         	String columnValue = "";
-        	if (columnType.equals("INTEGER"))
+        	if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
         	  columnValue = resultSet.getInt(counter+1) + "";
         	else if (columnType.equals("VARCHAR"))
-        	  columnValue = resultSet.getString(counter+1);  	
+        	  columnValue = resultSet.getString(counter+1);
         	record.append(String.format("%-12s", columnValue));
         	counter++;
         }
-        
+     // @author: Jahan. Check for duplication. Only insert unique data  
      if (!records.contains(record.toString())) {
-          records.add(record.toString());
-          
+          records.add(record.toString());          
       } else {
           continue;
       }
@@ -147,7 +145,6 @@ public class Application {
       break;
     default:
     }
-
     return columnType;
   }
 

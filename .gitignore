@@ -17,3 +17,5 @@ src/tests/*.class
 src/parser/*.class
 src/application/ApplicationConstants.java
 src/application/ApplicationConstants.java
+logs/fedprot.txt
+logs/fedprot.txt

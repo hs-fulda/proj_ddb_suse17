@@ -75,7 +75,11 @@ public class Helper {
 			System.out.println(e);
 		}
 	}
-	
+	/**
+	 * @parameter query
+	 * @author Jahan
+	 *
+	 */
 	public static List<String> GetColumnNames(String dbname, String table) throws SQLException
 	{
 	  List<String> x = new ArrayList<String>();			

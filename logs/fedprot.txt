@@ -1,28 +1,6 @@
-<11:51:36.597>Start FDBS 
-<11:51:37.895>Received FJDBC:N create table FLUGSJ (FNR integer,FLC varchar(2),FLNR integer, VON varchar(3),NACH varchar(3),AB integer,AN integer,constraint FLUGSJ_VON_NN check (VON is not null),constraint FLUGSJ_NACH_NN check (NACH is not null),constraint FLUGSJ_AB_NN check (AB is not null),constraint FLUGSJ_AN_NN check (AN is not null),constraint FLUGSJ_AB_CHK check (AB between 0 and 2400),constraint FLUGSJ_AN_CHK check (AN between 0 and 2400),constraint FLUGSJ_VONNACH_CHK check (VON != NACH),constraint FLUGSJ_PS primary key (FNR), constraint FLUGSJ_RANGE_CHK_AB check (AB < 1000)) 
-<11:51:37.910>Sending failed to oralv9a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.910>Received FJDBC:N create table FLUGSJ (FNR integer,FLC varchar(2),FLNR integer, VON varchar(3),NACH varchar(3),AB integer,AN integer,constraint FLUGSJ_VON_NN check (VON is not null),constraint FLUGSJ_NACH_NN check (NACH is not null),constraint FLUGSJ_AB_NN check (AB is not null),constraint FLUGSJ_AN_NN check (AN is not null),constraint FLUGSJ_AB_CHK check (AB between 0 and 2400),constraint FLUGSJ_AN_CHK check (AN between 0 and 2400),constraint FLUGSJ_VONNACH_CHK check (VON != NACH),constraint FLUGSJ_PS primary key (FNR), constraint FLUGSJ_RANGE_CHK_AB check (AB between 1000 and 1500)) 
-<11:51:37.921>Sending failed to oralv8a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.922>Received FJDBC:N create table FLUGSJ (FNR integer,FLC varchar(2),FLNR integer, VON varchar(3),NACH varchar(3),AB integer,AN integer,constraint FLUGSJ_VON_NN check (VON is not null),constraint FLUGSJ_NACH_NN check (NACH is not null),constraint FLUGSJ_AB_NN check (AB is not null),constraint FLUGSJ_AN_NN check (AN is not null),constraint FLUGSJ_AB_CHK check (AB between 0 and 2400),constraint FLUGSJ_AN_CHK check (AN between 0 and 2400),constraint FLUGSJ_VONNACH_CHK check (VON != NACH),constraint FLUGSJ_PS primary key (FNR), constraint FLUGSJ_RANGE_CHK_AB check (AB > 1500)) 
-<11:51:37.932>Sending failed to oralv10a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.933>Received FJDBC:N create table PASSAGIERSJ (PNR integer,NAME varchar(40),VORNAME varchar(40), LAND varchar(3),constraint PASSAGIERSJ_NAME_NN check (NAME is not null),constraint PASSAGIERSJ_PS primary key (PNR), constraint PASSAGIERSJ_RANGE_CHK_PNR check (PNR < 35)) 
-<11:51:37.939>Sending failed to oralv9a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.940>Received FJDBC:N create table PASSAGIERSJ (PNR integer,NAME varchar(40),VORNAME varchar(40), LAND varchar(3),constraint PASSAGIERSJ_NAME_NN check (NAME is not null),constraint PASSAGIERSJ_PS primary key (PNR), constraint PASSAGIERSJ_RANGE_CHK_PNR check (PNR between 35 and 70)) 
-<11:51:37.945>Sending failed to oralv8a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.946>Received FJDBC:N create table PASSAGIERSJ (PNR integer,NAME varchar(40),VORNAME varchar(40), LAND varchar(3),constraint PASSAGIERSJ_NAME_NN check (NAME is not null),constraint PASSAGIERSJ_PS primary key (PNR), constraint PASSAGIERSJ_RANGE_CHK_PNR check (PNR > 70)) 
-<11:51:37.953>Sending failed to oralv10a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.955>Received FJDBC:N create table BUCHUNGSJ (BNR integer,PNR integer,FLC varchar(2),FLNR integer, VON varchar(3),NACH varchar(3),TAG varchar(20),MEILEN integer,PREIS integer,constraint BUCHUNGSJ_NACH_NN check (NACH is not null),constraint BUCHUNGSJ_MEILEN_NN check (MEILEN is not null),constraint BUCHUNGSJ_PREIS_NN check (PREIS is not null),constraint BUCHUNGSJ_MEILEN_CHK check (MEILEN >= 0),constraint BUCHUNGSJ_PREIS_CHK check (PREIS > 0),constraint BUCHUNGSJ_PS primary key (BNR), constraint BUCHUNGSJ_RANGE_CHK_PNR check (PNR < 35)) 
-<11:51:37.960>Sending failed to oralv9a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.961>Received FJDBC:N create table BUCHUNGSJ (BNR integer,PNR integer,FLC varchar(2),FLNR integer, VON varchar(3),NACH varchar(3),TAG varchar(20),MEILEN integer,PREIS integer,constraint BUCHUNGSJ_NACH_NN check (NACH is not null),constraint BUCHUNGSJ_MEILEN_NN check (MEILEN is not null),constraint BUCHUNGSJ_PREIS_NN check (PREIS is not null),constraint BUCHUNGSJ_MEILEN_CHK check (MEILEN >= 0),constraint BUCHUNGSJ_PREIS_CHK check (PREIS > 0),constraint BUCHUNGSJ_PS primary key (BNR), constraint BUCHUNGSJ_RANGE_CHK_PNR check (PNR between 35 and 70)) 
-<11:51:37.968>Sending failed to oralv8a: ORA-00955: name is already used by an existing object
- 
-<11:51:37.968>Received FJDBC:N create table BUCHUNGSJ (BNR integer,PNR integer,FLC varchar(2),FLNR integer, VON varchar(3),NACH varchar(3),TAG varchar(20),MEILEN integer,PREIS integer,constraint BUCHUNGSJ_NACH_NN check (NACH is not null),constraint BUCHUNGSJ_MEILEN_NN check (MEILEN is not null),constraint BUCHUNGSJ_PREIS_NN check (PREIS is not null),constraint BUCHUNGSJ_MEILEN_CHK check (MEILEN >= 0),constraint BUCHUNGSJ_PREIS_CHK check (PREIS > 0),constraint BUCHUNGSJ_PS primary key (BNR), constraint BUCHUNGSJ_RANGE_CHK_PNR check (PNR > 70)) 
-<11:51:37.975>Sending failed to oralv10a: ORA-00955: name is already used by an existing object
- 
+<17:05:28.919>Start FDBS 
+<17:05:32.251>Entered FedConnection.close() 
+<17:05:32.281>JDBC connection to jdbc:oracle:thin:@mtsthelens.informatik.hs-fulda.de:1521:oralv9a has been closed. 
+<17:05:32.314>JDBC connection to jdbc:oracle:thin:@pinatubo.informatik.hs-fulda.de:1521:oralv8a has been closed. 
+<17:05:32.351>JDBC connection to jdbc:oracle:thin:@krakatau.informatik.hs-fulda.de:1521:oralv10a has been closed. 
+<17:05:32.352>Exited FedConnection.close() 
