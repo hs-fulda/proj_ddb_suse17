@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
-import com.sun.javafx.binding.StringFormatter;
-
 import fdbs.CustomLogger;
 import fjdbc.FedConnection;
 import fjdbc.FedException;
@@ -48,7 +46,7 @@ public class Application {
 	  fedStatement.executeUpdate(currentStatement);
 	else if (isCommit(currentStatement))
 	  fedConnection.commit();
-	else if (isRollback(currentStatement.toUpperCase()))
+	else if (isRollback(currentStatement))
 	  fedConnection.rollback();
 	else {
 	  FedResultSet resultSet = fedStatement.executeQuery(currentStatement);
@@ -56,7 +54,8 @@ public class Application {
 	}
 	totalOperations++;
       }
-      CustomLogger.log(Level.INFO, "Total statements in the file: " + totalOperations);
+      CustomLogger.log(Level.INFO,
+	  "Total statements in the file: " + totalOperations);
       CustomLogger.log(Level.INFO, "Time taken: " + getTimeTaken());
     } catch (FedException e) {
       CustomLogger.log(Level.WARNING, "FedException; " + e);
@@ -84,7 +83,7 @@ public class Application {
       column = resultSet.getColumnType(counter);
       columnTypes.add(column);
 
-      // String columnType = getColumnTypeStr(resultSet.getColumnType(counter));
+      //String columnType = getColumnTypeStr(resultSet.getColumnType(counter));
       // columnNames.add(String.format("%-10s", columnName + " (" + columnType +
       // ")"));
       // String columnValue = "";
