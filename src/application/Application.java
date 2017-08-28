@@ -4,9 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.sun.javafx.binding.StringFormatter;
 
+import fdbs.CustomLogger;
 import fjdbc.FedConnection;
 import fjdbc.FedException;
 import fjdbc.FedPseudoDriver;
@@ -19,49 +21,45 @@ public class Application {
   private static long duration;
 
   public static void main(String[] args) throws ParseException, FedException {
-    // Selects files and stores scripts in a list
+    // Selects files and stores statements in a list
     File selectedFile = FileUtility.getFile();
-    List<String> scriptsFromSelectedFile = FileUtility.getScriptsFromFile(selectedFile);
+    List<String> statementsFromFile = FileUtility
+	.getStatementsFromFile(selectedFile);
     FedConnection fedConnection = null;
     try {
 
       // Gets connection based on Username and Password
-      fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
+      fedConnection = new FedPseudoDriver().getConnection(
+	  ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
       fedConnection.setAutoCommit(false);
 
       FedStatement fedStatement = fedConnection.getStatement();
 
-      // Just a formatting to display result
-      OutputFormatter.printAstericks();
-      System.out.println("Executing script file \'" + selectedFile.getAbsolutePath() + "\' ...");
+      CustomLogger.log(Level.INFO, "Executing statements from an SQL file \'"
+	  + selectedFile.getAbsolutePath() + "\' ...");
 
       // Time starts
       startTime = System.currentTimeMillis();
-
-      // All scripts taken from file provided run here one by one
+      // All statements taken from file provided run here one by one
       int totalOperations = 0;
-      for (String currentScript : scriptsFromSelectedFile) {
-	// If the query is DDL or DML, executeUpdate should be called
-	// from FJDBC
-	if (isDDLOrDMLScript(currentScript.toUpperCase()))
-	  fedStatement.executeUpdate(currentScript);
-	else if (isCommit(currentScript.toUpperCase()))
+      for (String currentStatement : statementsFromFile) {
+	// If the query is DDL or DML, executeUpdate should be called from FJDBC
+	if (isDDLOrDMLScript(currentStatement))
+	  fedStatement.executeUpdate(currentStatement);
+	else if (isCommit(currentStatement))
 	  fedConnection.commit();
-	else if (isRollback(currentScript.toUpperCase()))
+	else if (isRollback(currentStatement.toUpperCase()))
 	  fedConnection.rollback();
 	else {
-	  FedResultSet resultSet = fedStatement.executeQuery(currentScript);
+	  FedResultSet resultSet = fedStatement.executeQuery(currentStatement);
 	  printResult(resultSet);
 	}
 	totalOperations++;
       }
-
-      System.out.println(totalOperations + " operations");
-
-      // Prints Time Taken
-      System.out.println(getTimeTaken());
-      OutputFormatter.printAstericks();
+      CustomLogger.log(Level.INFO, "Total statements in the file: " + totalOperations);
+      CustomLogger.log(Level.INFO, "Time taken: " + getTimeTaken());
     } catch (FedException e) {
+      CustomLogger.log(Level.WARNING, "FedException; " + e);
       System.out.println(e);
     }
     // @author: Anfilov. Close all JDBC connections
@@ -77,7 +75,7 @@ public class Application {
     List<String> records = new ArrayList<String>();
 
     int numberOfColumns = resultSet.getColumnCount();
-    
+
     int counter = 1;
     String column = null;
     while (counter <= numberOfColumns) {
@@ -97,34 +95,34 @@ public class Application {
       // columnValues.add(columnValue);
       counter++;
     }
-    
-     while (resultSet.next()) {
-        StringBuilder record = new StringBuilder();
-        counter = 0;
-        while (counter < numberOfColumns) {          	
-        	String columnType = columnTypes.get(counter);  	
-        	String columnValue = "";
-        	if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
-        	  columnValue = resultSet.getInt(counter+1) + "";
-        	else if (columnType.equals("VARCHAR"))
-        	  columnValue = resultSet.getString(counter+1);
-        	record.append(String.format("%-12s", columnValue));
-        	counter++;
-        }
-     // @author: Jahan. Check for duplication. Only insert unique data  
-     if (!records.contains(record.toString())) {
-          records.add(record.toString());          
-      } else {
-          continue;
+
+    while (resultSet.next()) {
+      StringBuilder record = new StringBuilder();
+      counter = 0;
+      while (counter < numberOfColumns) {
+	String columnType = columnTypes.get(counter);
+	String columnValue = "";
+	if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
+	  columnValue = resultSet.getInt(counter + 1) + "";
+	else if (columnType.equals("VARCHAR"))
+	  columnValue = resultSet.getString(counter + 1);
+	record.append(String.format("%-12s", columnValue));
+	counter++;
       }
-       
+      // @author: Jahan. Check for duplication. Only insert unique data  
+      if (!records.contains(record.toString())) {
+	records.add(record.toString());
+      } else {
+	continue;
+      }
+
     }
-    
+
     String columnNamesStr = "";
     for (String string : columnNames) {
       columnNamesStr += string;
     }
-   
+
     System.out.println(columnNamesStr);
     System.out.print("-------------------------------------------------------");
     System.out.print("\n");
@@ -137,13 +135,13 @@ public class Application {
   private static String getColumnTypeStr(int columnTypeInt) {
     String columnType = "";
     switch (columnTypeInt) {
-    case 1:
-      columnType = "INTEGER";
-      break;
-    case 2:
-      columnType = "VARCHAR";
-      break;
-    default:
+      case 1:
+	columnType = "INTEGER";
+	break;
+      case 2:
+	columnType = "VARCHAR";
+	break;
+      default:
     }
     return columnType;
   }
@@ -161,15 +159,17 @@ public class Application {
    * @return
    */
   private static boolean isDDLOrDMLScript(String script) {
-    return script.startsWith("CREATE") || script.startsWith("DROP") || script.startsWith("INSERT")
-	|| script.startsWith("DELETE") || script.startsWith("UPDATE") || script.startsWith("ALTER")
+    return script.startsWith("CREATE") || script.startsWith("DROP")
+	|| script.startsWith("INSERT") || script.startsWith("DELETE")
+	|| script.startsWith("UPDATE") || script.startsWith("ALTER")
 	|| script.startsWith("SET");
   }
 
   private static String getTimeTaken() {
     duration = System.currentTimeMillis() - startTime;
     Date timeTaken = new Date(duration);
-    String timeTakenStr = String.format("Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
+    String timeTakenStr = String.format(
+	"Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
 	timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
     return timeTakenStr;
   }

@@ -2,7 +2,7 @@ package application;
 
 public class OutputFormatter {
 
-	public static void printAstericks() {
+	public static void printAsterisks() {
 		int i = 75;
 		while (i > 0) {
 			System.out.print('*');

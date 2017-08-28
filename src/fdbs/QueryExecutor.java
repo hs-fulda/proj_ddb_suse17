@@ -202,7 +202,6 @@ public class QueryExecutor {
 
     try {
       for (Integer statementKey : statementsMap.keySet()) {
-	// Logger
 	CustomLogger.log(Level.INFO,
 	    "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
 	connectionNumber = statementKey;
