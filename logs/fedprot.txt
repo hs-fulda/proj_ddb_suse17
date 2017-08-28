@@ -1,6 +1,0 @@
-<17:05:28.919>Start FDBS 
-<17:05:32.251>Entered FedConnection.close() 
-<17:05:32.281>JDBC connection to jdbc:oracle:thin:@mtsthelens.informatik.hs-fulda.de:1521:oralv9a has been closed. 
-<17:05:32.314>JDBC connection to jdbc:oracle:thin:@pinatubo.informatik.hs-fulda.de:1521:oralv8a has been closed. 
-<17:05:32.351>JDBC connection to jdbc:oracle:thin:@krakatau.informatik.hs-fulda.de:1521:oralv10a has been closed. 
-<17:05:32.352>Exited FedConnection.close() 

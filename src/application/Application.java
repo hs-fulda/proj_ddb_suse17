@@ -56,7 +56,7 @@ public class Application {
       }
       CustomLogger.log(Level.INFO,
 	  "Total statements in the file: " + totalOperations);
-      CustomLogger.log(Level.INFO, "Time taken: " + getTimeTaken());
+      CustomLogger.log(Level.INFO, getTimeTaken());
     } catch (FedException e) {
       CustomLogger.log(Level.WARNING, "FedException; " + e);
       System.out.println(e);
