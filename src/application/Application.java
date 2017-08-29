@@ -23,7 +23,7 @@ public class Application {
     File selectedFile = FileUtility.getFile();
     List<String> statementsFromFile = FileUtility
 	.getStatementsFromFile(selectedFile);
-    
+
     FedConnection fedConnection = null;
     try {
 
@@ -33,7 +33,7 @@ public class Application {
       fedConnection.setAutoCommit(false);
 
       FedStatement fedStatement = fedConnection.getStatement();
-      
+
       CustomLogger.log(Level.INFO, "Executing statements from an SQL file \'"
 	  + selectedFile.getAbsolutePath() + "\' ...");
 
@@ -41,7 +41,7 @@ public class Application {
       startTime = System.currentTimeMillis();
       // All statements taken from file provided run here one by one
       int totalOperations = 0;
-     
+
       for (String currentStatement : statementsFromFile) {
 	// If the query is DDL or DML, executeUpdate should be called from FJDBC
 	if (isDDLOrDMLScript(currentStatement))
@@ -51,13 +51,13 @@ public class Application {
 	else if (isRollback(currentStatement))
 	  fedConnection.rollback();
 	else {
-	  
 	  FedResultSet resultSet = fedStatement.executeQuery(currentStatement);
 	  printResult(resultSet);
 	}
 	totalOperations++;
       }
-      CustomLogger.log(Level.INFO, "Total statements in the file: " + totalOperations);
+      CustomLogger.log(Level.INFO,
+	  "Total statements in the file: " + totalOperations);
       CustomLogger.log(Level.INFO, getTimeTaken());
     } catch (FedException e) {
       CustomLogger.log(Level.WARNING, "FedException; " + e);

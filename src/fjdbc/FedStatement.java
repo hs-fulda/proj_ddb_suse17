@@ -34,13 +34,13 @@ public class FedStatement implements FedStatementInterface {
   }
 
   public int executeUpdate(String query) throws FedException {
-    CustomLogger.log(Level.FINE, "SQL: " + query);
+    //    CustomLogger.log(Level.FINE, "SQL: " + query);
     int result = -1;
     if (isClose) {
       CustomLogger.log(Level.WARNING, fsrClosed);
       throw new FedException(new Throwable(fsrClosed));
     }
-
+    CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
     try {
       result = QueryExecutor.executeUpdate(query);
     } catch (ParseException e) {
@@ -65,7 +65,7 @@ public class FedStatement implements FedStatementInterface {
       }
       isClose = true;
     } catch (SQLException e) {
-      CustomLogger.log(Level.FINER, "FedException; " + e.getMessage());
+      CustomLogger.log(Level.WARNING, "FedException; " + e.getMessage());
       throw new FedException(new Throwable(e.getMessage()));
     }
   }
@@ -77,7 +77,8 @@ public class FedStatement implements FedStatementInterface {
    */
 
   public FedResultSet executeQuery(String sql) throws FedException {
-    CustomLogger.log(Level.FINE, "SQL: " + sql);
+    //    CustomLogger.log(Level.FINE, "SQL: " + sql);
+    CustomLogger.log(Level.INFO, "Received FJDBC: " + sql);
     if (isClose) {
       throw new FedException(new Throwable(fsrClosed));
     }
@@ -91,10 +92,9 @@ public class FedStatement implements FedStatementInterface {
       }
       fedResultSet = new FedResultSet(resultSets);
     } catch (SQLException e) {
-      CustomLogger.log(Level.FINER, "FedException; " + e.getMessage());
+      CustomLogger.log(Level.WARNING, "FedException; " + e.getMessage());
       throw new FedException(new Throwable(e.getMessage()));
     }
     return fedResultSet;
   }
-
 }

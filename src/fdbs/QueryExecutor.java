@@ -34,7 +34,8 @@ public class QueryExecutor {
 
   }
 
-  public static int executeUpdate(String query) throws FedException, ParseException {
+  public static int executeUpdate(String query)
+      throws FedException, ParseException {
     int queryType = QueryTypeConstant.NONE;
     int result = -1;
 
