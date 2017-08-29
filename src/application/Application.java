@@ -4,9 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 
-import fdbs.CustomLogger;
 import fjdbc.FedConnection;
 import fjdbc.FedException;
 import fjdbc.FedPseudoDriver;
@@ -26,7 +24,6 @@ public class Application {
 
     FedConnection fedConnection = null;
     try {
-
       // Gets connection based on Username and Password
       fedConnection = new FedPseudoDriver().getConnection(
 	  ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
@@ -34,7 +31,7 @@ public class Application {
 
       FedStatement fedStatement = fedConnection.getStatement();
 
-      CustomLogger.log(Level.INFO, "Executing statements from an SQL file \'"
+      System.out.println("Executing statements from an SQL file \'"
 	  + selectedFile.getAbsolutePath() + "\' ...");
 
       // Time starts
@@ -43,6 +40,8 @@ public class Application {
       int totalOperations = 0;
 
       for (String currentStatement : statementsFromFile) {
+	currentStatement = currentStatement.replaceAll("  ", " ")
+	    .replaceAll("\r\n", " ").replaceAll("\t", " ");
 	// If the query is DDL or DML, executeUpdate should be called from FJDBC
 	if (isDDLOrDMLScript(currentStatement))
 	  fedStatement.executeUpdate(currentStatement);
@@ -56,18 +55,15 @@ public class Application {
 	}
 	totalOperations++;
       }
-      CustomLogger.log(Level.INFO,
-	  "Total statements in the file: " + totalOperations);
-      CustomLogger.log(Level.INFO, getTimeTaken());
+      System.out.println("Total statements in the file: " + totalOperations);
+      System.out.println(getTimeTaken());
     } catch (FedException e) {
-      CustomLogger.log(Level.WARNING, "FedException; " + e);
-      System.out.println(e);
+      System.out.println("FedException; " + e);
     }
     // @author: Anfilov. Close all JDBC connections
     finally {
       fedConnection.close();
     }
-
   }
 
   private static void printResult(FedResultSet resultSet) throws FedException {
@@ -116,7 +112,6 @@ public class Application {
       } else {
 	continue;
       }
-
     }
 
     String columnNamesStr = "";
@@ -130,7 +125,6 @@ public class Application {
     for (String string : records) {
       System.out.println(string);
     }
-
   }
 
   private static String getColumnTypeStr(int columnTypeInt) {
