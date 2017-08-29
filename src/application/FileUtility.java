@@ -76,16 +76,16 @@ public class FileUtility {
 	    if (str.isEmpty())
 	      continue;
 
-	    script.append(str);
+	    script.append("  " + str);
 	  }
 
 	  if (script.length() > 0) {
-	    sQLStatements.add(script.toString());
+	    sQLStatements.add(script.toString().trim());
 	  }
 	  script = new StringBuilder();
 	} else {
 	  // @author: Jahan. Added a blank space to create a proper sql statement  
-	  script.append(" " + line);
+	  script.append("  " + line);
 	}
       }
     } catch (IOException e) {
