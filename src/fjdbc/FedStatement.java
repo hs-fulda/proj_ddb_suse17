@@ -34,17 +34,17 @@ public class FedStatement implements FedStatementInterface {
   }
 
   public int executeUpdate(String query) throws FedException {
-    CustomLogger.log(Level.INFO, "SQL: " + query);
+    CustomLogger.log(Level.FINE, "SQL: " + query);
     int result = -1;
     if (isClose) {
-      CustomLogger.log(Level.FINER, fsrClosed);
+      CustomLogger.log(Level.WARNING, fsrClosed);
       throw new FedException(new Throwable(fsrClosed));
     }
 
     try {
       result = QueryExecutor.executeUpdate(query);
     } catch (ParseException e) {
-      CustomLogger.log(Level.FINER, "ParseException; " + e);
+      CustomLogger.log(Level.WARNING, "ParseException; " + e);
       e.printStackTrace();
     }
     return result;
@@ -77,7 +77,7 @@ public class FedStatement implements FedStatementInterface {
    */
 
   public FedResultSet executeQuery(String sql) throws FedException {
-    CustomLogger.log(Level.INFO, "SQL: " + sql);
+    CustomLogger.log(Level.FINE, "SQL: " + sql);
     if (isClose) {
       throw new FedException(new Throwable(fsrClosed));
     }
