@@ -84,7 +84,8 @@ public class FileUtility {
 	  }
 	  script = new StringBuilder();
 	} else {
-	  script.append(line);
+	  // @author: Jahan. Added a blank space to create a proper sql statement  
+	  script.append(" " + line);
 	}
       }
     } catch (IOException e) {
