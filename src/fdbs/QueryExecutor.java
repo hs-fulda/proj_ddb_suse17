@@ -20,16 +20,16 @@ import parser.ParseException;
 public class QueryExecutor {
 
   private static FedStatement fedStatement;
-  // This map holds the JDBC Statement, it it initialized automatically when
-  // FedStatement is initialized.
+  /* This map holds the JDBC Statement, it it initialized automatically when
+   FedStatement is initialized. */
   private static HashMap<Integer, Statement> statementsMap;
 
   public static void setStatementsMap(HashMap<Integer, Statement> statements) {
     statementsMap = statements;
   }
 
-  // Can be used to execute SET command or some other commands like this.
-  // Not sure about it's usefullness at the moment.
+  /* Can be used to execute SET command or some other commands like this.
+   Not sure about it's usefullness at the moment. */
   public static void execute(String query) {
 
   }
@@ -41,37 +41,35 @@ public class QueryExecutor {
 
     /* Some complex preprocess start */
 
-    // Removes tabs, extra spaces and lines for parser to understand
-    // according to the grammar.
-    // NOTE: We use this method because skippng tabs, spaces and new lines
-    // does not work efficiently.
-    boolean isInsertQuery = query.toUpperCase().startsWith("INSERT");
+    /* Removes tabs, extra spaces and lines for parser to understand
+     according to the grammar.
+     NOTE: We use this method because skipping tabs, spaces and new lines
+     does not work efficiently.*/
+    boolean isInsertQuery = query.startsWith("INSERT");
     String preserveWhereClause = "";
     if (isInsertQuery) {
-      preserveWhereClause = query
-	  .substring(query.toUpperCase().indexOf("VALUES") + 6);
-      query = query.substring(0, query.toUpperCase().indexOf("VALUES") + 6);
+      preserveWhereClause = query.substring(query.indexOf("VALUES") + 6);
+      query = query.substring(0, query.indexOf("VALUES") + 6);
     }
 
     query = processQueryForParser(query);
 
     /* Some complex preprocess end */
 
-    // Every query needs ';' to parse, so being added here. Parsing starts
-    // here.
+    // Every query needs ';' to parse, so being added here. 
+    // Parsing starts here.
     GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
 
-    // If query is SET or ALTER, simply does not parse and executes directly
-    // on the DBs
-    if (!shouldNotParse(query.toUpperCase()))
+    /* If a query is SET or ALTER, do not parse and execute it directly */
+    if (!shouldNotParse(query))
       // This method is a general method from where all grammar starts.
       queryType = parser.ParseQuery();
 
     /* Some complex post process start before going to database */
 
-    // Special characters like Umlauts were replaced with Unicodes while
-    // running processQueryForParser method because JavaCC does not support
-    // umlauts because instead produces unicode of corresponding umlaut
+    /* Special characters like umlauts were replaced with unicode equivalents
+     *  while running processQueryForParser method. Reason: JavaCC does not 
+     *  support umlauts */
     query = UnicodeManager.replaceUnicodesWithChars(query);
     query = replace3DashesWithSpace(query);
     query = replaceBraces(query);
@@ -100,9 +98,7 @@ public class QueryExecutor {
       default:
 	result = executeDefaultQuery(query);
     }
-
     return result;
-
   }
 
   private static String replaceBraces(String query) {
@@ -111,13 +107,9 @@ public class QueryExecutor {
     return query;
   }
 
-  // Replaces dashes back space ( ), was added to parse successfully
-  // because I am unable to handle space in between string constant in
-  // Parser
+  /* Was added to parse successfully because I am unable to handle space 
+   * in between string constant in Parser */
   private static String replace3DashesWithSpace(String query) {
-    // Replaces underscores back space ( ), was added to parse successfully
-    // because I am unable to handle space in between string constant in
-    // Parser
     Pattern pattern = Pattern.compile("'(.+[---]+.+)'");
     Matcher m = pattern.matcher(query);
     while (m.find()) {
@@ -135,9 +127,9 @@ public class QueryExecutor {
     patterns.add(Pattern.compile("\n"));
     patterns.add(Pattern.compile("\r"));
 
-    // There are many doubles spaces, so we some are left unreplaced thus
-    // creating problem for parser, so we want to check as much as 10 times
-    // to make sure query is finely formatted.
+    /*  There are so many doubles spaces, so some of them are not replaced,
+       thus creating problem for parser, so we want to check as much as 
+       10 times to make sure the query is finely formatted.*/
     int counter = 10;
     while (counter > 0) {
       patterns.add(Pattern.compile("  "));
@@ -151,8 +143,8 @@ public class QueryExecutor {
 
     query = sb.toString();
 
-    // Removes all spaces in string constant because they are redundant e.g.
-    // 'ABC ' become 'ABC'
+    /* Removes all spaces in string constant because they are redundant e.g.
+     'ABC ' become 'ABC' */
     Pattern pattern = Pattern.compile("'([^',]*[ ]+)'");
     Matcher m = pattern.matcher(query);
     while (m.find()) {
@@ -160,11 +152,10 @@ public class QueryExecutor {
       query = query.replaceAll(searchStr, searchStr.replaceAll(" ", ""));
     }
 
-    // Replaces spaces in between string constant with ___ (with replace
-    // back)
-    // It is done because I am unable to handle space between string
-    // constant parser, it gives ever no matter what I do. e.g. 'ABC XYZ'
-    // becomes 'ABC___XYZ'
+    /* Replaces spaces in between string constant with ___ (with replace back)
+     * e.g. 'ABC XYZ' becomes 'ABC___XYZ'. It is done because I am unable to 
+     * handle space between string constant  parser. 
+     */
     pattern = Pattern.compile("'([^',]*[ ]+.+)'");
     m = pattern.matcher(query);
     while (m.find()) {
@@ -172,8 +163,8 @@ public class QueryExecutor {
       query = query.replaceAll(searchStr, searchStr.replaceAll(" ", "---"));
     }
 
-    // Replaces ( and ) because ) is showing conflict in parser and can not
-    // add it in String constant, so work around.
+    /*Replaces ( and ) because ) is showing conflict in parser and can not
+    add it in String constant, so workaround.*/
     pattern = Pattern.compile("'.*[^,][(].*[)].*'");
     m = pattern.matcher(query);
     while (m.find()) {
@@ -183,10 +174,9 @@ public class QueryExecutor {
       query = query.replaceAll(searchStr, searchStr.replaceAll(")", "//////"));
     }
 
-    // Replaces umlauts with unicodes to parse successfully because JavaCC
-    // replaces umlauts with unicodes too
+    /* Replaces umlauts with unicodes to parse successfully because JavaCC 
+     * replaces umlauts with unicodes too */
     query = UnicodeManager.getUnicodedQuery(query);
-
     return query;
   }
 
@@ -199,7 +189,7 @@ public class QueryExecutor {
     String connectionDB = "";
     Integer connectionNumber = -1;
     Statement statement = null;
-    // Simple SET query, i.e. set echo on, is not executable from JDBC
+    // Simple SET query, i.e. set echo on, will be ignored
     if (query.toUpperCase().startsWith("SET"))
       return 0;
     CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
@@ -226,9 +216,8 @@ public class QueryExecutor {
 	  "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
       throw new FedException(new Throwable(message));
     }
-
-    // CREATE query is neither INSERT nor UPDATE so it will always return 0
-    // as it effects 0 tuples
+    /* CREATE query is neither INSERT nor UPDATE so it will always return 0
+     as it effects 0 tuples */
     return 0;
   }
 
@@ -263,15 +252,14 @@ public class QueryExecutor {
 
 	  String message = "Connect " + statementKey + " " + connectionDB + ": "
 	      + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE,
-	      "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+	  CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB
+	      + ": " + e.getLocalizedMessage());
 	  throw new FedException(new Throwable(message));
 	}
 	e.printStackTrace();
       }
 
     }
-
     return result;
   }
 
@@ -281,12 +269,9 @@ public class QueryExecutor {
     int statementKey = 1;
 
     Statement statement = null;
-    // Logger
-    CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
+    // Logger: redundant, was called earlier in executeUpdate   CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
     while (statementKey <= statementsMap.size()) {
-
       statement = statementsMap.get(statementKey);
-
       if (statementKey == 1) {
 	connectionDB = ConnectionConstants.CONNECTION_1_SID;
       }
@@ -302,24 +287,20 @@ public class QueryExecutor {
 	CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
 	statementKey++;
       } catch (SQLException e) {
-
 	if (e instanceof SQLIntegrityConstraintViolationException) {
 	  statementKey++;
 	  continue;
 	} else if (fedStatement.getConnection().getAutoCommit() == false) {
 	  fedStatement.getConnection().rollback();
-
 	  String message = "Connect " + statementKey + " " + connectionDB + ": "
 	      + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE,
-	      "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+	  CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB
+	      + ": " + e.getLocalizedMessage());
 	  throw new FedException(new Throwable(message));
 	}
 	e.printStackTrace();
       }
-
     }
-
     return result;
   }
 
@@ -344,19 +325,15 @@ public class QueryExecutor {
 	statement = statementsMap.get(statementKey);
 	statement.executeUpdate(query);
 	CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
-
       }
     } catch (SQLException e) {
       String message = "Connect " + connectionNumber + " " + connectionDB + ": "
 	  + e.getLocalizedMessage();
-
       CustomLogger.log(Level.SEVERE,
 	  "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
       throw new FedException(new Throwable(message));
     }
-
     // CREATE query is neither INSERT nor UPDATE so it will always return 0
-    // as it effects 0 tuples
     return 0;
   }
 
@@ -365,22 +342,21 @@ public class QueryExecutor {
     Statement statementOfDB2 = statementsMap.get(2);
     Statement statementOfDB3 = statementsMap.get(3);
 
-    // Sets true if the Create query has to be deployed on first 2 DBs, that
-    // means the list of attributes provided in Horizontal Partitioning has
-    // 1 attribute only
-    boolean createLessPartitionsThanDatabase = createLessPartitionsThanDatabase(
-	query);
+    /* Sets true if the Create query has to be deployed on first 2 DBs, that
+     means the list_of_boundaries for Horizontal Partitioning has only
+     1 boundary  */
+    boolean createFewerPartitionsThanDBs = createFewerPartitionsThanDBs(query);
 
     String queryForDB1 = getCreatePartitionedQueryForDB1(query,
-	createLessPartitionsThanDatabase);
+	createFewerPartitionsThanDBs);
     String queryForDB2 = getCreatePartitionedQueryForDB2(query,
-	createLessPartitionsThanDatabase);
+	createFewerPartitionsThanDBs);
     String queryForDB3 = getCreatePartitionedQueryForDB3(query,
-	createLessPartitionsThanDatabase);
+	createFewerPartitionsThanDBs);
 
-    // Taking advantage to form query from DB3 to DB2 when the list the
-    // attribute provided in Horizontal Partitioning is only one.
-    if (createLessPartitionsThanDatabase) {
+    /* Taking advantage to form query from DB3 to DB2 when there is only one
+     * boundary provided in list_of_boundaries for Horizontal Partitioning .*/
+    if (createFewerPartitionsThanDBs) {
       queryForDB2 = queryForDB3;
     }
 
@@ -393,8 +369,9 @@ public class QueryExecutor {
 	      + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ")
 		  .replaceAll("\t", " "));
     } catch (SQLException e) {
-      CustomLogger.log(Level.SEVERE, "Sending failed to "
-	  + ConnectionConstants.CONNECTION_1_SID + ": " + e.getLocalizedMessage());
+      CustomLogger.log(Level.SEVERE,
+	  "Sending failed to " + ConnectionConstants.CONNECTION_1_SID + ": "
+	      + e.getLocalizedMessage());
     }
     try {
       CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB2
@@ -405,11 +382,12 @@ public class QueryExecutor {
 	      + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ")
 		  .replaceAll("\t", " "));
     } catch (SQLException e) {
-      CustomLogger.log(Level.SEVERE, "Sending failed to "
-	  + ConnectionConstants.CONNECTION_2_SID + ": " + e.getLocalizedMessage());
+      CustomLogger.log(Level.SEVERE,
+	  "Sending failed to " + ConnectionConstants.CONNECTION_2_SID + ": "
+	      + e.getLocalizedMessage());
     }
     try {
-      if (!createLessPartitionsThanDatabase) {
+      if (!createFewerPartitionsThanDBs) {
 	CustomLogger.log(Level.INFO,
 	    "Received FJDBC:" + queryForDB3.replaceAll("  ", " ")
 		.replaceAll("\r\n", " ").replaceAll("\t", " "));
@@ -420,23 +398,22 @@ public class QueryExecutor {
 		    .replaceAll("\t", " "));
       }
     } catch (SQLException e) {
-      CustomLogger.log(Level.SEVERE, "Sending failed to "
-	  + ConnectionConstants.CONNECTION_3_SID + ": " + e.getLocalizedMessage());
+      CustomLogger.log(Level.SEVERE,
+	  "Sending failed to " + ConnectionConstants.CONNECTION_3_SID + ": "
+	      + e.getLocalizedMessage());
     }
 
     // CREATE query is neither INSERT nor UPDATE so it will always return 0
-    // as it effects 0 tuples
     return 0;
   }
 
   /**
-   * This method checks whether the list of attribute provided in Horizontal
-   * Partitioning is one or not. returns true if list of attribute is 1
-   * 
+   * This method checks whether the list_of_boundaries provided in Horizontal
+   * Partitioning has only 1 boundary. Returns true for 1 element.
    * @param query
    */
-  private static boolean createLessPartitionsThanDatabase(String query) {
-    boolean createLessPartitionsThanDatabases = false;
+  private static boolean createFewerPartitionsThanDBs(String query) {
+    boolean createFewerPartitionsThanDBs = false;
     String columnName = query.substring(
 	query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 	query.lastIndexOf("("));
@@ -445,19 +422,17 @@ public class QueryExecutor {
 	+ (columnName.length() + 1);
     int secondIndex = query.lastIndexOf(",");
 
-    // If true it means it has one list of attribute for horizontal
-    // partitioning, so two tables should be created in first 2 DBs instead
-    // of 3 in all 3 DBs
+    /* "True" means only 1 boundary provided for horizontal partitioning, 
+     * so table should be created in first 2 DBs. */
     if (secondIndex < firstIndex) {
       secondIndex = query.lastIndexOf("))");
-      createLessPartitionsThanDatabases = true;
+      createFewerPartitionsThanDBs = true;
     }
-
-    return createLessPartitionsThanDatabases;
+    return createFewerPartitionsThanDBs;
   }
 
   private static String getCreatePartitionedQueryForDB1(String query,
-      boolean createLessPartitionsThanDatabase) {
+      boolean createFewerPartitionsThanDBs) {
     StringBuffer executableQuery = new StringBuffer();
     StringBuffer basicQuery = new StringBuffer(
 	query.substring(0, query.indexOf("HORIZONTAL")));
@@ -465,10 +440,9 @@ public class QueryExecutor {
     // Removes last ')' to further append constraint
     basicQuery = new StringBuffer(
 	basicQuery.substring(0, basicQuery.lastIndexOf(")")));
-
     basicQuery.append(", constraint ");
 
-    // Get values from Query to build constraint
+    // Get values from the Query to build a constraint
     String tableName = query.substring("CREATE TABLE ".length(),
 	query.indexOf(" ", "CREATE TABLE ".length()));
     String columnName = query.substring(
@@ -482,7 +456,7 @@ public class QueryExecutor {
 
     // If true it means it has one list of attribute for horizontal
     // partitioning
-    if (createLessPartitionsThanDatabase) {
+    if (createFewerPartitionsThanDBs) {
       secondIndex = query.lastIndexOf("))");
     }
 
@@ -500,8 +474,8 @@ public class QueryExecutor {
   }
 
   private static String getCreatePartitionedQueryForDB2(String query,
-      boolean createLessPartitionsThanDatabase) {
-    if (createLessPartitionsThanDatabase) {
+      boolean createFewerPartitionsThanDBs) {
+    if (createFewerPartitionsThanDBs) {
       return "";
     }
 
@@ -541,13 +515,13 @@ public class QueryExecutor {
   }
 
   private static String getCreatePartitionedQueryForDB3(String query,
-      boolean createLessPartitionsThanDatabase) {
+      boolean createFewerPartitionsThanDBs) {
     StringBuffer executableQuery = new StringBuffer();
     StringBuffer basicQuery = new StringBuffer(
 	query.substring(0, query.indexOf("HORIZONTAL")));
 
     String operator = "";
-    if (createLessPartitionsThanDatabase) {
+    if (createFewerPartitionsThanDBs) {
       operator = " >= ";
     } else {
       operator = " > ";
@@ -567,7 +541,7 @@ public class QueryExecutor {
 	query.lastIndexOf("("));
 
     String maxRange = "";
-    if (createLessPartitionsThanDatabase) {
+    if (createFewerPartitionsThanDBs) {
       maxRange = query.substring(
 	  query.indexOf(columnName + "(") + (columnName.length() + 1),
 	  query.lastIndexOf("))"));
@@ -592,14 +566,11 @@ public class QueryExecutor {
     String connectionDB = "";
     Integer connectionNumber = -1;
 
+    CustomLogger.log(Level.INFO, "Received FJDBC: " + query
+	.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
     try {
       Statement statement = null;
       for (Integer statementKey : statementsMap.keySet()) {
-
-	// Logger
-	CustomLogger.log(Level.INFO,
-	    "Received FJDBC: " + query.replaceAll("  ", " ")
-		.replaceAll("\r\n", " ").replaceAll("\t", " "));
 	connectionNumber = statementKey;
 	if (statementKey == 1) {
 	  connectionDB = ConnectionConstants.CONNECTION_1_SID;
@@ -616,7 +587,6 @@ public class QueryExecutor {
 	CustomLogger.log(Level.INFO,
 	    "Sent " + connectionDB + ": " + query.replaceAll("  ", " ")
 		.replaceAll("\r\n", " ").replaceAll("\t", " "));
-
       }
     } catch (SQLException e) {
       String message = "Connect " + connectionNumber + " " + connectionDB + ": "
@@ -625,13 +595,12 @@ public class QueryExecutor {
 	  "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
       throw new FedException(new Throwable(message));
     }
-
     return result;
   }
 
-  // Not used yet but might be used in further implementation
-  // Parser requires query as InputStream, so this method converts String
-  // queries and returns List of parsable InputStream queries
+  /* Not used yet but might be used in further implementation.
+   Parser requires query as InputStream, so this method converts String
+   queries and returns List of parse-able InputStream queries */
   public static List<InputStream> convertToParsableQueries(
       List<String> queries) {
     List<InputStream> parsableQueries = new ArrayList<InputStream>();
@@ -641,8 +610,8 @@ public class QueryExecutor {
     return parsableQueries;
   }
 
-  // Parser requires query as InputStream, so this method converts String
-  // query and returns parsable InputStream query
+   /*Parser requires query as InputStream, so this method converts String
+   query and returns parse-able InputStream query*/
   public static InputStream convertToParsableQuery(String query) {
     return new ByteArrayInputStream(query.getBytes());
   }
