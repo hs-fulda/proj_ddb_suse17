@@ -40,12 +40,13 @@ public class FedStatement implements FedStatementInterface {
       CustomLogger.log(Level.WARNING, fsrClosed);
       throw new FedException(new Throwable(fsrClosed));
     }
+    
     CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
     try {
       result = QueryExecutor.executeUpdate(query);
     } catch (ParseException e) {
       CustomLogger.log(Level.WARNING, "ParseException; " + e);
-      e.printStackTrace();
+      throw new FedException(new Throwable(e.getMessage()));
     }
     return result;
   }

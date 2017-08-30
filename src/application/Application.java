@@ -39,8 +39,10 @@ public class Application {
                 int totalOperations = 0;
 
                 for (String currentStatement : statementsFromFile) {
-                    currentStatement = currentStatement.replaceAll("  ", " ")
-                            .replaceAll("\r\n", " ").replaceAll("\t", " ");
+                  
+                  currentStatement = currentStatement.replaceAll("  ", " ")
+                      .replaceAll("\r\n", " ").replaceAll("\t", " ");
+                  try {
                     // If the query is DDL or DML, executeUpdate should be called from FJDBC
                     if (isDDLOrDMLScript(currentStatement))
                         fedStatement.executeUpdate(currentStatement);
@@ -53,6 +55,11 @@ public class Application {
                         printResult(resultSet);
                     }
                     totalOperations++;
+		  } catch (Exception e) {
+		    fedConnection.rollback();
+		  }
+                    
+                   
                 }
                 System.out.println("Total statements in the file: " + totalOperations);
                 System.out.println(getTimeTaken());
