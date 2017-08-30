@@ -359,9 +359,9 @@ public class QueryExecutor {
     if (createFewerPartitionsThanDBs) {
       queryForDB2 = queryForDB3;
     }
-
+    String fdbsCreated = "Query created by FDBS layer: ";
     try {
-      CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB1
+      CustomLogger.log(Level.INFO,  fdbsCreated + queryForDB1
 	  .replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
       statementOfDB1.executeUpdate(queryForDB1);
       CustomLogger.log(Level.INFO,
@@ -374,7 +374,7 @@ public class QueryExecutor {
 	      + e.getLocalizedMessage());
     }
     try {
-      CustomLogger.log(Level.INFO, "Received FJDBC:" + queryForDB2
+      CustomLogger.log(Level.INFO, fdbsCreated + queryForDB2
 	  .replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
       statementOfDB2.executeUpdate(queryForDB2);
       CustomLogger.log(Level.INFO,
@@ -389,7 +389,7 @@ public class QueryExecutor {
     try {
       if (!createFewerPartitionsThanDBs) {
 	CustomLogger.log(Level.INFO,
-	    "Received FJDBC:" + queryForDB3.replaceAll("  ", " ")
+	    fdbsCreated + queryForDB3.replaceAll("  ", " ")
 		.replaceAll("\r\n", " ").replaceAll("\t", " "));
 	statementOfDB3.executeUpdate(queryForDB3);
 	CustomLogger.log(Level.INFO,
@@ -399,7 +399,7 @@ public class QueryExecutor {
       }
     } catch (SQLException e) {
       CustomLogger.log(Level.SEVERE,
-	  "Sending failed to " + ConnectionConstants.CONNECTION_3_SID + ": "
+	  "Failed to send to " + ConnectionConstants.CONNECTION_3_SID + ": "
 	      + e.getLocalizedMessage());
     }
 
