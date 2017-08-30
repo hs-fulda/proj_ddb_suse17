@@ -16,12 +16,13 @@ INSERT INTO part_tab VALUES (99, 'oralv9a');
 -- 4. MUST BE DISTRIBUTED TO oralv10a:
 INSERT INTO part_tab VALUES (100, 'oralv10a');
 INSERT INTO part_tab VALUES (101, 'oralv10a');
--- 5. MUST SELECT 3*2 = 6 tuples
+-- 5. MUST BE DISTRIBUTED TO ALL
+commit;
+-- 6. MUST SELECT 3*2 = 6 tuples
 SELECT * FROM part_tab;
 DELETE FROM part_tab;
-commit;
--- 6. MUST SELECT 0 tuples:
+-- 7. MUST SELECT 0 tuples:
 SELECT * FROM part_tab;
 rollback;
--- 7. MUST SELECT 6 tuples
+-- 8. MUST SELECT 6 tuples
 SELECT * FROM part_tab;

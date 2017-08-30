@@ -68,6 +68,7 @@ public class FedConnection implements FedConnectionInterface {
   }
 
   public void commit() throws FedException {
+    CustomLogger.log(Level.INFO, "FJDBC: commit()");
     if (close) {
       throw new FedException(
 	  new Throwable("FedConnection resource is closed."));
@@ -82,6 +83,7 @@ public class FedConnection implements FedConnectionInterface {
   }
 
   public void rollback() throws FedException {
+    CustomLogger.log(Level.INFO, "FJDBC: rollback()");
     if (close) {
       throw new FedException(
 	  new Throwable("FedConnection resource is closed."));
