@@ -1,12 +1,12 @@
 package fjdbc;
 
+import fdbs.CustomLogger;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.logging.Level;
-
-import fdbs.CustomLogger;
 
 public class FedConnection implements FedConnectionInterface {
 
@@ -34,9 +34,9 @@ public class FedConnection implements FedConnectionInterface {
     int i = 0;
     for (Connection connection : connectionsMap.values()) {
       try {
-	statements.put(++i, connection.createStatement());
+        statements.put(++i, connection.createStatement());
       } catch (SQLException e) {
-	e.printStackTrace();
+        e.printStackTrace();
       }
     }
     statement = new FedStatement(this, statements);
@@ -45,12 +45,12 @@ public class FedConnection implements FedConnectionInterface {
   public void setAutoCommit(boolean commit) throws FedException {
     if (close) {
       throw new FedException(
-	  new Throwable("FedConnection resource is closed."));
+              new Throwable("FedConnection resource is closed."));
     }
 
     try {
       for (Connection connection : connectionsMap.values()) {
-	connection.setAutoCommit(commit);
+        connection.setAutoCommit(commit);
       }
       autoCommit = commit;
     } catch (SQLException e) {
@@ -61,7 +61,7 @@ public class FedConnection implements FedConnectionInterface {
   public boolean getAutoCommit() throws FedException {
     if (close) {
       throw new FedException(
-	  new Throwable("FedConnection resource is closed."));
+              new Throwable("FedConnection resource is closed."));
     }
 
     return autoCommit;
@@ -71,11 +71,11 @@ public class FedConnection implements FedConnectionInterface {
     CustomLogger.log(Level.INFO, "FJDBC: commit()");
     if (close) {
       throw new FedException(
-	  new Throwable("FedConnection resource is closed."));
+              new Throwable("FedConnection resource is closed."));
     }
     try {
       for (Connection connection : connectionsMap.values()) {
-	connection.commit();
+        connection.commit();
       }
     } catch (SQLException e) {
       throw new FedException(new Throwable(e.getMessage()));
@@ -86,12 +86,12 @@ public class FedConnection implements FedConnectionInterface {
     CustomLogger.log(Level.INFO, "FJDBC: rollback()");
     if (close) {
       throw new FedException(
-	  new Throwable("FedConnection resource is closed."));
+              new Throwable("FedConnection resource is closed."));
     }
 
     try {
       for (Connection connection : connectionsMap.values()) {
-	connection.rollback();
+        connection.rollback();
       }
     } catch (SQLException e) {
       throw new FedException(new Throwable(e.getMessage()));
@@ -103,10 +103,9 @@ public class FedConnection implements FedConnectionInterface {
     String url;
     try {
       for (Connection connection : connectionsMap.values()) {
-	url = connection.getMetaData().getURL();
-	connection.close();
-	CustomLogger.log(Level.INFO, "JDBC connection to " + url + " has been closed."); 
-	
+        url = connection.getMetaData().getURL();
+        connection.close();
+        CustomLogger.log(Level.INFO, "JDBC connection to " + url + " has been closed.");
       }
       close = true;
     } catch (SQLException e) {
