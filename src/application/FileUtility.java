@@ -15,6 +15,7 @@ import java.util.Scanner;
 
 public class FileUtility {
 
+    // Fetches file with GUI based on OS
     public static File getFile() {
         File sqlFile;
 
