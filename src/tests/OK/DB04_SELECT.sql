@@ -17,7 +17,7 @@ INSERT INTO part_tab VALUES (99, 'oralv9a');
 INSERT INTO part_tab VALUES (100, 'oralv10a');
 INSERT INTO part_tab VALUES (101, 'oralv10a');
 -- 5. MUST BE DISTRIBUTED TO ALL
-commit;
+commit; --There is no rollback after committing. It is either rollback or commit. 
 -- 6. MUST SELECT 3*2 = 6 tuples
 SELECT * FROM part_tab;
 DELETE FROM part_tab;
