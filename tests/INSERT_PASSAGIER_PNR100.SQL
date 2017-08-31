@@ -1,1 +1,0 @@
-INSERT INTO TJ_PASSAGIER VALUES (100, 'test of db catalogue', 'test', 'D');

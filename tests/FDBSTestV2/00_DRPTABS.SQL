@@ -13,3 +13,8 @@ drop table FLUG cascade constraints;
 drop table FLUGLINIE cascade constraints;
 
 drop table FLUGHAFEN cascade constraints;
+--author: Aleks A.
+DROP table DB04_Colors;
+DROP TABLE part_tab;
+-- This will output a list of available tables:
+--SELECT table_name, status, num_rows FROM USER_TABLES;

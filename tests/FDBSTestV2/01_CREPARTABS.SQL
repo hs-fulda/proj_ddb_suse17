@@ -3,7 +3,21 @@ set echo on;
 alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
-
+--2.2 CREATE TABLE
+--	1.4.1	☐Keywords and identifiers (names of tables and their attributes) may be written in capital or small letters or a mix of those. 
+--	2.2.2 constraint of types UNIQUE
+create table DB04_Colors (
+color		varchar(10),
+constraint color_UQ UNIQUE (color)
+);
+INSERT INTO  db04_colors values ('red');
+commit;
+SELECT * FROM  db04_colors;
+INSERT INTO  db04_colors values ('red');
+Drop table  db04_colors;
+ 
+--	2.2.1 constraints of types PRIMARY KEY
+--1.2	Only INTEGER and VARCHAR data types, written in capital letters, have to be considered.
 create table FLUGHAFEN (
 FHC		varchar(3),
 LAND		varchar(3),
@@ -12,7 +26,7 @@ NAME		varchar(50),
 constraint FLUGHAFEN_PS
 		primary key (FHC)
 );
-
+ 
 create table FLUGLINIE (
 FLC		varchar(2),
 LAND		varchar(3),
@@ -28,7 +42,9 @@ constraint FLUGLINIE_PS
 constraint FLUGLINIE_FS_HUB
 		foreign key (HUB) references FLUGHAFEN(FHC)
 );
-
+--	2.2.3	☐The FDBS at least must manage horizontally partitioned tables.
+-- WARNING: constraint FLUG_AB_CHK for AB is defined in addition to partition constraints
+--	2.2.2	☐Support of FOREIGN KEY constraints is optional. 
 create table FLUG (
 FNR             integer,
 FLC		varchar(2),

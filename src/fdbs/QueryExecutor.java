@@ -227,7 +227,7 @@ public class QueryExecutor {
       }
     } catch (SQLException e) {
       String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getLocalizedMessage();
-      CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+      CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
       throw new FedException(new Throwable(message));
     }
     /*
@@ -267,7 +267,7 @@ public class QueryExecutor {
 	  fedStatement.getConnection().rollback();
 
 	  String message = "Connect " + statementKey + " " + connectionDB + ": " + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
 	  throw new FedException(new Throwable(message));
 	}
 	e.printStackTrace();
@@ -308,7 +308,7 @@ public class QueryExecutor {
 	} else if (fedStatement.getConnection().getAutoCommit() == false) {
 	  fedStatement.getConnection().rollback();
 	  String message = "Connect " + statementKey + " " + connectionDB + ": " + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
 	  throw new FedException(new Throwable(message));
 	}
 	e.printStackTrace();
@@ -344,7 +344,7 @@ public class QueryExecutor {
 	  CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
 	} catch (Exception e) {
 	  String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
 	  hasException = true;
 	  exceptionMessage = e.getMessage();
 	}
@@ -390,7 +390,7 @@ public class QueryExecutor {
 	  + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
     } catch (SQLException e) {
       CustomLogger.log(Level.SEVERE,
-	  "Sending failed to " + ConnectionConstants.CONNECTION_1_SID + ": " + e.getLocalizedMessage());
+	  "JDBC SQLException in " + ConnectionConstants.CONNECTION_1_SID + ": " + e.getLocalizedMessage());
     }
     try {
       CustomLogger.log(Level.INFO,
@@ -400,7 +400,7 @@ public class QueryExecutor {
 	  + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
     } catch (SQLException e) {
       CustomLogger.log(Level.SEVERE,
-	  "Sending failed to " + ConnectionConstants.CONNECTION_2_SID + ": " + e.getLocalizedMessage());
+	  "JDBC SQLException in " + ConnectionConstants.CONNECTION_2_SID + ": " + e.getLocalizedMessage());
     }
     try {
       if (!createFewerPartitionsThanDBs) {
@@ -581,7 +581,7 @@ public class QueryExecutor {
       }
     } catch (SQLException e) {
       String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getLocalizedMessage();
-      CustomLogger.log(Level.SEVERE, "Sending failed to " + connectionDB + ": " + e.getLocalizedMessage());
+      CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
       throw new FedException(new Throwable(message));
     }
     return result;
