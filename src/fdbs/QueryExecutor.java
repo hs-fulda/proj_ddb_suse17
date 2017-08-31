@@ -38,7 +38,8 @@ public class QueryExecutor {
 
   }
 
-  public static int executeUpdate(String query) throws FedException, ParseException {
+  public static int executeUpdate(String query)
+      throws FedException, ParseException {
     int queryType = QueryTypeConstant.NONE;
     int result = -1;
 
@@ -86,23 +87,23 @@ public class QueryExecutor {
     /* Some complex post process end before going to database */
 
     switch (queryType) {
-    case QueryTypeConstant.CREATE_NON_PARTITIONED:
-      result = createNonPartitioned(query);
-      break;
-    case QueryTypeConstant.CREATE_PARTITIONED:
-      result = createPartitioned(query);
-      break;
-    case QueryTypeConstant.DROP:
-      result = dropTable(query);
-      break;
-    case QueryTypeConstant.DELETE:
-      result = deleteTable(query);
-      break;
-    case QueryTypeConstant.INSERT:
-      result = insertTable(query);
-      break;
-    default:
-      result = executeDefaultQuery(query);
+      case QueryTypeConstant.CREATE_NON_PARTITIONED:
+	result = createTable(query);
+	break;
+      case QueryTypeConstant.CREATE_PARTITIONED:
+	result = createTableHorizontal(query);
+	break;
+      case QueryTypeConstant.DROP:
+	result = dropTable(query);
+	break;
+      case QueryTypeConstant.DELETE:
+	result = deleteFromTable(query);
+	break;
+      case QueryTypeConstant.INSERT:
+	result = insertIntoTable(query);
+	break;
+      default:
+	result = executeDefaultQuery(query);
     }
     return result;
   }
@@ -184,7 +185,8 @@ public class QueryExecutor {
     m = pattern.matcher(query);
     while (m.find()) {
       String searchStr = m.group();
-      query = query.replaceAll(searchStr, searchStr.replaceAll("[(]{1}", "((("));
+      query = query.replaceAll(searchStr,
+	  searchStr.replaceAll("[(]{1}", "((("));
       query = query.replaceAll(searchStr, searchStr.replaceAll(")", "//////"));
     }
 
@@ -222,12 +224,14 @@ public class QueryExecutor {
 	  connectionDB = ConnectionConstants.CONNECTION_3_SID;
 	}
 	statement = statementsMap.get(statementKey);
+	CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
 	result = statement.executeUpdate(query);
-	CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
       }
     } catch (SQLException e) {
-      String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getLocalizedMessage();
-      CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
+      String message = "Connect " + connectionNumber + " " + connectionDB + ": "
+	  + e.getLocalizedMessage();
+      CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB
+	  + ": " + e.getLocalizedMessage());
       throw new FedException(new Throwable(message));
     }
     /*
@@ -237,7 +241,7 @@ public class QueryExecutor {
     return 0;
   }
 
-  private static int deleteTable(String query) throws FedException {
+  private static int deleteFromTable(String query) throws FedException {
     int result = -1;
     String connectionDB = "";
     int statementKey = 1;
@@ -255,9 +259,9 @@ public class QueryExecutor {
       if (statementKey == 3) {
 	connectionDB = ConnectionConstants.CONNECTION_3_SID;
       }
+      CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
       try {
 	result = statement.executeUpdate(query);
-	CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
 	statementKey++;
       } catch (SQLException e) {
 	if (e instanceof SQLIntegrityConstraintViolationException) {
@@ -266,8 +270,10 @@ public class QueryExecutor {
 	} else if (fedStatement.getConnection().getAutoCommit() == false) {
 	  fedStatement.getConnection().rollback();
 
-	  String message = "Connect " + statementKey + " " + connectionDB + ": " + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
+	  String message = "Connect " + statementKey + " " + connectionDB + ": "
+	      + e.getLocalizedMessage();
+	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB
+	      + ": " + e.getLocalizedMessage());
 	  throw new FedException(new Throwable(message));
 	}
 	e.printStackTrace();
@@ -277,7 +283,7 @@ public class QueryExecutor {
     return result;
   }
 
-  private static int insertTable(String query) throws FedException {
+  private static int insertIntoTable(String query) throws FedException {
     int result = -1;
     String connectionDB = "";
     int statementKey = 1;
@@ -298,8 +304,8 @@ public class QueryExecutor {
       }
 
       try {
+	CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
 	result = statement.executeUpdate(query);
-	CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
 	statementKey++;
       } catch (SQLException e) {
 	if (e instanceof SQLIntegrityConstraintViolationException) {
@@ -307,8 +313,10 @@ public class QueryExecutor {
 	  continue;
 	} else if (fedStatement.getConnection().getAutoCommit() == false) {
 	  fedStatement.getConnection().rollback();
-	  String message = "Connect " + statementKey + " " + connectionDB + ": " + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
+	  String message = "Connect " + statementKey + " " + connectionDB + ": "
+	      + e.getLocalizedMessage();
+	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB
+	      + ": " + e.getLocalizedMessage());
 	  throw new FedException(new Throwable(message));
 	}
 	e.printStackTrace();
@@ -317,48 +325,49 @@ public class QueryExecutor {
     return result;
   }
 
-  private static int createNonPartitioned(String query) throws FedException {
+  private static int createTable(String query) throws FedException {
     String connectionDB = "";
     Integer connectionNumber = -1;
     boolean hasException = false;
     String exceptionMessage = "";
 
     CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
-      Statement statement = null;
-      for (Integer statementKey : statementsMap.keySet()) {
-	connectionNumber = statementKey;
+    Statement statement = null;
+    for (Integer statementKey : statementsMap.keySet()) {
+      connectionNumber = statementKey;
 
-	if (statementKey == 1) {
-	  connectionDB = ConnectionConstants.CONNECTION_1_SID;
-	}
-	if (statementKey == 2) {
-	  connectionDB = ConnectionConstants.CONNECTION_2_SID;
-	}
-	if (statementKey == 3) {
-	  connectionDB = ConnectionConstants.CONNECTION_3_SID;
-	}
-	statement = statementsMap.get(statementKey);
-
-	try {
-	  statement.executeUpdate(query);
-	  CustomLogger.log(Level.INFO, "Sent " + connectionDB + ": " + query);
-	} catch (Exception e) {
-	  String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getLocalizedMessage();
-	  CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
-	  hasException = true;
-	  exceptionMessage = e.getMessage();
-	}
+      if (statementKey == 1) {
+	connectionDB = ConnectionConstants.CONNECTION_1_SID;
       }
-      
-      
-      if(hasException)
-	throw new FedException(new Throwable(exceptionMessage));
-      
+      if (statementKey == 2) {
+	connectionDB = ConnectionConstants.CONNECTION_2_SID;
+      }
+      if (statementKey == 3) {
+	connectionDB = ConnectionConstants.CONNECTION_3_SID;
+      }
+      statement = statementsMap.get(statementKey);
+
+      try {
+	CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
+	statement.executeUpdate(query);
+      } catch (Exception e) {
+	String message = "Connect " + connectionNumber + " " + connectionDB
+	    + ": " + e.getLocalizedMessage();
+	CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB
+	    + ": " + e.getLocalizedMessage());
+	hasException = true;
+	exceptionMessage = e.getMessage();
+      }
+    }
+
+    if (hasException)
+      throw new FedException(new Throwable(exceptionMessage));
+
     // CREATE query is neither INSERT nor UPDATE so it will always return 0
     return 0;
   }
 
-  private static int createPartitioned(String query) throws FedException {
+  private static int createTableHorizontal(String query) throws FedException {
     Statement statementOfDB1 = statementsMap.get(1);
     Statement statementOfDB2 = statementsMap.get(2);
     Statement statementOfDB3 = statementsMap.get(3);
@@ -370,9 +379,12 @@ public class QueryExecutor {
      */
     boolean createFewerPartitionsThanDBs = createFewerPartitionsThanDBs(query);
 
-    String queryForDB1 = getCreatePartitionedQueryForDB1(query, createFewerPartitionsThanDBs);
-    String queryForDB2 = getCreatePartitionedQueryForDB2(query, createFewerPartitionsThanDBs);
-    String queryForDB3 = getCreatePartitionedQueryForDB3(query, createFewerPartitionsThanDBs);
+    String queryForDB1 = buildPartitionedQueryForDB1(query,
+	createFewerPartitionsThanDBs);
+    String queryForDB2 = buildPartitionedQueryForDB2(query,
+	createFewerPartitionsThanDBs);
+    String queryForDB3 = buildPartitionedQueryForDB3(query,
+	createFewerPartitionsThanDBs);
 
     /*
      * Taking advantage to form query from DB3 to DB2 when there is only one
@@ -383,36 +395,46 @@ public class QueryExecutor {
     }
     String fdbsCreated = "Query created by FDBS layer: ";
     try {
+      CustomLogger.log(Level.INFO, fdbsCreated + queryForDB1
+	  .replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
       CustomLogger.log(Level.INFO,
-	  fdbsCreated + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+	  "Sending to:" + ConnectionConstants.CONNECTION_1_SID + ": "
+	      + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ")
+		  .replaceAll("\t", " "));
       statementOfDB1.executeUpdate(queryForDB1);
-      CustomLogger.log(Level.INFO, "Sent:" + ConnectionConstants.CONNECTION_1_SID + ": "
-	  + queryForDB1.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
     } catch (SQLException e) {
       CustomLogger.log(Level.SEVERE,
-	  "JDBC SQLException in " + ConnectionConstants.CONNECTION_1_SID + ": " + e.getLocalizedMessage());
+	  "JDBC SQLException in " + ConnectionConstants.CONNECTION_1_SID + ": "
+	      + e.getLocalizedMessage());
     }
     try {
+      CustomLogger.log(Level.INFO, fdbsCreated + queryForDB2
+	  .replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
       CustomLogger.log(Level.INFO,
-	  fdbsCreated + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+	  "Sending to: " + ConnectionConstants.CONNECTION_2_SID + ": "
+	      + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ")
+		  .replaceAll("\t", " "));
       statementOfDB2.executeUpdate(queryForDB2);
-      CustomLogger.log(Level.INFO, "Sent:" + ConnectionConstants.CONNECTION_2_SID + ": "
-	  + queryForDB2.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
     } catch (SQLException e) {
       CustomLogger.log(Level.SEVERE,
-	  "JDBC SQLException in " + ConnectionConstants.CONNECTION_2_SID + ": " + e.getLocalizedMessage());
+	  "JDBC SQLException in " + ConnectionConstants.CONNECTION_2_SID + ": "
+	      + e.getLocalizedMessage());
     }
     try {
       if (!createFewerPartitionsThanDBs) {
 	CustomLogger.log(Level.INFO,
-	    fdbsCreated + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+	    fdbsCreated + queryForDB3.replaceAll("  ", " ")
+		.replaceAll("\r\n", " ").replaceAll("\t", " "));
+	CustomLogger.log(Level.INFO,
+	    "Sending to: " + ConnectionConstants.CONNECTION_3_SID + ": "
+		+ queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ")
+		    .replaceAll("\t", " "));
 	statementOfDB3.executeUpdate(queryForDB3);
-	CustomLogger.log(Level.INFO, "Sent:" + ConnectionConstants.CONNECTION_3_SID + ": "
-	    + queryForDB3.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
       }
     } catch (SQLException e) {
       CustomLogger.log(Level.SEVERE,
-	  "Failed to send to " + ConnectionConstants.CONNECTION_3_SID + ": " + e.getLocalizedMessage());
+	  "Failed to send to " + ConnectionConstants.CONNECTION_3_SID + ": "
+	      + e.getLocalizedMessage());
     }
 
     // CREATE query is neither INSERT nor UPDATE so it will always return 0
@@ -427,10 +449,12 @@ public class QueryExecutor {
    */
   private static boolean createFewerPartitionsThanDBs(String query) {
     boolean createFewerPartitionsThanDBs = false;
-    String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
+    String columnName = query.substring(
+	query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 	query.lastIndexOf("("));
     // Fetching range
-    int firstIndex = query.lastIndexOf(columnName + "(") + (columnName.length() + 1);
+    int firstIndex = query.lastIndexOf(columnName + "(")
+	+ (columnName.length() + 1);
     int secondIndex = query.lastIndexOf(",");
 
     /*
@@ -444,21 +468,27 @@ public class QueryExecutor {
     return createFewerPartitionsThanDBs;
   }
 
-  private static String getCreatePartitionedQueryForDB1(String query, boolean createFewerPartitionsThanDBs) {
+  private static String buildPartitionedQueryForDB1(String query,
+      boolean createFewerPartitionsThanDBs) {
     StringBuffer executableQuery = new StringBuffer();
-    StringBuffer basicQuery = new StringBuffer(query.substring(0, query.indexOf("HORIZONTAL")));
+    StringBuffer basicQuery = new StringBuffer(
+	query.substring(0, query.indexOf("HORIZONTAL")));
 
     // Removes last ')' to further append constraint
-    basicQuery = new StringBuffer(basicQuery.substring(0, basicQuery.lastIndexOf(")")));
+    basicQuery = new StringBuffer(
+	basicQuery.substring(0, basicQuery.lastIndexOf(")")));
     basicQuery.append(", constraint ");
 
     // Get values from the Query to build a constraint
-    String tableName = query.substring("CREATE TABLE ".length(), query.indexOf(" ", "CREATE TABLE ".length()));
-    String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
+    String tableName = query.substring("CREATE TABLE ".length(),
+	query.indexOf(" ", "CREATE TABLE ".length()));
+    String columnName = query.substring(
+	query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 	query.lastIndexOf("("));
 
     // Fetching range
-    int firstIndex = query.lastIndexOf(columnName + "(") + (columnName.length() + 1);
+    int firstIndex = query.lastIndexOf(columnName + "(")
+	+ (columnName.length() + 1);
     int secondIndex = query.lastIndexOf(",");
 
     // If true it means it has one list of attribute for horizontal
@@ -480,26 +510,33 @@ public class QueryExecutor {
     return executableQuery.toString();
   }
 
-  private static String getCreatePartitionedQueryForDB2(String query, boolean createFewerPartitionsThanDBs) {
+  private static String buildPartitionedQueryForDB2(String query,
+      boolean createFewerPartitionsThanDBs) {
     if (createFewerPartitionsThanDBs) {
       return "";
     }
 
     StringBuffer executableQuery = new StringBuffer();
-    StringBuffer basicQuery = new StringBuffer(query.substring(0, query.indexOf("HORIZONTAL")));
+    StringBuffer basicQuery = new StringBuffer(
+	query.substring(0, query.indexOf("HORIZONTAL")));
 
     // Removes last ')' to further append constraint
-    basicQuery = new StringBuffer(basicQuery.substring(0, basicQuery.lastIndexOf(")")));
+    basicQuery = new StringBuffer(
+	basicQuery.substring(0, basicQuery.lastIndexOf(")")));
 
     basicQuery.append(", constraint ");
 
     // Get values from Query to build constraint
-    String tableName = query.substring("CREATE TABLE ".length(), query.indexOf(" ", "CREATE TABLE ".length()));
-    String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
+    String tableName = query.substring("CREATE TABLE ".length(),
+	query.indexOf(" ", "CREATE TABLE ".length()));
+    String columnName = query.substring(
+	query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 	query.lastIndexOf("("));
-    String lowerRange = query.substring(query.indexOf(columnName + "(") + (columnName.length() + 1),
+    String lowerRange = query.substring(
+	query.indexOf(columnName + "(") + (columnName.length() + 1),
 	query.lastIndexOf(","));
-    String upperRange = query.substring(query.indexOf(lowerRange + ",") + (lowerRange + ",").length(),
+    String upperRange = query.substring(
+	query.indexOf(lowerRange + ",") + (lowerRange + ",").length(),
 	query.lastIndexOf("))"));
 
     // Appends constraint name
@@ -514,9 +551,11 @@ public class QueryExecutor {
     return executableQuery.toString();
   }
 
-  private static String getCreatePartitionedQueryForDB3(String query, boolean createFewerPartitionsThanDBs) {
+  private static String buildPartitionedQueryForDB3(String query,
+      boolean createFewerPartitionsThanDBs) {
     StringBuffer executableQuery = new StringBuffer();
-    StringBuffer basicQuery = new StringBuffer(query.substring(0, query.indexOf("HORIZONTAL")));
+    StringBuffer basicQuery = new StringBuffer(
+	query.substring(0, query.indexOf("HORIZONTAL")));
 
     String operator = "";
     if (createFewerPartitionsThanDBs) {
@@ -526,20 +565,26 @@ public class QueryExecutor {
     }
 
     // Removes last ')' to further append constraint
-    basicQuery = new StringBuffer(basicQuery.substring(0, basicQuery.lastIndexOf(")")));
+    basicQuery = new StringBuffer(
+	basicQuery.substring(0, basicQuery.lastIndexOf(")")));
 
     basicQuery.append(", constraint ");
 
     // Get values from Query to build constraint
-    String tableName = query.substring("CREATE TABLE ".length(), query.indexOf(" ", "CREATE TABLE ".length()));
-    String columnName = query.substring(query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
+    String tableName = query.substring("CREATE TABLE ".length(),
+	query.indexOf(" ", "CREATE TABLE ".length()));
+    String columnName = query.substring(
+	query.indexOf("HORIZONTAL (") + "HORIZONTAL (".length(),
 	query.lastIndexOf("("));
 
     String maxRange = "";
     if (createFewerPartitionsThanDBs) {
-      maxRange = query.substring(query.indexOf(columnName + "(") + (columnName.length() + 1), query.lastIndexOf("))"));
+      maxRange = query.substring(
+	  query.indexOf(columnName + "(") + (columnName.length() + 1),
+	  query.lastIndexOf("))"));
     } else {
-      maxRange = query.substring(query.lastIndexOf(",") + 1, query.lastIndexOf("))"));
+      maxRange = query.substring(query.lastIndexOf(",") + 1,
+	  query.lastIndexOf("))"));
     }
 
     // Appends constraint name
@@ -558,8 +603,10 @@ public class QueryExecutor {
     String connectionDB = "";
     Integer connectionNumber = -1;
 
+    /**commented out to fix the issue #2
     CustomLogger.log(Level.INFO,
-	"Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+    "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+    */
     try {
       Statement statement = null;
       for (Integer statementKey : statementsMap.keySet()) {
@@ -575,14 +622,16 @@ public class QueryExecutor {
 	}
 
 	statement = statementsMap.get(statementKey);
-	statement.executeUpdate(query);
 	CustomLogger.log(Level.INFO,
-	    "Sent " + connectionDB + ": " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
+	    "Sending to " + connectionDB + ": " + query.replaceAll("  ", " ")
+		.replaceAll("\r\n", " ").replaceAll("\t", " "));
+	statement.executeUpdate(query);
       }
     } catch (SQLException e) {
-      String message = "Connect " + connectionNumber + " " + connectionDB + ": " + e.getLocalizedMessage();
-      CustomLogger.log(Level.SEVERE, "JDBC SQLException in " + connectionDB + ": " + e.getLocalizedMessage());
-      throw new FedException(new Throwable(message));
+      String dbMessage = "JDBC SQLException in " + connectionDB + ": "
+	  + e.getMessage();
+      CustomLogger.log(Level.SEVERE, dbMessage);
+      throw new FedException(new Throwable(dbMessage));
     }
     return result;
   }
@@ -592,7 +641,8 @@ public class QueryExecutor {
    * query as InputStream, so this method converts String queries and returns
    * List of parse-able InputStream queries
    */
-  public static List<InputStream> convertToParsableQueries(List<String> queries) {
+  public static List<InputStream> convertToParsableQueries(
+      List<String> queries) {
     List<InputStream> parsableQueries = new ArrayList<InputStream>();
     for (int i = 0; i < queries.size(); i++) {
       parsableQueries.add(convertToParsableQuery(queries.get(i)));
