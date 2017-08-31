@@ -43,7 +43,6 @@ constraint FLUGLINIE_FS_HUB
 		foreign key (HUB) references FLUGHAFEN(FHC)
 );
 --	2.2.3	☐The FDBS at least must manage horizontally partitioned tables.
--- WARNING: constraint FLUG_AB_CHK for AB is defined in addition to partition constraints
 --	2.2.2	☐Support of FOREIGN KEY constraints is optional. 
 create table FLUG (
 FNR             integer,

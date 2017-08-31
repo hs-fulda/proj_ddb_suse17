@@ -224,7 +224,8 @@ public class QueryExecutor {
 	  connectionDB = ConnectionConstants.CONNECTION_3_SID;
 	}
 	statement = statementsMap.get(statementKey);
-	CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
+	CustomLogger.log(Level.INFO,
+	    "Sending to " + connectionDB + ": " + query);
 	result = statement.executeUpdate(query);
       }
     } catch (SQLException e) {
@@ -304,7 +305,8 @@ public class QueryExecutor {
       }
 
       try {
-	CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
+	CustomLogger.log(Level.INFO,
+	    "Sending to " + connectionDB + ": " + query);
 	result = statement.executeUpdate(query);
 	statementKey++;
       } catch (SQLException e) {
@@ -348,7 +350,8 @@ public class QueryExecutor {
       statement = statementsMap.get(statementKey);
 
       try {
-	CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
+	CustomLogger.log(Level.INFO,
+	    "Sending to " + connectionDB + ": " + query);
 	statement.executeUpdate(query);
       } catch (Exception e) {
 	String message = "Connect " + connectionNumber + " " + connectionDB
@@ -500,8 +503,8 @@ public class QueryExecutor {
     String maxRange = query.substring(firstIndex, secondIndex);
 
     // Appends constraint name
-    basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
-    basicQuery.append(columnName + " < " + maxRange);
+    basicQuery.append(tableName + "_" + columnName + "_HORIZ check (");
+    basicQuery.append(columnName + " <= " + maxRange);
     basicQuery.append(")");
 
     // Adds back ')' after constraint is appended
@@ -540,9 +543,9 @@ public class QueryExecutor {
 	query.lastIndexOf("))"));
 
     // Appends constraint name
-    basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
+    basicQuery.append(tableName + "_" + columnName + "_HORIZ check (");
     basicQuery.append(columnName);
-    basicQuery.append(" between " + lowerRange + " and " + upperRange);
+    basicQuery.append(" between " + (Integer.parseInt(lowerRange) + 1) + " and " + upperRange);
     basicQuery.append(")");
 
     // Adds back ')' after constraint is appended
@@ -588,7 +591,7 @@ public class QueryExecutor {
     }
 
     // Appends constraint name
-    basicQuery.append(tableName + "_RANGE_CHK_" + columnName + " check (");
+    basicQuery.append(tableName + "_" + columnName + "_HORIZ check (");
     basicQuery.append(columnName + operator + maxRange);
     basicQuery.append(")");
 
