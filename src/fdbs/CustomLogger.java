@@ -30,6 +30,8 @@ public class CustomLogger {
         SimpleFormatter formatter = new SimpleFormatter();
         fh.setFormatter(formatter);
         logger.addHandler(fh);
+
+        // disable output to console
         logger.setUseParentHandlers(false);
 
     }

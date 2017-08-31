@@ -14,24 +14,23 @@ public class Application {
 
     public static void main(String[] args) throws ParseException, FedException {
 
-        while(true) {
+        while (true) {
 
             // Selects files and stores statements in a list
             File selectedFile = FileUtility.getFile();
-            List<String> statementsFromFile = FileUtility
-                    .getStatementsFromFile(selectedFile);
+            List<String> statementsFromFile = FileUtility.getStatementsFromFile(selectedFile);
 
             FedConnection fedConnection = null;
             try {
                 // Gets connection based on Username and Password
-                fedConnection = new FedPseudoDriver().getConnection(
-                        ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
+                fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
                 fedConnection.setAutoCommit(false);
 
                 FedStatement fedStatement = fedConnection.getStatement();
 
-                System.out.println("Executing statements from an SQL file \'"
-                        + selectedFile.getAbsolutePath() + "\' ...");
+                System.out.println();
+                OutputFormatter.printAsterisks();
+                System.out.println("Executing script file \'" + selectedFile.getAbsolutePath() + "\' ...");
 
                 // Time starts
                 startTime = System.currentTimeMillis();
@@ -39,30 +38,32 @@ public class Application {
                 int totalOperations = 0;
 
                 for (String currentStatement : statementsFromFile) {
-                  
-                  currentStatement = currentStatement.replaceAll("  ", " ")
-                      .replaceAll("\r\n", " ").replaceAll("\t", " ");
-                  try {
-                    // If the query is DDL or DML, executeUpdate should be called from FJDBC
-                    if (isDDLOrDMLScript(currentStatement))
-                        fedStatement.executeUpdate(currentStatement);
-                    else if (isCommit(currentStatement))
-                        fedConnection.commit();
-                    else if (isRollback(currentStatement))
+
+                    currentStatement = currentStatement.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " ");
+                    try {
+                        // If the query is DDL or DML, executeUpdate should be called from FJDBC
+                        if (isDDLOrDMLScript(currentStatement))
+                            fedStatement.executeUpdate(currentStatement);
+                        else if (isCommit(currentStatement))
+                            fedConnection.commit();
+                        else if (isRollback(currentStatement))
+                            fedConnection.rollback();
+                        else {
+                            System.out.println("Executing \'" + currentStatement + "\'");
+                            FedResultSet resultSet = fedStatement.executeQuery(currentStatement);
+                            printResult(resultSet);
+                            System.out.println("\n=======================================================");
+
+                        }
+                        totalOperations++;
+                    } catch (Exception e) {
                         fedConnection.rollback();
-                    else {
-                        FedResultSet resultSet = fedStatement.executeQuery(currentStatement);
-                        printResult(resultSet);
                     }
-                    totalOperations++;
-		  } catch (Exception e) {
-		    fedConnection.rollback();
-		  }
-                    
-                   
+
+
                 }
-                System.out.println("Total statements in the file: " + totalOperations);
-                System.out.println(getTimeTaken());
+                System.out.println("File: \'" + selectedFile.getName() + "\', Operations: " + totalOperations);
+
             } catch (FedException e) {
                 System.out.println("FedException; " + e);
             }
@@ -70,6 +71,9 @@ public class Application {
             finally {
                 fedConnection.close();
             }
+            System.out.println(getTimeTaken());
+            OutputFormatter.printAsterisks();
+            System.out.println();
 
             String message = "File \"" + selectedFile.getName() + "\" execution completed. Do you want to load another SQL script?";
             if (FileUtility.showConfirmDialog(message)) {
@@ -116,8 +120,7 @@ public class Application {
                 String columnValue = "";
                 if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
                     columnValue = resultSet.getInt(counter + 1) + "";
-                else if (columnType.equals("VARCHAR"))
-                    columnValue = resultSet.getString(counter + 1);
+                else if (columnType.equals("VARCHAR")) columnValue = resultSet.getString(counter + 1);
                 record.append(String.format("%-12s", columnValue));
                 counter++;
             }
@@ -169,18 +172,13 @@ public class Application {
      * @return
      */
     private static boolean isDDLOrDMLScript(String script) {
-        return script.startsWith("CREATE") || script.startsWith("DROP")
-                || script.startsWith("INSERT") || script.startsWith("DELETE")
-                || script.startsWith("UPDATE") || script.startsWith("ALTER")
-                || script.startsWith("SET");
+        return script.startsWith("CREATE") || script.startsWith("DROP") || script.startsWith("INSERT") || script.startsWith("DELETE") || script.startsWith("UPDATE") || script.startsWith("ALTER") || script.startsWith("SET");
     }
 
     private static String getTimeTaken() {
         duration = System.currentTimeMillis() - startTime;
         Date timeTaken = new Date(duration);
-        String timeTakenStr = String.format(
-                "Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
-                timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
+        String timeTakenStr = String.format("Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(), timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
         return timeTakenStr;
     }
 

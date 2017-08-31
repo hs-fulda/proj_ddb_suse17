@@ -88,8 +88,8 @@ public class FedStatement implements FedStatementInterface {
     List<ResultSet> resultSets = new ArrayList<ResultSet>();
     try {
       for (Statement statement : statementsMap.values()) {
-	ResultSet resultSet = statement.executeQuery(sql);
-	resultSets.add(resultSet);
+        ResultSet resultSet = statement.executeQuery(sql);
+        resultSets.add(resultSet);
       }
       fedResultSet = new FedResultSet(resultSets);
     } catch (SQLException e) {
