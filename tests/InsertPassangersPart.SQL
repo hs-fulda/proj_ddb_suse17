@@ -4,7 +4,7 @@ alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
 
-
+--PINATUBO:
 INSERT INTO TJ_PASSAGIER VALUES (1, 'Collins', 'Phil', 'GB ');
 INSERT INTO TJ_PASSAGIER VALUES (2, 'Sting', null, 'GB ');
 INSERT INTO TJ_PASSAGIER VALUES (3, 'Bush', 'Kate', 'GB ');
@@ -40,6 +40,9 @@ INSERT INTO TJ_PASSAGIER VALUES (30, 'Gueclue', 'Erdem', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (31, 'Tepel', 'Andreas', null);
 INSERT INTO TJ_PASSAGIER VALUES (32, 'Tepel', 'Martin', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (35, 'Mueller', 'Tatjana', null);
+
+INSERT INTO TJ_PASSAGIER VALUES (34, 'DELETE', 'PINATUBO', 'D ');
+-- MTSHELENS:
 INSERT INTO TJ_PASSAGIER VALUES (36, 'Mueller', 'Susi', null);
 INSERT INTO TJ_PASSAGIER VALUES (37, 'Reinel', 'Mario', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (38, 'Reinel', 'Martin', 'D  ');
@@ -74,8 +77,9 @@ INSERT INTO TJ_PASSAGIER VALUES (66, 'Tobert', 'Stefan', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (67, 'Kouada', 'Hichem', 'TUN');
 INSERT INTO TJ_PASSAGIER VALUES (68, 'Englert', 'Michael', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (69, 'Ksaier', 'Nejib', 'TUN');
-
 INSERT INTO TJ_PASSAGIER VALUES (70, 'Helmke', 'Christian', 'D  ');
+INSERT INTO TJ_PASSAGIER VALUES (54, 'DELETE', 'MTSHELENS', 'D ');
+-- KRAKATAU
 INSERT INTO TJ_PASSAGIER VALUES (71, 'Gannouni', 'Walid', 'TUN');
 INSERT INTO TJ_PASSAGIER VALUES (72, 'Sanama', 'Gaspard', 'CMR');
 INSERT INTO TJ_PASSAGIER VALUES (73, 'Fessi', 'Aymen', 'TUN');
@@ -88,7 +92,7 @@ INSERT INTO TJ_PASSAGIER VALUES (79, 'Hahn', 'Benedikt', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (80, 'Wald', 'Daniel', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (81, 'Schaefer', 'Thilo', 'D  ');
 INSERT INTO TJ_PASSAGIER VALUES (82, 'Nguentcheng', 'Alexandre', 'CMR');
-
+INSERT INTO TJ_PASSAGIER VALUES (84, 'DELETE', 'KRAKATAU', 'D ');
 
 
 commit;
