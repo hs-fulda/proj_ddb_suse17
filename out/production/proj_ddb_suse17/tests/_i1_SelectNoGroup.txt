@@ -1,3 +1,0 @@
-passenger.lastname, passenger.firstname, flights.code
-FROM
-passengers, flights, thirdTableIsInvalid;
