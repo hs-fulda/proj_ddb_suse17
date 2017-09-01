@@ -53,7 +53,7 @@ public class FileUtility {
 
 
     public static List<String> getStatementsFromFile(File file) {
-        List<String> sQLStatements = new ArrayList<String>();
+        List<String> sqlStatements = new ArrayList<String>();
 
         BufferedReader br = null;
         try {
@@ -78,7 +78,8 @@ public class FileUtility {
                     }
 
                     if (script.length() > 0) {
-                        sQLStatements.add(script.toString().trim());
+                        script = new StringBuilder(refineQuery(script.toString()));
+                        sqlStatements.add(script.toString().trim());
                     }
                     script = new StringBuilder();
                 } else {
@@ -97,21 +98,35 @@ public class FileUtility {
             }
         }
 
-        return sQLStatements;
+        return sqlStatements;
+    }
+
+    private static String refineQuery(String script) {
+        while(script.contains("\n")) {
+            script = script.replaceAll("\n", " ");
+        }
+        while(script.contains("\t")) {
+            script = script.replaceAll("\t", " ");
+        }
+        while(script.contains("  ")) {
+            script = script.replaceAll("  ", " ");
+        }
+
+        return script;
     }
 
     // Does not consider comments (e.g. -- // /* \\ # as scripts
     private static String fetchValidLine(String script) {
         StringBuilder validLine = new StringBuilder();
         Scanner input = new Scanner(script.toString());
+
         while (input.hasNextLine()) {
             String line = input.nextLine();
-            if (line.startsWith("--") || line.startsWith("\\\\")
-                    || line.startsWith("//") || line.startsWith("/*")
+            if (line.startsWith("--") || line.startsWith("\\\\") || line.startsWith("//") || line.startsWith("/*")
                     || line.startsWith("#") || line.trim().isEmpty())
                 continue;
             else {
-                validLine.append(line.toUpperCase());
+                validLine.append(line);
             }
         }
         return validLine.toString();

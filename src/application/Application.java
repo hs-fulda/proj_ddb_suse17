@@ -1,198 +1,220 @@
 package application;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import fjdbc.*;
 import parser.ParseException;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Application {
-  private static long startTime;
-  private static long duration;
 
-  public static void main(String[] args) throws ParseException, FedException {
+    // Variables to keep track of time
+    private static long startTime;
+    private static long duration;
 
-    while (true) {
+    public static void main(String[] args) throws ParseException, FedException {
 
-      // Selects files and stores statements in a list
-      File selectedFile = FileUtility.getFile();
-      List<String> statementsFromFile = FileUtility
-	  .getStatementsFromFile(selectedFile);
+        // Program does not terminate until user clicks "Cancel" button in a prompted dialogue.
+        while (true) {
 
-      FedConnection fedConnection = null;
-      try {
-	// Gets connection based on Username and Password
-	fedConnection = new FedPseudoDriver().getConnection(
-	    ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
-	fedConnection.setAutoCommit(false);
+            // Selects files and stores statements in a list
+            File selectedFile = FileUtility.getFile();
+            List<String> statementsFromFile = FileUtility.getStatementsFromFile(selectedFile);
 
-	FedStatement fedStatement = fedConnection.getStatement();
+            // All statements taken from file provided run here one by one
+            int totalOperations = 0;
+            int successfulOperations = 0;
+            int failedOperations = 0;
 
-	System.out.println();
-	OutputFormatter.printAsterisks();
-	System.out.println("Executing script file \'"
-	    + selectedFile.getAbsolutePath() + "\' ...");
+            FedConnection fedConnection = null;
+            try {
+                // Prepares resources
+                fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
+                fedConnection.setAutoCommit(false);
+                FedStatement fedStatement = fedConnection.getStatement();
 
-	// Time starts
-	startTime = System.currentTimeMillis();
-	// All statements taken from file provided run here one by one
-	int totalOperations = 0;
+                // Prints file name
+                OutputFormatter.printFileName(selectedFile);
+                System.out.println("\nFile: \'" + selectedFile.getName() + "\'\n");
 
-	for (String currentStatement : statementsFromFile) {
+                // Recording time starts
+                startTime = System.currentTimeMillis();
 
-	  currentStatement = currentStatement.replaceAll("  ", " ")
-	      .replaceAll("\r\n", " ").replaceAll("\t", " ");
-	  try {
-	    // If the query is DDL or DML, executeUpdate should be called from FJDBC
-	    if (isDDLOrDMLScript(currentStatement))
-	      fedStatement.executeUpdate(currentStatement);
-	    else if (isCommit(currentStatement))
-	      fedConnection.commit();
-	    else if (isRollback(currentStatement))
-	      fedConnection.rollback();
-	    else {
-	      System.out.println("Executing \'" + currentStatement + "\'");
-	      FedResultSet resultSet = fedStatement
-		  .executeQuery(currentStatement);
-	      printResult(resultSet);
-	      System.out.println(
-		  "\n=======================================================");
+                for (String currentStatement : statementsFromFile) {
+                    // Ignores "SET" or "ALTER" script
+                    if (shouldNotParse(currentStatement)) {
+                        continue;
+                    }
 
-	    }
-	    totalOperations++;
-	  } catch (Exception e) {
-	    fedConnection.rollback();
-	  }
+                    try {
+                        // DDL and DML
+                        if (isDDLOrDMLScript(currentStatement)) {
+                            fedStatement.executeUpdate(currentStatement);
+                            System.out.print("\nSUCCESSFUL - ");
+                            OutputFormatter.printQuery(currentStatement);
+                        }
+                        // Commit
+                        else if (isCommitScript(currentStatement)) {
+                            fedConnection.commit();
+                            System.out.print("\nSUCCESSFUL - ");
+                            OutputFormatter.printQuery(currentStatement);
+                        }
+                        // Rollback
+                        else if (isRollbackScript(currentStatement)) {
+                            fedConnection.rollback();
+                            System.out.print("\nSUCCESSFUL - ");
+                            OutputFormatter.printQuery(currentStatement);
+                        }
+                        // Select
+                        else {
+                            FedResultSet resultSet = fedStatement.executeQuery(currentStatement);
+                            System.out.print("\nSUCCESSFUL - ");
+                            OutputFormatter.printQuery(currentStatement);
+                            System.out.println();
+                            printResult(resultSet);
+                        }
 
-	}
-	System.out.println("File: \'" + selectedFile.getName()
-	    + "\', Operations: " + totalOperations);
+                        successfulOperations++;
+                    } catch (FedException e) {
+                        failedOperations++;
+                        System.out.print("\nFAILED - ");
+                        OutputFormatter.printQuery(currentStatement);
+                        System.out.println("\nMESSAGE - " + e);
+                    }
+                    totalOperations++;
+                }
+            } catch (Exception e) {
+                System.out.println("Exception; " + e);
+            }
+            // @author: Anfilov. Close all JDBC connections
+            finally {
+                fedConnection.close();
+            }
 
-      } catch (FedException e) {
-	System.out.println("FedException; " + e);
-      }
-      // @author: Anfilov. Close all JDBC connections
-      finally {
-	fedConnection.close();
-      }
-      System.out.println(getTimeTaken());
-      OutputFormatter.printAsterisks();
-      System.out.println();
+            // Prints time taken
+            System.out.println("\n\nTotal Operations: " + totalOperations + ", Successful: " + successfulOperations + ", Failed: " + failedOperations);
+            System.out.println(getTimeTaken());
+            OutputFormatter.printAsterisks();
+            System.out.println();
 
-      String message = "File \"" + selectedFile.getName()
-	  + "\" execution completed. Do you want to load another SQL script?";
-      if (FileUtility.showConfirmDialog(message)) {
-	continue;
-      } else {
-	System.exit(1);
-      }
-      break;
-    }
-  }
+            // Prompts dialog box for user to either load another script file or to terminate the program
+            String message = "File \"" + selectedFile.getName() + "\" execution completed. Do you want to load another SQL script?";
+            if (FileUtility.showConfirmDialog(message)) {
+                continue;
+            } else {
+                break;
+            }
+        }
 
-  private static void printResult(FedResultSet resultSet) throws FedException {
-    List<String> columnNames = new ArrayList<String>();
-    List<String> columnTypes = new ArrayList<String>();
-    List<String> records = new ArrayList<String>();
-
-    int numberOfColumns = resultSet.getColumnCount();
-
-    int counter = 1;
-    String column = null;
-    while (counter <= numberOfColumns) {
-      String columnName = resultSet.getColumnName(counter);
-      columnNames.add(String.format("%-12s", columnName));
-      column = resultSet.getColumnType(counter);
-      columnTypes.add(column);
-
-      //String columnType = getColumnTypeStr(resultSet.getColumnType(counter));
-      // columnNames.add(String.format("%-10s", columnName + " (" + columnType +
-      // ")"));
-      // String columnValue = "";
-      // if (columnType.equals("INTEGER"))
-      // columnValue = resultSet.getInt(counter) + "";
-      // else if (columnType.equals("VARCHAR"))
-      // columnValue = resultSet.getString(counter);
-      // columnValues.add(columnValue);
-      counter++;
+        System.out.println("PROGRAM ENDS");
     }
 
-    while (resultSet.next()) {
-      StringBuilder record = new StringBuilder();
-      counter = 0;
-      while (counter < numberOfColumns) {
-	String columnType = columnTypes.get(counter);
-	String columnValue = "";
-	if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
-	  columnValue = resultSet.getInt(counter + 1) + "";
-	else if (columnType.equals("VARCHAR"))
-	  columnValue = resultSet.getString(counter + 1);
-	record.append(String.format("%-12s", columnValue));
-	counter++;
-      }
-      // @author: Jahan. Check for duplication. Only insert unique data
-      if (!records.contains(record.toString())) {
-	records.add(record.toString());
-      } else {
-	continue;
-      }
+    private static boolean shouldNotParse(String query) {
+        query = query.trim().toUpperCase();
+        return query.startsWith("SET") || query.startsWith("ALTER");
     }
 
-    String columnNamesStr = "";
-    for (String string : columnNames) {
-      columnNamesStr += string;
+    private static void printResult(FedResultSet resultSet) throws FedException {
+        List<String> columnNames = new ArrayList<String>();
+        List<String> columnTypes = new ArrayList<String>();
+        List<String> records = new ArrayList<String>();
+
+        int numberOfColumns = resultSet.getColumnCount();
+
+        int counter = 1;
+        String column = null;
+        while (counter <= numberOfColumns) {
+            String columnName = resultSet.getColumnName(counter);
+            columnNames.add(String.format("%.12s", String.format("%-12s", columnName)));
+            column = resultSet.getColumnType(counter);
+            columnTypes.add(column);
+
+            counter++;
+        }
+
+        while (resultSet.next()) {
+            StringBuilder record = new StringBuilder();
+            counter = 0;
+            while (counter < numberOfColumns) {
+                String columnType = columnTypes.get(counter);
+                String columnValue = "";
+                if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
+                    columnValue = resultSet.getInt(counter + 1) + "";
+                else if (columnType.equals("VARCHAR")) columnValue = resultSet.getString(counter + 1);
+                record.append(String.format("%.12s", String.format("%-12s", columnValue)));
+                counter++;
+            }
+            // @author: Jahan. Check for duplication. Only insert unique data
+            if (!records.contains(record.toString())) {
+                records.add(record.toString());
+            } else {
+                continue;
+            }
+        }
+
+        String columnNamesStr = "";
+        for (String string : columnNames) {
+            columnNamesStr += string;
+        }
+
+        counter = 1;
+        while(counter <= numberOfColumns) {
+            OutputFormatter.printDashes(12);
+            counter++;
+        }
+        System.out.print("\n");
+        System.out.println(columnNamesStr);
+        counter = 1;
+        while(counter <= numberOfColumns) {
+            OutputFormatter.printDashes(12);
+            counter++;
+        }
+        System.out.print("\n");
+
+        for (String string : records) {
+            System.out.println(string);
+        }
     }
 
-    System.out.println(columnNamesStr);
-    System.out.print("-------------------------------------------------------");
-    System.out.print("\n");
-    for (String string : records) {
-      System.out.println(string);
+    private static String getColumnTypeStr(int columnTypeInt) {
+        String columnType = "";
+        switch (columnTypeInt) {
+            case 1:
+                columnType = "INTEGER";
+                break;
+            case 2:
+                columnType = "VARCHAR";
+                break;
+            default:
+        }
+        return columnType;
     }
-  }
 
-  private static String getColumnTypeStr(int columnTypeInt) {
-    String columnType = "";
-    switch (columnTypeInt) {
-      case 1:
-	columnType = "INTEGER";
-	break;
-      case 2:
-	columnType = "VARCHAR";
-	break;
-      default:
+    private static boolean isRollbackScript(String script) {
+        return script.trim().toUpperCase().startsWith("ROLLBACK");
     }
-    return columnType;
-  }
 
-  private static boolean isRollback(String script) {
-    return script.startsWith("ROLLBACK");
-  }
+    private static boolean isCommitScript(String script) {
+        return script.trim().toUpperCase().startsWith("COMMIT");
+    }
 
-  private static boolean isCommit(String script) {
-    return script.startsWith("COMMIT");
-  }
+    private static boolean isDDLOrDMLScript(String script) {
+        script = script.trim().toUpperCase();
+        return script.startsWith("CREATE") || script.startsWith("DROP") || script.startsWith("INSERT") || script.startsWith("DELETE") || script.startsWith("UPDATE");
+    }
 
-  /**
-   * @param script
-   * @return
-   */
-  private static boolean isDDLOrDMLScript(String script) {
-    return script.startsWith("CREATE") || script.startsWith("DROP")
-	|| script.startsWith("INSERT") || script.startsWith("DELETE")
-	|| script.startsWith("UPDATE") || script.startsWith("ALTER")
-	|| script.startsWith("SET");
-  }
+    private static String getTimeTaken() {
+        duration = System.currentTimeMillis() - startTime;
+        Date timeTaken = new Date(duration);
+        String timeTakenStr = String.format(
+                "Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
+                timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
+        return timeTakenStr;
+    }
 
-  private static String getTimeTaken() {
-    duration = System.currentTimeMillis() - startTime;
-    Date timeTaken = new Date(duration);
-    String timeTakenStr = String.format(
-	"Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
-	timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
-    return timeTakenStr;
-  }
 
 }
