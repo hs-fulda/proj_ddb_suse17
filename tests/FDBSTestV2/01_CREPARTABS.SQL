@@ -13,7 +13,8 @@ constraint color_UQ UNIQUE (color)
 INSERT INTO  db04_colors values ('red');
 commit;
 SELECT * FROM  db04_colors;
-INSERT INTO  db04_colors values ('red');
+INSERT INTO  db04_colors values ('red');-- CHECK for violation of color_UQ
+SELECT * FROM  db04_colors;
 Drop table  db04_colors;
  
 --	2.2.1 constraints of types PRIMARY KEY

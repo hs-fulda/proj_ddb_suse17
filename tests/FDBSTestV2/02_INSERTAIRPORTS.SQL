@@ -4,7 +4,9 @@ alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
 
-
+-- FLUGHAFEN has no partition.
+-- 2.2.6.4.	If no partitioning clause is given, the entire table hast to be stored on the “first” of your CDBSes.
+-- Total: 84 records, all must be stored ONLY in pinatubo
 INSERT INTO FLUGHAFEN VALUES ('AKL', 'NZ ', 'Auckland', 'Auckland International');                  
 INSERT INTO FLUGHAFEN VALUES ('ALC', 'E  ', 'Alicante', 'Alicante');                                
 INSERT INTO FLUGHAFEN VALUES ('ALF', 'N  ', 'Alta', 'Flughafen Alta');                              
