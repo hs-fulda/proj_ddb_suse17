@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import fdbs.CustomLogger;
 import fdbs.QueryExecutor;
 import parser.ParseException;
-import sun.security.x509.FreshestCRLExtension;
 
 public class FedStatement implements FedStatementInterface {
   String fsrClosed = "FedStatement resource is closed.";
@@ -34,7 +33,6 @@ public class FedStatement implements FedStatementInterface {
   }
 
   public int executeUpdate(String query) throws FedException {
-    //    CustomLogger.log(Level.FINE, "SQL: " + query);
     int result = -1;
     if (isClose) {
       CustomLogger.log(Level.WARNING, fsrClosed);
@@ -71,14 +69,7 @@ public class FedStatement implements FedStatementInterface {
     }
   }
 
-  /*
-   * 
-   * Not used yet, might/might not needs to be changed. So can't comment on it
-   * at the moment.
-   */
-
   public FedResultSet executeQuery(String sql) throws FedException {
-    //    CustomLogger.log(Level.FINE, "SQL: " + sql);
     CustomLogger.log(Level.INFO, "Received FJDBC: " + sql);
     if (isClose) {
       throw new FedException(new Throwable(fsrClosed));
