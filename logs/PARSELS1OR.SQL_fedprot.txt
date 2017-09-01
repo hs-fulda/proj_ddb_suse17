@@ -1,0 +1,15 @@
+<14:16:16.741>Start FDBS
+<14:16:16.794>FDBS; opened connection to oralv8a
+<14:16:16.863>FDBS; opened connection to oralv9a
+<14:16:16.910>FDBS; opened connection to oralv10a
+<14:16:16.910>Received FJDBC: SELECT * FROM BUCHUNG WHERE BUCHUNG.PNR = 12 OR BUCHUNG.BNR = 2
+<14:16:16.941>Received FJDBC: SELECT PASSAGIER.PNR, PASSAGIER.NAME, PASSAGIER.LAND FROM PASSAGIER WHERE PASSAGIER.PNR <= 16 AND PASSAGIER.LAND = 'I '
+<14:16:16.963>Received FJDBC: SELECT BUCHUNG.BNR, BUCHUNG.PNR, BUCHUNG.FLC, BUCHUNG.FLNR FROM BUCHUNG WHERE BUCHUNG.BNR <= 16 AND BUCHUNG.PNR = 78
+<14:16:16.979>Received FJDBC: SELECT BUCHUNG.BNR, BUCHUNG.PNR, BUCHUNG.FLC, BUCHUNG.FLNR FROM BUCHUNG WHERE BUCHUNG.BNR <= 16 AND BUCHUNG.BNR > 16
+<14:16:16.994>Received FJDBC: SELECT * FROM FLUGHAFEN WHERE FLUGHAFEN.LAND = 'UAE' OR FLUGHAFEN.FHC = 'ABC'
+<14:16:16.994>FJDBC: rollback()
+<14:16:17.010>Entered FedConnection.close()
+<14:16:17.010>JDBC connection to jdbc:oracle:thin:@pinatubo.informatik.hs-fulda.de:1521:oralv8a has been closed.
+<14:16:17.010>JDBC connection to jdbc:oracle:thin:@mtsthelens.informatik.hs-fulda.de:1521:oralv9a has been closed.
+<14:16:17.010>JDBC connection to jdbc:oracle:thin:@krakatau.informatik.hs-fulda.de:1521:oralv10a has been closed.
+<14:16:17.010>Exited FedConnection.close()

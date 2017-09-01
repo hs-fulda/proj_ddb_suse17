@@ -1,0 +1,16 @@
+<14:20:54.907>Start FDBS
+<14:20:55.088>FDBS; opened connection to oralv8a
+<14:20:55.126>FDBS; opened connection to oralv9a
+<14:20:55.173>FDBS; opened connection to oralv10a
+<14:20:55.173>Received FJDBC: SELECT FLUGLINIE.LAND, COUNT(*) FROM FLUGLINIE GROUP BY FLUGLINIE.LAND
+<14:20:55.206>Received FJDBC: SELECT FLUGLINIE.LAND, COUNT(*) FROM FLUGLINIE WHERE ALLIANZ = 'Star' GROUP BY FLUGLINIE.LAND
+<14:20:55.210>Received FJDBC: SELECT BUCHUNG.FLC, SUM(BUCHUNG.PREIS) FROM BUCHUNG WHERE BUCHUNG.MEILEN > 3000 GROUP BY BUCHUNG.FLC
+<14:20:55.226>Received FJDBC: SELECT BUCHUNG.PNR, SUM(BUCHUNG.MEILEN) FROM BUCHUNG WHERE BUCHUNG.MEILEN < 0 GROUP BY BUCHUNG.PNR
+<14:20:55.242>Received FJDBC: SELECT BUCHUNG.NACH, SUM(BUCHUNG.MEILEN) FROM BUCHUNG GROUP BY BUCHUNG.NACH HAVING COUNT (*) = 4
+<14:20:55.257>Received FJDBC: SELECT BUCHUNG.VON, SUM(BUCHUNG.PREIS) FROM BUCHUNG WHERE (BUCHUNG.BNR > 20) GROUP BY BUCHUNG.VON HAVING COUNT (*) > 10
+<14:20:55.273>FJDBC: rollback()
+<14:20:55.289>Entered FedConnection.close()
+<14:20:55.289>JDBC connection to jdbc:oracle:thin:@pinatubo.informatik.hs-fulda.de:1521:oralv8a has been closed.
+<14:20:55.289>JDBC connection to jdbc:oracle:thin:@mtsthelens.informatik.hs-fulda.de:1521:oralv9a has been closed.
+<14:20:55.289>JDBC connection to jdbc:oracle:thin:@krakatau.informatik.hs-fulda.de:1521:oralv10a has been closed.
+<14:20:55.289>Exited FedConnection.close()
