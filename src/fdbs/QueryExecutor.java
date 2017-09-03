@@ -8,6 +8,7 @@ import parser.ParseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
@@ -185,12 +186,12 @@ public class QueryExecutor {
      * Replaces ( and ) because ) is showing conflict in parser and can not add
      * it in String constant, so workaround.
      */
-    pattern = Pattern.compile("\\((.*?)[.](.*?)[ ](.*?)\\)");
-    m = pattern.matcher(query);
-    while (m.find()) {
-        String searchStr = m.group();
-        query = query.replace(searchStr, searchStr.replaceAll("\\(", "").replaceAll("\\)", ""));
-    }
+        pattern = Pattern.compile("\\((.*?)[.](.*?)[ ](.*?)\\)");
+        m = pattern.matcher(query);
+        while (m.find()) {
+            String searchStr = m.group();
+            query = query.replace(searchStr, searchStr.replaceAll("\\(", "").replaceAll("\\)", ""));
+        }
 
     /*
      * Replaces umlauts with unicodes to parse successfully because JavaCC
@@ -287,6 +288,9 @@ public class QueryExecutor {
     }
 
     private static int insertIntoTable(String query) throws FedException {
+//        HashMap<Integer, Statement> statements = DatabaseCatalog.getStatementsForQuery(query);
+        HashMap<Integer, Statement> statements = statementsMap;
+
         int result = -1;
         String connectionDB = "";
         int statementKey = 1;
@@ -294,8 +298,8 @@ public class QueryExecutor {
         Statement statement = null;
         // Logger: redundant, was called earlier in executeUpdate
         // CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
-        while (statementKey <= statementsMap.size()) {
-            statement = statementsMap.get(statementKey);
+        while (statementKey <= statements.size()) {
+            statement = statements.get(statementKey);
             if (statementKey == 1) {
                 connectionDB = ConnectionConstants.CONNECTION_1_SID;
             }
@@ -667,8 +671,8 @@ public class QueryExecutor {
         fedStatement = statement;
     }
 
-    public static FedResultSet executeQuery(String query) throws FedException {
-        // Do not execute UPDATE query
+    public static FedResultSet executeSelectQuery(String query) throws FedException {
+        // Do not execute HAVING query
         if (query.toUpperCase().contains(" HAVING ")) {
             throw new FedException(new Throwable("\'HAVING\' is not supported."));
         }
@@ -713,18 +717,52 @@ public class QueryExecutor {
 
         switch (queryType) {
             case QueryTypeConstant.SELECT_COUNT_ALL_TABLE:
-                System.out.println("count");
+                instance = selectCountAllTable(query);
                 break;
-            case QueryTypeConstant.SELECT_WITH_GROUP:
-                System.out.println("with group");
-                break;
-            case QueryTypeConstant.SELECT_WITHOUT_GROUP:
-                System.out.println("without group");
-                break;
+//            case QueryTypeConstant.SELECT_WITH_GROUP:
+//                System.out.println("with group");
+//                break;
+//            case QueryTypeConstant.SELECT_WITHOUT_GROUP:
+//                System.out.println("without group");
+//                break;
             default:
-                System.out.println("Unknown type");
+                instance = executeQuery(query);
         }
 
         return instance;
+    }
+
+    private static FedResultSet executeQuery(String query) throws FedException {
+        List<ResultSet> resultSets = new ArrayList<>();
+
+        for (Statement statement : statementsMap.values()) {
+            try {
+                resultSets.add(statement.executeQuery(query));
+            } catch (SQLException e) {
+                throw new FedException(e.getCause());
+            }
+        }
+
+        return new FedResultSet(resultSets);
+
+
+    }
+
+    private static FedResultSet selectCountAllTable(String query) throws FedException {
+        List<ResultSet> resultSets = new ArrayList<>();
+
+        for (Statement statement : statementsMap.values()) {
+            try {
+                resultSets.add(statement.executeQuery(query));
+            } catch (SQLException e) {
+                throw new FedException(e.getCause());
+            }
+        }
+
+        ResultSet rs = new SelectCountResultSet(resultSets);
+        resultSets = new ArrayList<>();
+        resultSets.add(rs);
+        return new FedResultSet(resultSets);
+
     }
 }

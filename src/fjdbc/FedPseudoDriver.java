@@ -30,7 +30,7 @@ public class FedPseudoDriver implements FedPseudoDriverInterface {
 	  ConnectionConstants.CONNECTION_3_URL, userName, password));
       CustomLogger.log(Level.INFO, info + ConnectionConstants.CONNECTION_3_SID);
 
-      connection = new FedConnection(connectionsMap);
+      connection = new FedConnection(connectionsMap, userName, password);
     } catch (SQLException e) {
       throw new FedException(new Throwable(e.getMessage()));
     }

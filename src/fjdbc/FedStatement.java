@@ -1,14 +1,12 @@
 package fjdbc;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 
 import fdbs.CustomLogger;
+import fdbs.DatabaseCatalog;
 import fdbs.QueryExecutor;
 import parser.ParseException;
 
@@ -25,6 +23,7 @@ public class FedStatement implements FedStatementInterface {
                         HashMap<Integer, Statement> statementsMap) {
         this.connection = connection;
         this.statementsMap = statementsMap;
+        DatabaseCatalog.setStatementsMap(statementsMap);
         isClose = false;
 
         // Initialize query executor to use JDBC statements
@@ -57,16 +56,16 @@ public class FedStatement implements FedStatementInterface {
     }
 
     public void close() throws FedException {
-        try {
-            // Closes all JDBC Statements
-            for (Statement statement : statementsMap.values()) {
-                statement.close();
-            }
-            isClose = true;
-        } catch (SQLException e) {
-            CustomLogger.log(Level.WARNING, "FedException; " + e.getMessage());
-            throw new FedException(new Throwable(e.getMessage()));
-        }
+//        try {
+//            // Closes all JDBC Statements
+//            for (Statement statement : statementsMap.values()) {
+//                statement.close();
+//            }
+//            isClose = true;
+//        } catch (SQLException e) {
+//            CustomLogger.log(Level.WARNING, "FedException; " + e.getMessage());
+//            throw new FedException(new Throwable(e.getMessage()));
+//        }
     }
 
     public FedResultSet executeQuery(String sql) throws FedException {
@@ -75,7 +74,7 @@ public class FedStatement implements FedStatementInterface {
             throw new FedException(new Throwable(fsrClosed));
         }
 
-        FedResultSet instance = QueryExecutor.executeQuery(sql);
+        FedResultSet instance = QueryExecutor.executeSelectQuery(sql);
 
         return instance;
     }
