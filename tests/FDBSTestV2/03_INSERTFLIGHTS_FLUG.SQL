@@ -4,6 +4,7 @@ alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
 
+TRUNCATE TABLE FLUG;
 --HORIZONTAL (AB(1000,1500)); applies to the next to last column
 --Total: 100 records
 

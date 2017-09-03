@@ -4,9 +4,7 @@ alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
 
--- FLUGLINIE has no partition.
--- 2.2.6.4.	If no partitioning clause is given, the entire table hast to be stored on the “first” of your CDBSes.
--- Total: 11 records, all must be stored ONLY in pinatubo
+
 INSERT INTO FLUGLINIE VALUES ('AB', 'D  ', null, 'Air Berlin', null);                                   
 INSERT INTO FLUGLINIE VALUES ('AC', 'CDN', null, 'Air Canada', 'Star');                               
 INSERT INTO FLUGLINIE VALUES ('AF', 'F  ', null, 'Air France', 'SkyTeam');                            

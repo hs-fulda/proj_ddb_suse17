@@ -1,0 +1,13 @@
+2.2.6.4 If no partitioning clause is given, the entire table hast to be stored on the “first” of your CDBSes (PINATUBO)
+This means that FLUGHAFEN, FLUGLINIE tables will only exist in Pinatubo DB.
+
+Table PASSAGIER is partitioned over three DBs but has no FOREIGN KEYS referencing to the tables above.
+
+Table BUCHUNG has the same partitioning over three DBs as the PASSAGIER table, has a FOREIGN KEY PNR that references to PASSAGIER, so no problem at this stage.
+However, it has FOREIGN KEYS to FLUGHAFEN, FLUGLINIE, so all of the INSERT statements with PNR>35 will fail due to foreign keys unavailable.  Presisely, these foreign key constraints will be violated: FS_NACH and FS_VON referencing FLUGHAFEN,  FS_FLC referencing FLUGLINIE.
+Same problem exists for FLUG table.
+
+The first naive solution is to change the rule 2.2.6.4, so all of the required parent tables will be created in every DB. Plus, for these parent tables the required FOREIGN keys tuples will  be INSERTed before inserting tuples into child table.
+
+
+
