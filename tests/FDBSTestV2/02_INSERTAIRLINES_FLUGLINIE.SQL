@@ -3,7 +3,7 @@ set echo on;
 alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
-
+TRUNCATE TABLE FLUGLINIE;
 -- FLUGLINIE has no partition.
 -- 2.2.6.4.	If no partitioning clause is given, the entire table hast to be stored on the “first” of your CDBSes.
 -- Total: 11 records, all must be stored ONLY in pinatubo
@@ -27,4 +27,5 @@ update FLUGLINIE set ALLIANZ = 'OneWorld' where FLC = 'BA';
 update FLUGLINIE set HUB = NULL;
 
 commit;
+--SELECT COUNT(*) FROM FLUGLINIE;
   
