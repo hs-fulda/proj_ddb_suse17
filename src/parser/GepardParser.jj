@@ -63,7 +63,7 @@ TOKEN : { < AND : " AND " > }
 TOKEN : { < OR : " OR " > }
 TOKEN : { < COUNT : "COUNT"([" "])? > }
 TOKEN : { < SUM : "SUM"([" "])? > }
-TOKEN : { < GROUPBY : "GROUP BY " > }
+TOKEN : { < GROUPBY : ([" "])?"GROUP BY " > }
 TOKEN : { < HAVING : " HAVING " > }
 
 

@@ -1,10 +1,8 @@
 package application;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import fjdbc.*;
 import parser.ParseException;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -105,9 +103,9 @@ public class Application {
             String message = "File \"" + selectedFile.getName() + "\" execution completed. Do you want to load another SQL script?";
             if (FileUtility.showConfirmDialog(message)) {
                 continue;
-            } else {
-                break;
             }
+
+            break;
         }
 
         System.out.println("PROGRAM ENDS");
@@ -119,6 +117,12 @@ public class Application {
     }
 
     private static void printResult(FedResultSet resultSet) throws FedException {
+
+        if(resultSet == null) {
+            System.out.println("ResultSet is \'NULL\'");
+            return;
+        }
+
         List<String> columnNames = new ArrayList<String>();
         List<String> columnTypes = new ArrayList<String>();
         List<String> records = new ArrayList<String>();
