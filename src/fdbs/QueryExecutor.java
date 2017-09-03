@@ -547,7 +547,7 @@ public class QueryExecutor {
         // Appends constraint name
         basicQuery.append(tableName + "_" + columnName + "_HORIZ check (");
         basicQuery.append(columnName);
-        basicQuery.append(" between " + (Integer.parseInt(lowerRange) + 1) + " and " + upperRange);
+        basicQuery.append(" between " + (lowerRange.contains("\'") ? lowerRange : (Integer.parseInt(lowerRange) + 1)) + " and " + upperRange);
         basicQuery.append(")");
 
         // Adds back ')' after constraint is appended
