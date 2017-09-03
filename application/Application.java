@@ -13,7 +13,7 @@ public class Application {
   // Variables to keep track of time
   private static long startTime;
   private static long duration;
-  public static void __main(String[] args) throws ParseException, FedException {
+  public static void main(String[] args) throws ParseException, FedException {
 
     // Program does not terminate until user clicks "Cancel" button in a prompted dialogue.
     while (true) {

@@ -1,0 +1,24 @@
+<20:32:54.406>Start FDBS 
+<20:32:56.466>FDBS; opened connection to oralv8a 
+<20:32:56.935>FDBS; opened connection to oralv9a 
+<20:32:57.392>FDBS; opened connection to oralv10a 
+<20:33:07.620>Received FJDBC: drop table BUCHUNG cascade constraints 
+<20:33:07.651>Sending to oralv8a: drop table BUCHUNG cascade constraints 
+<20:33:07.713>Sending to oralv9a: drop table BUCHUNG cascade constraints 
+<20:33:07.776>Sending to oralv10a: drop table BUCHUNG cascade constraints 
+<20:33:07.838>Received FJDBC: drop table PASSAGIER cascade constraints 
+<20:33:07.838>Sending to oralv8a: drop table PASSAGIER cascade constraints 
+<20:33:07.901>Sending to oralv9a: drop table PASSAGIER cascade constraints 
+<20:33:07.932>Sending to oralv10a: drop table PASSAGIER cascade constraints 
+<20:33:07.995>Received FJDBC: drop table FLUG cascade constraints 
+<20:33:07.995>Sending to oralv8a: drop table FLUG cascade constraints 
+<20:33:08.057>Sending to oralv9a: drop table FLUG cascade constraints 
+<20:33:08.166>Sending to oralv10a: drop table FLUG cascade constraints 
+<20:33:08.213>Received FJDBC: drop table FLUGLINIE cascade constraints 
+<20:33:08.213>Sending to oralv8a: drop table FLUGLINIE cascade constraints 
+<20:33:08.276>Sending to oralv9a: drop table FLUGLINIE cascade constraints 
+<20:33:08.338>Sending to oralv10a: drop table FLUGLINIE cascade constraints 
+<20:33:08.416>Received FJDBC: drop table FLUGHAFEN cascade constraints 
+<20:33:08.416>Sending to oralv8a: drop table FLUGHAFEN cascade constraints 
+<20:33:08.463>Sending to oralv9a: drop table FLUGHAFEN cascade constraints 
+<20:33:08.495>Sending to oralv10a: drop table FLUGHAFEN cascade constraints 
