@@ -1,10 +1,8 @@
 package application;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import fjdbc.*;
 import parser.ParseException;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,7 +13,6 @@ public class Application {
   // Variables to keep track of time
   private static long startTime;
   private static long duration;
-
   public static void main(String[] args) throws ParseException, FedException {
 
     // Program does not terminate until user clicks "Cancel" button in a prompted dialogue.
@@ -33,8 +30,7 @@ public class Application {
       FedConnection fedConnection = null;
       try {
 	// Prepares resources
-	fedConnection = new FedPseudoDriver()
-			.getConnection(ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
+	fedConnection = new FedPseudoDriver().getConnection(ApplicationConstants.USERNAME, ApplicationConstants.PASSWORD);
 	fedConnection.setAutoCommit(false);
 	FedStatement fedStatement = fedConnection.getStatement();
 
@@ -103,15 +99,14 @@ public class Application {
       OutputFormatter.printAsterisks();
       System.out.println();
 
-      // Prompts dialog box for user to either load another script file or to terminate the program
-      String message = "File \"" + selectedFile.getName()
-		      + "\" execution completed. Do you want to load another SQL script?";
-      if (FileUtility.showConfirmDialog(message)) {
-	continue;
-      } else {
-	break;
-      }
-    }
+            // Prompts dialog box for user to either load another script file or to terminate the program
+            String message = "File \"" + selectedFile.getName() + "\" execution completed. Do you want to load another SQL script?";
+            if (FileUtility.showConfirmDialog(message)) {
+                continue;
+            }
+
+            break;
+        }
 
     System.out.println("PROGRAM ENDS");
   }
@@ -121,10 +116,16 @@ public class Application {
     return query.startsWith("SET") || query.startsWith("ALTER");
   }
 
-  private static void printResult(FedResultSet resultSet) throws FedException {
-    List<String> columnNames = new ArrayList<String>();
-    List<String> columnTypes = new ArrayList<String>();
-    List<String> records = new ArrayList<String>();
+    private static void printResult(FedResultSet resultSet) throws FedException {
+
+        if(resultSet == null) {
+            System.out.println("ResultSet is \'NULL\'");
+            return;
+        }
+
+        List<String> columnNames = new ArrayList<String>();
+        List<String> columnTypes = new ArrayList<String>();
+        List<String> records = new ArrayList<String>();
 
     int numberOfColumns = resultSet.getColumnCount();
 
@@ -147,8 +148,7 @@ public class Application {
 	String columnValue = "";
 	if (columnType.equals("INTEGER") || columnType.equals("NUMBER"))
 	  columnValue = resultSet.getInt(counter + 1) + "";
-	else if (columnType.equals("VARCHAR"))
-	  columnValue = resultSet.getString(counter + 1);
+	else if (columnType.equals("VARCHAR")) columnValue = resultSet.getString(counter + 1);
 	record.append(String.format("%.12s", String.format("%-12s", columnValue)));
 	counter++;
       }
@@ -157,7 +157,7 @@ public class Application {
 	records.add(record.toString());
       } else {
 	continue;
-      }
+      	}
     }
 
     String columnNamesStr = "";
@@ -166,19 +166,18 @@ public class Application {
     }
 
     counter = 1;
-    while (counter <= numberOfColumns) {
+    while(counter <= numberOfColumns) {
       OutputFormatter.printDashes(12);
       counter++;
     }
     System.out.print("\n");
     System.out.println(columnNamesStr);
     counter = 1;
-    while (counter <= numberOfColumns) {
+    while(counter <= numberOfColumns) {
       OutputFormatter.printDashes(12);
       counter++;
     }
     System.out.print("\n");
-
     for (String string : records) {
       System.out.println(string);
     }
@@ -189,13 +188,13 @@ public class Application {
     switch (columnTypeInt) {
     case 1:
       columnType = "INTEGER";
-      break;
+	break;
     case 2:
       columnType = "VARCHAR";
       break;
     default:
     }
-    return columnType;
+  return columnType;
   }
 
   private static boolean isRollbackScript(String script) {
@@ -208,16 +207,17 @@ public class Application {
 
   private static boolean isDDLOrDMLScript(String script) {
     script = script.trim().toUpperCase();
-    return script.startsWith("CREATE") || script.startsWith("DROP") || script.startsWith("INSERT") || script
-		    .startsWith("DELETE") || script.startsWith("UPDATE");
+    return script.startsWith("CREATE") || script.startsWith("DROP") || script.startsWith("INSERT") || script.startsWith("DELETE") || script.startsWith("UPDATE");
   }
 
   private static String getTimeTaken() {
     duration = System.currentTimeMillis() - startTime;
     Date timeTaken = new Date(duration);
-    String timeTakenStr = String.format("Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
-		    timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
+    String timeTakenStr = String.format(
+      "Time Taken : %2d Min : %2d Sec : %3d Millis", timeTaken.getMinutes(),
+      timeTaken.getSeconds(), (timeTaken.getTime() % 1000));
     return timeTakenStr;
   }
+
 
 }

@@ -63,7 +63,7 @@ TOKEN : { < AND : " AND " > }
 TOKEN : { < OR : " OR " > }
 TOKEN : { < COUNT : "COUNT"([" "])? > }
 TOKEN : { < SUM : "SUM"([" "])? > }
-TOKEN : { < GROUPBY : "GROUP BY " > }
+TOKEN : { < GROUPBY : ([" "])?"GROUP BY " > }
 TOKEN : { < HAVING : " HAVING " > }
 
 
@@ -129,7 +129,7 @@ void HorizontalSyntax() : {}
 }
 void ListOfBoundaries() : {}
 {
-	(<DIGIT>)+(<COMMA>(<DIGIT>)+)*
+	((<DIGIT>)+(<COMMA>(<DIGIT>)+)*)|(<SINGLEQUOTE>(<LETTER>)+<SINGLEQUOTE>(<COMMA><SINGLEQUOTE>(<LETTER>)+<SINGLEQUOTE>)*)
 }
 void TableConstraint() : {}
 {

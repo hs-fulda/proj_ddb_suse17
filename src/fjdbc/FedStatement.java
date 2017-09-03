@@ -75,18 +75,8 @@ public class FedStatement implements FedStatementInterface {
             throw new FedException(new Throwable(fsrClosed));
         }
 
-        FedResultSet fedResultSet = null;
-        List<ResultSet> resultSets = new ArrayList<ResultSet>();
-        try {
-            for (Statement statement : statementsMap.values()) {
-                ResultSet resultSet = statement.executeQuery(sql);
-                resultSets.add(resultSet);
-            }
-            fedResultSet = new FedResultSet(resultSets);
-        } catch (SQLException e) {
-            CustomLogger.log(Level.WARNING, "FedException; " + e.getMessage());
-            throw new FedException(new Throwable(e.getMessage()));
-        }
-        return fedResultSet;
+        FedResultSet instance = QueryExecutor.executeQuery(sql);
+
+        return instance;
     }
 }

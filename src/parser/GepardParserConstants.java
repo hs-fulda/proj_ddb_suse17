@@ -135,7 +135,7 @@ public interface GepardParserConstants {
     "\" OR \"",
     "<COUNT>",
     "<SUM>",
-    "\"GROUP BY \"",
+    "<GROUPBY>",
     "\" HAVING \"",
     "\"FROM \"",
     "<DIGIT>",

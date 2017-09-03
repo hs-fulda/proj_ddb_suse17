@@ -1,6 +1,7 @@
 package fdbs;
 
 import fjdbc.FedException;
+import fjdbc.FedResultSet;
 import fjdbc.FedStatement;
 import parser.GepardParser;
 import parser.ParseException;
@@ -157,11 +158,11 @@ public class QueryExecutor {
 
         query = sb.toString();
 
-    /*
-     * Removes all spaces in string constant because they are redundant e.g.
-     * 'ABC ' become 'ABC'
-     */
-        Pattern pattern = Pattern.compile("'([^',]*[ ]+)'");
+        /*
+         * Removes all trailing spaces in string constant because they are redundant e.g.
+         * 'ABC ' become 'ABC'. It is also important to remove because Parser is unable to parse the query with trailing spaces
+         */
+        Pattern pattern = Pattern.compile("'([^\\s']+)([ ])+'");
         Matcher m = pattern.matcher(query);
         while (m.find()) {
             String searchStr = m.group();
@@ -173,7 +174,7 @@ public class QueryExecutor {
      * e.g. 'ABC XYZ' becomes 'ABC___XYZ'. It is done because I am unable to
      * handle space between string constant parser.
      */
-        pattern = Pattern.compile("'([^',]*[ ]+.+)'");
+        pattern = Pattern.compile("'([^\\s']+)([ ])+([^\\s']+)'");
         m = pattern.matcher(query);
         while (m.find()) {
             String searchStr = m.group();
@@ -184,14 +185,12 @@ public class QueryExecutor {
      * Replaces ( and ) because ) is showing conflict in parser and can not add
      * it in String constant, so workaround.
      */
-        pattern = Pattern.compile("'.*[^,][(].*[)].*'");
-        m = pattern.matcher(query);
-        while (m.find()) {
-            String searchStr = m.group();
-            query = query.replaceAll(searchStr,
-                    searchStr.replaceAll("[(]{1}", "((("));
-            query = query.replaceAll(searchStr, searchStr.replaceAll(")", "//////"));
-        }
+    pattern = Pattern.compile("\\((.*?)[.](.*?)[ ](.*?)\\)");
+    m = pattern.matcher(query);
+    while (m.find()) {
+        String searchStr = m.group();
+        query = query.replace(searchStr, searchStr.replaceAll("\\(", "").replaceAll("\\)", ""));
+    }
 
     /*
      * Replaces umlauts with unicodes to parse successfully because JavaCC
@@ -249,7 +248,7 @@ public class QueryExecutor {
         int result = -1;
         String connectionDB = "";
         int statementKey = 1;
-        java.sql.Statement statement = null;
+        Statement statement = null;
         CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
         // Map of 3 oracle.jdbc.driver.OracleStatement objects
         while (statementKey <= statementsMap.size()) {
@@ -378,11 +377,11 @@ public class QueryExecutor {
         Statement statementOfDB2 = statementsMap.get(2);
         Statement statementOfDB3 = statementsMap.get(3);
 
-    /*
-     * Sets true if the Create query has to be deployed on first 2 DBs, that
-     * means the list_of_boundaries for Horizontal Partitioning has only 1
-     * boundary
-     */
+        /*
+         * Sets true if the Create query has to be deployed on first 2 DBs, that
+         * means the list_of_boundaries for Horizontal Partitioning has only 1
+         * boundary
+         */
         boolean createFewerPartitionsThanDBs = createFewerPartitionsThanDBs(query);
 
         String queryForDB1 = buildPartitionedQueryForDB1(query,
@@ -548,7 +547,7 @@ public class QueryExecutor {
         // Appends constraint name
         basicQuery.append(tableName + "_" + columnName + "_HORIZ check (");
         basicQuery.append(columnName);
-        basicQuery.append(" between " + (Integer.parseInt(lowerRange) + 1) + " and " + upperRange);
+        basicQuery.append(" between " + (lowerRange.contains("\'") ? lowerRange : (Integer.parseInt(lowerRange) + 1)) + " and " + upperRange);
         basicQuery.append(")");
 
         // Adds back ')' after constraint is appended
@@ -668,4 +667,64 @@ public class QueryExecutor {
         fedStatement = statement;
     }
 
+    public static FedResultSet executeQuery(String query) throws FedException {
+        // Do not execute UPDATE query
+        if (query.toUpperCase().contains(" HAVING ")) {
+            throw new FedException(new Throwable("\'HAVING\' is not supported."));
+        }
+
+        FedResultSet instance = null;
+        int queryType = QueryTypeConstant.NONE;
+
+        /* Some complex preprocess start */
+
+        /*
+         * Removes tabs, extra spaces and lines for parser to understand according
+         * to the grammar. NOTE: We use this method because skipping tabs, spaces
+         * and new lines does not work efficiently.
+         */
+        query = processQueryForParser(query);
+
+        /* Some complex preprocess end */
+
+        // Every query needs ';' to parse, so being added here.
+        // Parsing starts here.
+        GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
+
+        // This method is a general method from where all grammar starts.
+        try {
+            queryType = parser.ParseQuery();
+        } catch (ParseException e) {
+            throw new FedException(new Throwable(e.getMessage()));
+        }
+
+        /* Some complex post process start before going to database */
+
+        /*
+         * Special characters like umlauts were replaced with unicode equivalents
+         * while running processQueryForParser method. Reason: JavaCC does not
+         * support umlauts
+         */
+        query = UnicodeManager.replaceUnicodesWithChars(query);
+        query = replace3DashesWithSpace(query);
+        query = replaceBraces(query);
+
+        /* Some complex post process end before going to database */
+
+        switch (queryType) {
+            case QueryTypeConstant.SELECT_COUNT_ALL_TABLE:
+                System.out.println("count");
+                break;
+            case QueryTypeConstant.SELECT_WITH_GROUP:
+                System.out.println("with group");
+                break;
+            case QueryTypeConstant.SELECT_WITHOUT_GROUP:
+                System.out.println("without group");
+                break;
+            default:
+                System.out.println("Unknown type");
+        }
+
+        return instance;
+    }
 }
