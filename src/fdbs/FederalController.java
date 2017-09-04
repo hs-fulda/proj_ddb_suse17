@@ -244,11 +244,11 @@ public class FederalController {
             query = query.replaceAll(searchStr, searchStr.replaceAll(" ", "---"));
         }
 
+        pattern = Pattern.compile("\\((.*?)[.](.*?)[ ](.*?)\\)\\)?");
     /*
      * Replaces ( and ) because ) is showing conflict in parser and can not add
      * it in String constant, so workaround.
      */
-        pattern = Pattern.compile("\\((.*?)[.](.*?)[ ](.*?)\\)");
         m = pattern.matcher(query);
         while (m.find()) {
             String searchStr = m.group();
