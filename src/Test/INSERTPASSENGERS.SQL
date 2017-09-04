@@ -48,7 +48,7 @@ INSERT INTO PASSAGIER VALUES (35, 'Mueller', 'Tatjana', null);
 
 
 -- FOR MTSHELENS: 33 tuples 
-INSERT INTO PASSAGIER VALUES (36, 'Mueller', 'Susi', null);                                           
+INSERT INTO PASSAGIER VALUES (36, 'Mueller', 'Susi', null);                                        
 INSERT INTO PASSAGIER VALUES (37, 'Reinel', 'Mario', 'D  ');                                        
 INSERT INTO PASSAGIER VALUES (38, 'Reinel', 'Martin', 'D  ');                                       
 INSERT INTO PASSAGIER VALUES (39, 'Lamps', 'Bob', null);                                              

@@ -1,0 +1,59 @@
+<00:17:21.775>Start FDBS 
+<00:17:28.133>FDBS; opened connection to oralv8a 
+<00:17:30.544>FDBS; opened connection to oralv9a 
+<00:17:34.155>FDBS; opened connection to oralv10a 
+<00:18:15.979>Received FJDBC: drop table BUCHUNG cascade constraints 
+<00:18:16.001>Sending to oralv8a: drop table BUCHUNG cascade constraints 
+<00:18:46.132>SQLException in oralv8a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:19:08.002>Sending to oralv9a: drop table BUCHUNG cascade constraints 
+<00:19:13.166>SQLException in oralv9a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:19:23.450>Sending to oralv10a: drop table BUCHUNG cascade constraints 
+<00:19:26.180>SQLException in oralv10a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:20.611>Received FJDBC: drop table PASSAGIER cascade constraints 
+<00:20:20.623>Sending to oralv8a: drop table PASSAGIER cascade constraints 
+<00:20:22.632>SQLException in oralv8a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:22.634>Sending to oralv9a: drop table PASSAGIER cascade constraints 
+<00:20:23.460>SQLException in oralv9a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:23.465>Sending to oralv10a: drop table PASSAGIER cascade constraints 
+<00:20:25.765>SQLException in oralv10a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:25.811>Received FJDBC: drop table FLUG cascade constraints 
+<00:20:25.829>Sending to oralv8a: drop table FLUG cascade constraints 
+<00:20:27.460>SQLException in oralv8a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:27.465>Sending to oralv9a: drop table FLUG cascade constraints 
+<00:20:32.284>SQLException in oralv9a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:32.288>Sending to oralv10a: drop table FLUG cascade constraints 
+<00:20:33.976>SQLException in oralv10a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:34.607>Received FJDBC: drop table FLUGLINIE cascade constraints 
+<00:20:34.618>Sending to oralv8a: drop table FLUGLINIE cascade constraints 
+<00:20:36.015>SQLException in oralv8a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:36.019>Sending to oralv9a: drop table FLUGLINIE cascade constraints 
+<00:20:36.995>SQLException in oralv9a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:36.998>Sending to oralv10a: drop table FLUGLINIE cascade constraints 
+<00:20:37.875>SQLException in oralv10a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:38.087>Received FJDBC: drop table FLUGHAFEN cascade constraints 
+<00:20:38.099>Sending to oralv8a: drop table FLUGHAFEN cascade constraints 
+<00:20:41.044>SQLException in oralv8a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:41.050>Sending to oralv9a: drop table FLUGHAFEN cascade constraints 
+<00:20:42.139>SQLException in oralv9a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:42.141>Sending to oralv10a: drop table FLUGHAFEN cascade constraints 
+<00:20:43.729>SQLException in oralv10a:ORA-00942: ¿¿¿¿¿¿¿ ¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿¿¿¿¿¿¿¿¿¿¿ ¿¿ ¿¿¿¿¿¿¿¿¿¿
+ 
+<00:20:51.114>Entered FedConnection.close() 
+<00:20:51.678>JDBC connection to jdbc:oracle:thin:@pinatubo.informatik.hs-fulda.de:1521:oralv8a has been closed. 
+<00:20:52.190>JDBC connection to jdbc:oracle:thin:@mtsthelens.informatik.hs-fulda.de:1521:oralv9a has been closed. 
+<00:20:52.782>JDBC connection to jdbc:oracle:thin:@krakatau.informatik.hs-fulda.de:1521:oralv10a has been closed. 
+<00:20:52.787>Exited FedConnection.close() 
