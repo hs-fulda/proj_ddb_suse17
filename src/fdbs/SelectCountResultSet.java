@@ -21,4 +21,13 @@ public class SelectCountResultSet extends AbstractResultSet {
         return i;
     }
 
+    @Override
+    public String getString(int columnIndex) throws SQLException {
+        int i = 0;
+        for (ResultSet rs : list) {
+            i += Integer.parseInt(rs.getString(1));
+        }
+        return i + "";
+    }
+
 }
