@@ -1,13 +1,12 @@
 package fjdbc;
 
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.logging.Level;
 
 import fdbs.CustomLogger;
 import fdbs.DatabaseCatalog;
-import fdbs.QueryExecutor;
+import fdbs.FederalController;
 import parser.ParseException;
 
 public class FedStatement implements FedStatementInterface {
@@ -27,8 +26,8 @@ public class FedStatement implements FedStatementInterface {
         isClose = false;
 
         // Initialize query executor to use JDBC statements
-        QueryExecutor.setFedStatement(this);
-        QueryExecutor.setStatementsMap(statementsMap);
+        FederalController.setFedStatement(this);
+        FederalController.setStatementsMap(statementsMap);
     }
 
     public int executeUpdate(String query) throws FedException {
@@ -40,7 +39,7 @@ public class FedStatement implements FedStatementInterface {
 
         CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
         try {
-            result = QueryExecutor.executeUpdate(query);
+            result = FederalController.executeUpdate(query);
         } catch (ParseException e) {
             CustomLogger.log(Level.WARNING, "ParseException; " + e);
             throw new FedException(new Throwable(e.getMessage()));
@@ -74,7 +73,7 @@ public class FedStatement implements FedStatementInterface {
             throw new FedException(new Throwable(fsrClosed));
         }
 
-        FedResultSet instance = QueryExecutor.executeSelectQuery(sql);
+        FedResultSet instance = FederalController.executeSelectQuery(sql);
 
         return instance;
     }

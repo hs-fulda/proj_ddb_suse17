@@ -79,7 +79,7 @@ public class FederalController {
 
   private static FedStatement fedStatement;
   /*
-   * This map holds the JDBC Statement, it it initialized automatically when
+   * This map holds the =DBC Statement, it it initialized automatically when
    * FedStatement is initialized.
    */
   private static HashMap<Integer, Statement> statementsMap;
@@ -634,26 +634,41 @@ public class FederalController {
      CustomLogger.log(Level.INFO,
      "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
      */
+    boolean isAnyTableDropped = false;
     try {
       Statement statement = null;
-      for (Integer statementKey : statementsMap.keySet()) {
-	connectionNumber = statementKey;
-	if (statementKey == 1) {
-	  connectionDB = ConnectionConstants.CONNECTION_1_SID;
-	}
-	if (statementKey == 2) {
-	  connectionDB = ConnectionConstants.CONNECTION_2_SID;
-	}
-	if (statementKey == 3) {
-	  connectionDB = ConnectionConstants.CONNECTION_3_SID;
-	}
+      SQLException ex = null;
 
-	statement = statementsMap.get(statementKey);
-	CustomLogger.log(Level.INFO,
+      for (Integer statementKey : statementsMap.keySet()) {
+	    connectionNumber = statementKey;
+        if (statementKey == 1) {
+          connectionDB = ConnectionConstants.CONNECTION_1_SID;
+        }
+        if (statementKey == 2) {
+          connectionDB = ConnectionConstants.CONNECTION_2_SID;
+        }
+        if (statementKey == 3) {
+          connectionDB = ConnectionConstants.CONNECTION_3_SID;
+        }
+
+	    statement = statementsMap.get(statementKey);
+	    CustomLogger.log(Level.INFO,
 			"Sending to " + connectionDB + ": " + query.replaceAll("  ", " ").replaceAll("\r\n", " ")
 					.replaceAll("\t", " "));
-	statement.executeUpdate(query);
+	    try {
+            result = statement.executeUpdate(query);
+            isAnyTableDropped = true;
+        } catch (SQLException e) {
+	        ex = e;
+            continue;
+        }
+
       }
+
+      if(!isAnyTableDropped) {
+          throw ex;
+      }
+
     } catch (SQLException e) {
       String dbMessage = "JDBC SQLException in " + connectionDB + ": " + e.getMessage();
       CustomLogger.log(Level.SEVERE, dbMessage);
