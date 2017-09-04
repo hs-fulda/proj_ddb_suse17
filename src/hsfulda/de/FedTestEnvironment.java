@@ -47,13 +47,13 @@ public class FedTestEnvironment {
 	  }
 	  statement = statement.substring(statement.indexOf("*/") + 2).trim();
 	} else {
-	  String comment = statement.substring(0, statement.length()-1);
+	  String comment = statement.substring(0, (statement.contains("\n") ? statement.indexOf("\n") : statement.length())-1);
 	  if (debug) {
 	    System.out.println("--> " + comment + " <--");
 	  }
-	  statement = statement.substring(statement.indexOf("\n") + 1).trim();
+	  statement = statement.substring((statement.contains("\n") ? statement.indexOf("\n") + 1 : statement.length())).trim();
 	}
-	break;
+
       }
 
       if (!"".equals(statement)) {
