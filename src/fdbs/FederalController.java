@@ -542,7 +542,7 @@ public class FederalController {
 
     // Appends constraint name
     basicQuery.append(tableName + "_" + columnName + "_HORIZ check (");
-    basicQuery.append(columnName + " <= " + maxRange);
+    basicQuery.append(columnName + " " + (maxRange.contains("\'") ? "<" : "<=") + " " + maxRange);
     basicQuery.append(")");
 
     // Adds back ')' after constraint is appended
