@@ -3,6 +3,7 @@ package fdbs;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -99,6 +100,20 @@ public class DatabaseCatalog {
     public static String getTableFromInsertQuery(String query) {
         query = query.trim().toUpperCase();
         return query.substring(query.indexOf("INTO ") + 5, query.indexOf(" VALUE")).trim();
+    }
+
+    public static void disableAllReferentialConstraints(String table, Statement statement) {
+            try {
+                ResultSet constraintsSet = statement.executeQuery("SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE TABLE_NAME = '" + table + "' AND CONSTRAINT_TYPE = 'R'");
+                StringBuilder query = new StringBuilder("alter table " + table);
+                while (constraintsSet.next()) {
+                    query.append(" disable constraint " + constraintsSet.getString(1));
+                }
+                statement.execute(query.toString());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
     }
 }
 

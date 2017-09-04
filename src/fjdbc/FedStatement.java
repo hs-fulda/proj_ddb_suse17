@@ -32,6 +32,10 @@ public class FedStatement implements FedStatementInterface {
 
     public int executeUpdate(String query) throws FedException {
         int result = -1;
+
+        if(query.trim().startsWith("-") || query.trim().startsWith("//") || query.trim().toLowerCase().startsWith("applies ") || query.trim().startsWith("\\") || query.trim().startsWith("#"))
+            return result;
+
         if (isClose) {
             CustomLogger.log(Level.WARNING, fsrClosed);
             throw new FedException(new Throwable(fsrClosed));
@@ -68,6 +72,9 @@ public class FedStatement implements FedStatementInterface {
     }
 
     public FedResultSet executeQuery(String sql) throws FedException {
+        if(sql.trim().startsWith("-") || sql.trim().startsWith("//") || sql.trim().toLowerCase().startsWith("applies ") || sql.trim().startsWith("\\") || sql.trim().startsWith("#"))
+            return null;
+
         CustomLogger.log(Level.INFO, "Received FJDBC: " + sql);
         if (isClose) {
             throw new FedException(new Throwable(fsrClosed));
