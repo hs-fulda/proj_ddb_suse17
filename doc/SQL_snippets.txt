@@ -1,0 +1,35 @@
+set echo on;
+alter session set nls_language = english;
+alter session set nls_date_format = 'DD-MON-YYYY';
+alter session set nls_date_language = english;
+
+-- LIST CREATED TABLES
+SELECT table_name, status, num_rows FROM USER_TABLES 
+WHERE table_name IN ('BUCHUNG','PASSAGIER','FLUG','FLUGLINIE','FLUGHAFEN');  
+
+
+-- LIST FOREIGN KEY AND REFERENCED TABLE 
+SELECT a.table_name, a.column_name, a.constraint_name, c_pk.table_name r_table_name,
+  c.owner,   c.r_owner,   c_pk.constraint_name r_pk   -- referenced pk
+FROM all_cons_columns a
+  JOIN all_constraints c ON a.owner = c.owner
+                            AND a.constraint_name = c.constraint_name
+  JOIN all_constraints c_pk ON c.r_owner = c_pk.owner
+                               AND c.r_constraint_name = c_pk.constraint_name
+	WHERE c.constraint_type = 'R'
+AND a.table_name = 'FLUGLINIE';
+      
+
+-- DELETE FROM BUCHUNG; --06
+-- DELETE FROM PASSAGIER; --05
+-- DELETE FROM FLUG; --04
+-- DELETE FROM FLUGLINIE;  --03
+-- DELETE FROM FLUGHAFEN;  --02
+-- COMMIT;
+
+-- TRUNCATE TABLE BUCHUNG;
+-- TRUNCATE TABLE PASSAGIER
+-- TRUNCATE TABLE FLUG;
+SELECT * FROM USER_CONSTRAINTS WHERE TABLE_NAME = 'BUCHUNG';
+-- DELETE FROM FLUGHAFEN; COMMIT;
+--TRUNCATE TABLE FLUGHAFEN;
