@@ -305,7 +305,7 @@ public class FederalController {
     }
 
     private static int deleteFromTable(String query) throws FedException {
-        int result = -1;
+        int result = 0;
         String connectionDB = "";
         int statementKey = 1;
         Statement statement = null;
@@ -324,7 +324,7 @@ public class FederalController {
             }
             CustomLogger.log(Level.INFO, "Sending to " + connectionDB + ": " + query);
             try {
-                result = statement.executeUpdate(query);
+                result += statement.executeUpdate(query);
                 statementKey++;
             } catch (SQLException e) {
                 if (e instanceof SQLIntegrityConstraintViolationException) {
