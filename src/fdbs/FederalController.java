@@ -383,8 +383,11 @@ public class FederalController {
 	if (e instanceof SQLIntegrityConstraintViolationException) {
 	  if (e.getMessage().toLowerCase().contains("unique constraint")) {
 	    throw new FedException(
-		new Throwable("Record already exists with this primary key."));
-	  } else if (e.getMessage().toLowerCase()
+		new Throwable(e.getMessage()));
+	  } else if(e.getMessage().toLowerCase().contains("check ") && !e.getMessage().toLowerCase().contains("horiz")) {
+          throw new FedException(
+                  new Throwable(e.getMessage()));
+      } else if (e.getMessage().toLowerCase()
 	      .contains("integrity constraint")) {
 	    disableAllReferentialConstraints(query, statement);
 	    statementKey--;
