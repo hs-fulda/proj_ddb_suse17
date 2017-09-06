@@ -49,57 +49,61 @@ public interface GepardParserConstants {
   /** RegularExpression Id. */
   int DELETE = 19;
   /** RegularExpression Id. */
-  int INSERT = 20;
+  int UPDATE = 20;
   /** RegularExpression Id. */
-  int INTO = 21;
+  int SET = 21;
   /** RegularExpression Id. */
-  int VALUES = 22;
+  int INSERT = 22;
   /** RegularExpression Id. */
-  int SELECT = 23;
+  int INTO = 23;
   /** RegularExpression Id. */
-  int WHERE = 24;
+  int VALUES = 24;
   /** RegularExpression Id. */
-  int AND = 25;
+  int SELECT = 25;
   /** RegularExpression Id. */
-  int OR = 26;
+  int WHERE = 26;
   /** RegularExpression Id. */
-  int COUNT = 27;
+  int AND = 27;
   /** RegularExpression Id. */
-  int SUM = 28;
+  int OR = 28;
   /** RegularExpression Id. */
-  int GROUPBY = 29;
+  int COUNT = 29;
   /** RegularExpression Id. */
-  int HAVING = 30;
+  int SUM = 30;
   /** RegularExpression Id. */
-  int FROM = 31;
+  int GROUPBY = 31;
   /** RegularExpression Id. */
-  int DIGIT = 32;
+  int HAVING = 32;
   /** RegularExpression Id. */
-  int LETTER = 33;
+  int FROM = 33;
   /** RegularExpression Id. */
-  int LPAREN = 34;
+  int DIGIT = 34;
   /** RegularExpression Id. */
-  int RPAREN = 35;
+  int LETTER = 35;
   /** RegularExpression Id. */
-  int UNDERSCORE = 36;
+  int LPAREN = 36;
   /** RegularExpression Id. */
-  int COMMA = 37;
+  int RPAREN = 37;
   /** RegularExpression Id. */
-  int SEMICOLON = 38;
+  int UNDERSCORE = 38;
   /** RegularExpression Id. */
-  int SINGLEQUOTE = 39;
+  int COMMA = 39;
   /** RegularExpression Id. */
-  int OPERATOR = 40;
+  int SEMICOLON = 40;
   /** RegularExpression Id. */
-  int MINUS = 41;
+  int SINGLEQUOTE = 41;
   /** RegularExpression Id. */
-  int NULL = 42;
+  int OPERATOR = 42;
   /** RegularExpression Id. */
-  int DOT = 43;
+  int MINUS = 43;
   /** RegularExpression Id. */
-  int AST = 44;
+  int NULL = 44;
   /** RegularExpression Id. */
-  int FSLASH = 45;
+  int DOT = 45;
+  /** RegularExpression Id. */
+  int AST = 46;
+  /** RegularExpression Id. */
+  int FSLASH = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -126,6 +130,8 @@ public interface GepardParserConstants {
     "\"CASCADE \"",
     "\"CONSTRAINTS\"",
     "\"DELETE \"",
+    "\"UPDATE \"",
+    "\"SET \"",
     "\"INSERT \"",
     "\"INTO \"",
     "<VALUES>",

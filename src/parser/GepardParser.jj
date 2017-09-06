@@ -46,7 +46,8 @@ TOKEN : { < CONSTRAINTS : "CONSTRAINTS" > }
 
 // DML Tokens
 TOKEN : { < DELETE : "DELETE " > }
-
+TOKEN : { < UPDATE : "UPDATE " > }
+TOKEN : { < SET : "SET " > }
 TOKEN : { < INSERT : "INSERT " > }
 TOKEN : { < INTO : "INTO " > }
 TOKEN : { < VALUES : "VALUES"([" "])? > }
@@ -171,11 +172,17 @@ int DropTable() : {}
 int ParseDMLQuery() : {int queryType;}
 {
 	queryType=DeleteTable(){return queryType;} | 
+	queryType=UpdateTable(){return queryType;} | 
 	queryType=InsertTable(){return queryType;}
 }
 int DeleteTable() : {}
 {
   <DELETE><FROM>NameWithoutSpace()(WhereClauseForDelete())?<SEMICOLON>
+  {return 4;}
+}
+int UpdateTable() : {}
+{
+  <UPDATE>NameWithSpace()<SET>NameWithSpace()<OPERATOR>Constant()(WhereClauseForDelete())?<SEMICOLON>
   {return 4;}
 }
 int InsertTable() : {}

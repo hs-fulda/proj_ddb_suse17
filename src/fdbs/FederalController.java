@@ -101,16 +101,6 @@ public class FederalController {
     int queryType = QueryTypeConstant.NONE;
     int result = -1;
 
-    // Do not execute UPDATE query
-    if (query.toUpperCase().startsWith("UPDATE")) {
-      /* @author Anfilov. I do not agree that we shall ignore all UPDATE queries. We can execute
-      all local UPDATES that do not change values of partitioned column.
-      To-do: implement analysis of UPDATE: discard a query only if:
-      (a table_name is found in DB Catalogue) AND (the column to be updated is partitioned)
-           */
-      throw new FedException(new Throwable("\'UPDATE\' is not supported."));
-    }
-
     /* Some complex preprocess start */
 
     /*
