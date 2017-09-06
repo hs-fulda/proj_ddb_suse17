@@ -1,10 +1,12 @@
 set echo on;
-
 alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
+-- FLUGHAFEN has no partition. Despite 2.2.6.4 will not be stored on the “first” of your CDBs, but in every DB
 
 
+
+-- Total: 84 records
 INSERT INTO FLUGHAFEN VALUES ('AKL', 'NZ ', 'Auckland', 'Auckland International');                  
 INSERT INTO FLUGHAFEN VALUES ('ALC', 'E  ', 'Alicante', 'Alicante');                                
 INSERT INTO FLUGHAFEN VALUES ('ALF', 'N  ', 'Alta', 'Flughafen Alta');                              
@@ -18,7 +20,6 @@ INSERT INTO FLUGHAFEN VALUES ('BRS', 'GB ', 'Bristol', 'International');
 INSERT INTO FLUGHAFEN VALUES ('CDG', 'F  ', 'Paris', 'Charles de Gaulle');                          
 INSERT INTO FLUGHAFEN VALUES ('CGK', 'ID ', 'Jakarta', 'Sukarno-Hatta Airport');                    
 INSERT INTO FLUGHAFEN VALUES ('CGN', 'D  ', 'Koeln', 'Konrad-Adenauer');                            
-
 INSERT INTO FLUGHAFEN VALUES ('CPH', 'DK ', 'Kopenhagen', 'Kastrup');                               
 INSERT INTO FLUGHAFEN VALUES ('CPT', 'RSA', 'Kapstadt', '');                                        
 INSERT INTO FLUGHAFEN VALUES ('CRT', 'TUN', 'Chartage', 'Tunesien');                                
@@ -32,7 +33,6 @@ INSERT INTO FLUGHAFEN VALUES ('FDH', 'D  ', 'Friedrichshafen', 'Bodensee-Airport
 INSERT INTO FLUGHAFEN VALUES ('FLR', 'I  ', 'Florenz', 'Peretola');                                 
 INSERT INTO FLUGHAFEN VALUES ('FRA', 'D  ', 'Frankfurt', 'Rhein-Main');                             
 INSERT INTO FLUGHAFEN VALUES ('GOT', 'S  ', 'Goeteborg', 'Landvetter');                             
-
 INSERT INTO FLUGHAFEN VALUES ('GRZ', 'A  ', 'Graz', 'Flughafen Graz');                              
 INSERT INTO FLUGHAFEN VALUES ('GVA', 'CH ', 'Genf', 'Flughafen Genf');                              
 INSERT INTO FLUGHAFEN VALUES ('HAJ', 'D  ', 'Hannover', 'Langenhagen');                             
@@ -46,7 +46,6 @@ INSERT INTO FLUGHAFEN VALUES ('JFK', 'USA', 'New York', 'John F. Kennedy');
 INSERT INTO FLUGHAFEN VALUES ('KIX', 'J  ', 'Osaka', 'Kansai');                                     
 INSERT INTO FLUGHAFEN VALUES ('KLU', 'D  ', 'Klagenfurt', 'Klagenfurter Flughafen');                
 INSERT INTO FLUGHAFEN VALUES ('KSF', 'D  ', 'Kassel', 'Calden');                                    
-
 INSERT INTO FLUGHAFEN VALUES ('LAX', 'USA', 'Los Angeles', '');                                     
 INSERT INTO FLUGHAFEN VALUES ('LGW', 'GB ', 'London', 'Gatwick');                                   
 INSERT INTO FLUGHAFEN VALUES ('LHR', 'GB ', 'London', 'Heathrow');                                  
@@ -60,7 +59,6 @@ INSERT INTO FLUGHAFEN VALUES ('MPL', 'F  ', 'Montpellier', 'Montpellier Airport'
 INSERT INTO FLUGHAFEN VALUES ('MRS', 'F  ', 'Marseille', 'Marseille Provence');                     
 INSERT INTO FLUGHAFEN VALUES ('MUC', 'D  ', 'Munich', 'Franz-Josef Strauss');                       
 INSERT INTO FLUGHAFEN VALUES ('MVR', 'CMR', 'Maroua', 'Maroua Salek Airport');                      
-
 INSERT INTO FLUGHAFEN VALUES ('NAP', 'I  ', 'Neapel', 'Capodichino');                               
 INSERT INTO FLUGHAFEN VALUES ('NCE', 'D  ', 'Nice', '');                                            
 INSERT INTO FLUGHAFEN VALUES ('NRT', 'J  ', 'Tokio', 'Narita');                                     
@@ -74,7 +72,6 @@ INSERT INTO FLUGHAFEN VALUES ('PMI', 'E  ', 'Palma', 'Aeropuerto de Son Sant Joa
 INSERT INTO FLUGHAFEN VALUES ('SEA', 'USA', 'Seattle', 'Seattle-Tacoma');                           
 INSERT INTO FLUGHAFEN VALUES ('SFO', 'USA', 'San Francisco', '');                                   
 INSERT INTO FLUGHAFEN VALUES ('SSH', 'ET ', 'Sharm El Sheikh', 'Sharm El Sheikh Nat. Airport');     
-
 INSERT INTO FLUGHAFEN VALUES ('STN', 'GB ', 'London', 'Stanstead');                                 
 INSERT INTO FLUGHAFEN VALUES ('SVO', 'RUS', 'Moskau', 'Scheremetjewo');                             
 INSERT INTO FLUGHAFEN VALUES ('SZG', 'A  ', 'Salzburg', 'Salzburg Airport');                        
@@ -88,16 +85,10 @@ INSERT INTO FLUGHAFEN VALUES ('VCE', 'I  ', 'Venedig', 'Marco Polo');
 INSERT INTO FLUGHAFEN VALUES ('VIE', 'A  ', 'Wien', 'Schwechat');                                   
 INSERT INTO FLUGHAFEN VALUES ('VLC', 'E  ', 'Valencia', 'Manises');                                 
 INSERT INTO FLUGHAFEN VALUES ('YDE', 'CMR', 'Yaounde', null);                                         
-
 INSERT INTO FLUGHAFEN VALUES ('YUL', 'CDN', 'Montreal', 'Pierre Elliot Trudeau');                   
 INSERT INTO FLUGHAFEN VALUES ('YVR', 'CDN', 'Vancouver', 'Vancouver International');                
 INSERT INTO FLUGHAFEN VALUES ('YYC', 'CDN', 'Calgary', 'Municipal Airport');                        
 INSERT INTO FLUGHAFEN VALUES ('YYZ', 'CDN', 'Toronto', 'Lester Pearson');                           
 INSERT INTO FLUGHAFEN VALUES ('ZAZ', 'E  ', 'Zaragoza', null);                                        
 INSERT INTO FLUGHAFEN VALUES ('ZRH', 'CH ', 'Zuerich', 'Kloten');                                   
-
-
-
-
 commit;
-  
