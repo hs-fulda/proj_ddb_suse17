@@ -5,13 +5,15 @@ package fdbs;
 import java.io.IOException;
 import java.util.logging.*;
 
-/**
+/**Logger Wrapper Class
+ * The logger will be used by several part of the application to log several info. 
+ * It sets the configuration. For example, file name, formatting of the texts etc.
  * @author Jahan
  *
  */
 public class CustomLogger {
 	
-	static Logger logger;
+    static Logger logger;
     public FileHandler fh;
    
     /**
