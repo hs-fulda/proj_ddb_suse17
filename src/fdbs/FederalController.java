@@ -842,7 +842,7 @@ public class FederalController {
       }
     }
 
-    ResultSet rs = new SelectCountResultSet(resultSets);
+    ResultSet rs = new ResultSetAdapter(resultSets);
     resultSets = new ArrayList<>();
     resultSets.add(rs);
     return new FedResultSet(resultSets);

@@ -4,10 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class SelectCountResultSet extends AbstractResultSet {
+public class ResultSetAdapter extends AbstractResultSet {
     private List<ResultSet> list;
 
-    public SelectCountResultSet(List<ResultSet> list) {
+    public ResultSetAdapter(List<ResultSet> list) {
         super(list);
         this.list = list;
     }
