@@ -59,11 +59,10 @@ public class Assign2_FJDBC {
     myJDBC();
 
     /*	FJBDC	*/
-    System.out.println("Starting FJDBC.");
     int count = 0;
     String sqlInsert, sqlValues, name, vname, land;
     tuplesCount = NUMBER_OF_TABLES;
- 
+    System.out.println("Starting FJDBC."); 
     try {
       fedConnection = (new FedPseudoDriver()).getConnection(USER, PASS);
       fedConnection.setAutoCommit(false);
@@ -72,7 +71,7 @@ public class Assign2_FJDBC {
       System.out.println(fedException.getMessage());
       System.out.flush();
     }
-
+	
     //fjRunQuery("ALTER SESSION SET nls_language = english");
 
     /*	BATCH INSERT */
@@ -86,6 +85,7 @@ public class Assign2_FJDBC {
 	vname = VORNAME[random.nextInt(VORNAME.length)];
 	land = LAND[random.nextInt(LAND.length)];
 	sqlValues = pnr + "," + " '" + name + "'," + " '" + vname + "'," + " '" + land + "')";
+	/* 	EXECUTE THE QUERY*/
 	count += fjRunQuery(sqlInsert + sqlValues);
       }//end for tuples
 
