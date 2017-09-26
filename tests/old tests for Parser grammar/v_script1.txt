@@ -1,1 +1,0 @@
-table1.attribute1, COUNT(*) FROM table1

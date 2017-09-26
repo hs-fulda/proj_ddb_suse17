@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 
-import fdbs.CustomLogger;
+import fdbs.logger.CustomLogger;
 
 /*
  * CAUTION: Haven't implemented this class yet, might/might not need modificaions. So can't comment on it. Can be changed based on requirements

@@ -1,13 +1,14 @@
 package fjdbc;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import fdbs.CustomLogger;
+import fdbs.logger.CustomLogger;
 import fdbs.DatabaseCatalog;
 import fdbs.FederalController;
-import parser.ParseException;
+import fdbs.parser.ParseException;
 
 public class FedStatement implements FedStatementInterface {
     String fsrClosed = "FedStatement resource is closed.";
@@ -33,7 +34,7 @@ public class FedStatement implements FedStatementInterface {
     public int executeUpdate(String query) throws FedException {
         int result = -1;
 
-        if(query.trim().startsWith("-") || query.trim().startsWith("//") || query.trim().toLowerCase().startsWith("applies ") || query.trim().startsWith("\\") || query.trim().startsWith("#"))
+        if(query.trim().startsWith("-") || query.trim().startsWith("//") || query.trim().startsWith("\\") || query.trim().startsWith("#"))
             return result;
 
         if (isClose) {
@@ -41,7 +42,7 @@ public class FedStatement implements FedStatementInterface {
             throw new FedException(new Throwable(fsrClosed));
         }
 
-        CustomLogger.log(Level.INFO, "Received FJDBC: " + query);
+        CustomLogger.log(Level.INFO, "Received FJDBC: " + query.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
         try {
             result = FederalController.executeUpdate(query);
         } catch (ParseException e) {
@@ -72,10 +73,10 @@ public class FedStatement implements FedStatementInterface {
     }
 
     public FedResultSet executeQuery(String sql) throws FedException {
-        if(sql.trim().startsWith("-") || sql.trim().startsWith("//") || sql.trim().toLowerCase().startsWith("applies ") || sql.trim().startsWith("\\") || sql.trim().startsWith("#"))
+        if(sql.trim().startsWith("-") || sql.trim().startsWith("//") || sql.trim().startsWith("\\") || sql.trim().startsWith("#"))
             return null;
 
-        CustomLogger.log(Level.INFO, "Received FJDBC: " + sql);
+        CustomLogger.log(Level.INFO, "Received FJDBC: " + sql.replaceAll("  ", " ").replaceAll("\r\n", " ").replaceAll("\t", " "));
         if (isClose) {
             throw new FedException(new Throwable(fsrClosed));
         }

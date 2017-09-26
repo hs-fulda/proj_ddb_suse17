@@ -1,0 +1,15 @@
+Duration of the test (DROP-CREATE-INSERT) without VPN connection: 0:02:41
+<23:18:33.534>Start FDBS 
+<23:19:00.417>Received FJDBC: INSERT INTO FLUGHAFEN VALUES ('AKL', 'NZ ', 'Auckland', 'Auckland International') 
+
+<23:21:14.330>Sending to oralv10a: INSERT INTO BUCHUNG VALUES (187, 81, 'LH', 54, 'FRA', 'CDG', '17-FEB-2012', 5000, 500) 
+<23:21:14.391>FJDBC: commit() 
+
+
+Duration of the test (DROP-CREATE-INSERT) with VPN connection: 0:01:41
+
+<23:27:03.920>Start FDBS 
+<23:27:18.962>Received FJDBC: INSERT INTO FLUGHAFEN VALUES ('AKL', 'NZ ', 'Auckland', 'Auckland International') 
+
+<23:28:44.903>Sending to oralv10a: INSERT INTO BUCHUNG VALUES (187, 81, 'LH', 54, 'FRA', 'CDG', '17-FEB-2012', 5000, 500) 
+<23:28:44.961>FJDBC: commit() 

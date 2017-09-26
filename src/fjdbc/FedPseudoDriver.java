@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 
 import fdbs.ConnectionConstants;
-import fdbs.CustomLogger;
+import fdbs.logger.CustomLogger;
 
 public class FedPseudoDriver implements FedPseudoDriverInterface {
 

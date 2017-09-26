@@ -56,11 +56,12 @@
 
 package fdbs;
 
+import fdbs.logger.CustomLogger;
 import fjdbc.FedException;
 import fjdbc.FedResultSet;
 import fjdbc.FedStatement;
-import parser.GepardParser;
-import parser.ParseException;
+import fdbs.parser.GepardParser;
+import fdbs.parser.ParseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -111,9 +112,9 @@ public class FederalController {
     boolean isInsertQuery = query.toUpperCase().startsWith("INSERT");
     String preserveWhereClause = "";
     if (isInsertQuery) {
-      preserveWhereClause = query.substring(query.indexOf("VALUES") + 6);
-      query = query.substring(0, query.indexOf("VALUES") + 6);
-    }
+          preserveWhereClause = query.substring(query.indexOf("VALUES") + 6);
+          query = query.substring(0, query.indexOf("VALUES") + 6);
+      }
 
     query = processQueryForParser(query);
 

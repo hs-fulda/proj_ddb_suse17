@@ -1,1 +1,0 @@
-drop table TJ_PASSAGIER cascade constraints;

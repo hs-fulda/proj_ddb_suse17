@@ -1,0 +1,109 @@
+package		public class		method 
+
+fjdbc		FedPseudoDriver 	getConnection	//gets FedConnection. FedConnection has 3 Database Connections in a Map
+hsfulda.de	FedTestEnvironment	setAutoCommit(false)
+hsfulda.de	FedTestEnvironment	run 		//read script file
+
+REPEAT FOR EVERY STATEMENT:
+fjdbc		FedConnection		getStatement()
+fjdbc 		FedStatement		executeUpdate(query)
+//log query receieved
+
+fdbs 		FederalController	executeUpdate(query)
+fdbs		FederalController	processQueryForParser(query)
+fdbs		FederalController	convertToParsableQuery(query) 
+//GepardParser parser = new GepardParser(convertToParsableQuery(query + ";"));
+
+parser		GepardParser		GepardParser()	//Constructor
+fdbs		FederalController	queryType = parser.ParseQuery();
+
+//Analyze the query type:
+parser		GepardParser		ParseQuery()	//returns a number for every query
+parser		GepardParser		ParseDDLQuery()
+parser		GepardParser		DropTable()
+
+Clean-up the query (remove spaces, tabs, etc):
+fdbs		UnicodeManager		replaceUnicodesWithChars(query)	//replace specific chars with umlauts
+fdbs		FederalController	replace3DashesWithSpace(query);
+fdbs		FederalController	replaceBraces(query);
+
+Decide hich method must be called for the query with 
+switch(queryType) case CREATE | CREATE_PARTITIONED | DROP | DELETE | INSERT | default executeDefaultQuery(query)
+
+fdbs		FederalController	createTableHorizontal(query)
+fdbs		FederalController	createFewerPartitionsThanDBs(query)	//checks whether the list_of_boundaries provided in Horizontal Partitioning has only 1 boundary. Returns true for 1 element, meaning that CREATE query has to be deployed on first 2 DBs.
+
+Prepare a separate CREATE TABLE statement for every DB, where X in the method name is a number from 1 to 3
+fdbs		FederalController	buildPartitionedQueryForDBX(query,
+	createFewerPartitionsThanDBs);
+
+
+
+
+
+
+
+
+fdbs		FederalController	dropTable(query)	//calls JDBS executeUpdate() in a for loop for every DB connection
+
+
+
+
+
+
+executeDefaultQuery	createTable	dropTable
+for (Integer statementKey : statementsMap.keySet()) {
+	connectionNumber = statementKey;
+	if (statementKey == 1) connectionDB = ConnectionConstants.CONNECTION_1_SID;
+	if (statementKey == 2) connectionDB = ConnectionConstants.CONNECTION_2_SID;
+	if (statementKey == 3) connectionDB = ConnectionConstants.CONNECTION_3_SID;
+	statement = statementsMap.get(statementKey);
+	result = statement.executeUpdate(query);
+}
+deleteFromTable: try DELETE starting from the first database
+  try {
+	result += statement.executeUpdate(query);
+	statementKey++;
+      } catch (SQLException e) {
+	if (e instanceof SQLIntegrityConstraintViolationException) {
+	  statementKey++;
+	  continue;
+	} else if (fedStatement.getConnection().getAutoCommit() == false) {
+	  fedStatement.getConnection().rollback();
+
+insertIntoTable
+  try {
+	result = statement.executeUpdate(query);
+	statementKey++;
+      } catch (SQLException e) {
+	if (e instanceof SQLIntegrityConstraintViolationException) {
+	  if (e.getMessage().toLowerCase().contains("unique constraint")) {
+	    throw new FedException(new Throwable(e.getMessage()));
+	  } else if(e.getMessage().toLowerCase().contains("check ") && !e.getMessage().toLowerCase().contains("horiz")) {
+          throw new FedException(new Throwable(e.getMessage()));
+      } else if (e.getMessage().toLowerCase()
+	      .contains("integrity constraint")) {
+	    disableAllReferentialConstraints(query, statement);
+	    statementKey--;
+	  }
+	  statementKey++;
+	  continue;
+	} 
+
+
+
+
+
+app		OutputFormatter		printAstericks()
+
+// Time starts
+
+fjdbc		FedStatement	executeUpdate(String query)
+
+fdbs		QueryExecutor	executeUpdate(String query)
+
+parser		GepardParser	ParseQuery()
+
+LOOP
+application	Application	getTimeTaken()
+app		OutputFormatter	printAstericks()

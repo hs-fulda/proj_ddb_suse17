@@ -4,10 +4,10 @@ alter session set nls_language = english;
 alter session set nls_date_format = 'DD-MON-YYYY';
 alter session set nls_date_language = english;
 
---HORIZONTAL (PNR(35,70)); applies to the first column
--- Total: 78 tuples
 
--- FOR PINATUBO: 33 tuples
+
+
+
 INSERT INTO PASSAGIER VALUES (1, 'Collins', 'Phil', 'GB ');                                         
 INSERT INTO PASSAGIER VALUES (2, 'Sting', null, 'GB ');                                               
 INSERT INTO PASSAGIER VALUES (3, 'Bush', 'Kate', 'GB ');                                            
@@ -40,15 +40,15 @@ INSERT INTO PASSAGIER VALUES (29, 'Gueclue', 'Ilkem', null);
 INSERT INTO PASSAGIER VALUES (30, 'Gueclue', 'Erdem', 'D  ');                                       
 INSERT INTO PASSAGIER VALUES (31, 'Tepel', 'Andreas', null);                                          
 INSERT INTO PASSAGIER VALUES (32, 'Tepel', 'Martin', 'D  ');                                        
-INSERT INTO PASSAGIER VALUES (35, 'Mueller', 'Tatjana', null);      
+INSERT INTO PASSAGIER VALUES (35, 'Mueller', 'Tatjana', null);                                        
 
 
 
 
 
 
--- FOR MTSHELENS: 33 tuples 
-INSERT INTO PASSAGIER VALUES (36, 'Mueller', 'Susi', null);                                        
+
+INSERT INTO PASSAGIER VALUES (36, 'Mueller', 'Susi', null);                                           
 INSERT INTO PASSAGIER VALUES (37, 'Reinel', 'Mario', 'D  ');                                        
 INSERT INTO PASSAGIER VALUES (38, 'Reinel', 'Martin', 'D  ');                                       
 INSERT INTO PASSAGIER VALUES (39, 'Lamps', 'Bob', null);                                              
@@ -87,7 +87,7 @@ INSERT INTO PASSAGIER VALUES (70, 'Helmke', 'Christian', 'D  ');
 
 
 
--- FOR KRAKATAU: 12 tuples
+
 INSERT INTO PASSAGIER VALUES (71, 'Gannouni', 'Walid', 'TUN');                                      
 INSERT INTO PASSAGIER VALUES (72, 'Sanama', 'Gaspard', 'CMR');                                      
 INSERT INTO PASSAGIER VALUES (73, 'Fessi', 'Aymen', 'TUN');                                         
@@ -101,4 +101,7 @@ INSERT INTO PASSAGIER VALUES (80, 'Wald', 'Daniel', 'D  ');
 INSERT INTO PASSAGIER VALUES (81, 'Schaefer', 'Thilo', 'D  ');                                      
 INSERT INTO PASSAGIER VALUES (82, 'Nguentcheng', 'Alexandre', 'CMR');                               
 
+
+
 commit;
+  
